@@ -12,6 +12,9 @@ const order = ["atendimento", "rotinas", "sistemas", "integracoes", "paineis", "
 const items = order.map((id) => solutions.find((s) => s.id === id)).filter((s) => s !== undefined);
 const tones = ["goiaba", "caju", "lila", "goiaba", "caju", "lila"];
 
+/** Partes do texto com "e-mail" protegido contra quebra no hífen. */
+const keep = (text: string) => text.split(/(e-mail)/);
+
 /** "a, b e c" em português. */
 const list = (xs: string[]) => (xs.length > 1 ? `${xs.slice(0, -1).join(", ")} e ${xs[xs.length - 1]}` : xs[0]);
 ---
@@ -37,7 +40,11 @@ const list = (xs: string[]) => (xs.length > 1 ? `${xs.slice(0, -1).join(", ")} e
               <h3>{s.title}</h3>
               <p>{s.promise}</p>
               <p class="offer-ex">
-                <span>Por exemplo:</span> {list(s.examples.map((e, j) => (j === 0 ? e : e.charAt(0).toLowerCase() + e.slice(1))))}.
+                <span>Por exemplo:</span>{" "}
+                {keep(list(s.examples.map((e) => e.charAt(0).toLowerCase() + e.slice(1)))).map((part) =>
+                  part === "e-mail" ? <span class="nowrap">e-mail</span> : part,
+                )}
+                .
               </p>
             </div>
           </li>
@@ -103,7 +110,7 @@ const list = (xs: string[]) => (xs.length > 1 ? `${xs.slice(0, -1).join(", ")} e
     font-size: var(--t-sm);
   }
 
-  .offer-ex span {
+  .offer-ex > span:first-child {
     font-weight: 700;
     color: var(--ink);
   }

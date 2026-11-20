@@ -14,7 +14,7 @@ interface Props {
   title?: string;
 }
 
-const { topic, title = "Do primeiro e-mail à primeira rotina funcionando" } = Astro.props;
+const { topic, title = "Da primeira mensagem à primeira rotina funcionando" } = Astro.props;
 const mailto = topic ? talkMailto(topic) : site.talkMailto;
 const whats = whatsappHref();
 const subject = topic ? `${site.talkSubject}: ${topic}` : site.talkSubject;
