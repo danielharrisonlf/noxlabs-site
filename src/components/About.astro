@@ -2,65 +2,67 @@
 import { site } from "../data/site";
 import Icon from "./Icon.astro";
 
-const links = [
-  { label: "Portfólio", href: site.links.portfolio },
-  { label: "GitHub", href: site.links.github },
-  { label: "LinkedIn", href: site.links.linkedin },
-  { label: "Blog", href: site.links.blog },
+const ways = [
+  { title: "Você fala com quem constrói", text: "Sem gerente de conta no meio. A pessoa da conversa inicial é a que entrega." },
+  { title: "Português claro, por escrito", text: "Proposta, andamento e decisões em texto simples, que o sócio entende sem tradução." },
+  { title: "Honesto sobre limites", text: "Se a automação não compensa ou não é a pessoa certa para o problema, você ouve isso cedo." },
 ];
 ---
 
 <section class="section about" id="sobre" aria-labelledby="sobre-title">
   <div class="wrap about-grid">
-    <div class="portrait" data-reveal="iris">
-      <div class="portrait-frame">
-        <svg class="portrait-trails" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
-          <path class="pt-glow pt-a" d="M -70 260 C 60 250, 250 330, 400 120"></path>
-          <path class="pt-core pt-a" d="M -70 260 C 60 250, 250 330, 400 120"></path>
-        </svg>
-        <img
-          src="/img/daniel-harrison.webp"
-          width="360"
-          height="360"
-          alt="Daniel Harrison, de camiseta preta, diante de uma parede vermelha."
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
-      <p class="portrait-caption">
+    <figure class="portrait" data-reveal>
+      <img
+        src="/img/daniel-harrison.webp"
+        width="360"
+        height="360"
+        alt="Daniel Harrison, de camiseta preta, diante de uma parede vermelha."
+        loading="lazy"
+        decoding="async"
+      />
+      <figcaption>
         <strong>Daniel Harrison</strong>
-        <span>Engenheiro de software, fundador da Noxlabs</span>
-      </p>
-    </div>
+        <span>Fundador da Noxlabs</span>
+      </figcaption>
+    </figure>
 
-    <div class="about-copy" data-reveal="right" style="--i:1">
-      <h2 id="sobre-title" class="section-title">Prazer, sou o Daniel.</h2>
+    <div class="about-copy" data-reveal style="--i:1">
+      <h2 id="sobre-title" class="section-title">Quem faz: Daniel Harrison.</h2>
       <p class="about-lede">
-        Abri a Noxlabs para trabalhar do jeito que eu gostaria de contratar: alguém que entende o negócio, decide a
-        arquitetura, escreve o código e continua responsável depois que o sistema vai ao ar.
+        A Noxlabs é o meu trabalho. Eu converso com você, entendo a rotina, construo a solução e continuo responsável por ela
+        depois que entra em uso.
       </p>
       <p>
-        Nos últimos três anos construí software para empresas de engenharia, controle de acesso e locação de equipamentos:
-        um portal de suporte com fila e controle de prazos, notificações por WhatsApp e Telegram sobre filas sem disparo
-        duplicado, um fluxo de upload direto ao S3 adotado por mais de dez módulos, integração com catracas e leitores
-        biométricos, câmeras de obra transmitidas por RTSP.
+        Antes da Noxlabs, construí sistemas para empresas de engenharia, controle de acesso e locação de equipamentos: um
+        portal de suporte com fila e controle de prazos, avisos automáticos por WhatsApp e Telegram, integração com catracas e
+        leitores biométricos, câmeras de obra acompanhadas a distância.
       </p>
       <p>
-        Hoje meu foco é IA aplicada: agentes que operam sistemas reais com permissão, registro e revisão humana. O Kairos é
-        onde testo essas ideias em produção antes de levá-las a um cliente.
+        Hoje o foco é tirar trabalho repetitivo das empresas com automação e assistentes de IA que seguem as regras de cada
+        negócio, com registro do que fazem e revisão humana onde importa.
       </p>
-      <ul class="about-links" role="list">
+
+      <ul role="list" class="ways">
         {
-          links.map((l) => (
+          ways.map((w) => (
             <li>
-              <a href={l.href}>
-                {l.label}
-                <Icon name="arrow-up-right" />
-              </a>
+              <h3>{w.title}</h3>
+              <p>{w.text}</p>
             </li>
           ))
         }
       </ul>
+
+      <p class="about-links">
+        <a class="text-link" href={site.links.linkedin}>
+          LinkedIn
+          <Icon name="arrow-up-right" />
+        </a>
+        <a class="text-link" href={site.links.portfolio}>
+          Portfólio
+          <Icon name="arrow-up-right" />
+        </a>
+      </p>
     </div>
   </div>
 </section>
@@ -68,72 +70,37 @@ const links = [
 <style>
   .about-grid {
     display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
     gap: clamp(2.5rem, 6vw, 6rem);
-    align-items: center;
+    align-items: start;
   }
 
   .portrait {
+    position: sticky;
+    top: calc(var(--header-h) + 2rem);
     display: grid;
-    justify-items: center;
-    gap: var(--s-5);
+    gap: var(--s-4);
+    max-width: 22rem;
   }
 
-  /* Retrato com dois rastros de luz passando por trás. */
-  .portrait-frame {
-    position: relative;
-    isolation: isolate;
-    width: min(100%, 20rem);
-  }
-
-  .portrait-trails {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-  }
-
-  .portrait-trails path {
-    fill: none;
-    stroke-linecap: round;
-  }
-
-  .pt-a {
-    stroke: var(--sodio);
-  }
-
-  .pt-glow {
-    stroke-width: 12;
-    opacity: var(--trail-glow);
-  }
-
-  .pt-core {
-    stroke-width: 2;
-  }
-
-  .portrait-frame img {
+  .portrait img {
     width: 100%;
     aspect-ratio: 1;
     object-fit: cover;
     border-radius: var(--r-xl);
     box-shadow: var(--shadow-2);
+    /* Etiqueta de marca-texto atrás da foto: um toque de papel colado. */
+    outline: 10px solid var(--surface);
   }
 
-  .portrait-caption {
+  .portrait figcaption {
     display: grid;
-    justify-items: center;
-    text-align: center;
-    font-size: var(--t-sm);
-    color: var(--fg-2);
+    padding-left: var(--s-2);
   }
 
-  .portrait-caption strong {
-    font-family: var(--font-display);
-    font-size: var(--t-md);
-    font-weight: 600;
-    color: var(--fg);
+  .portrait figcaption span {
+    color: var(--ink-2);
+    font-size: var(--t-sm);
   }
 
   .about-copy {
@@ -141,67 +108,64 @@ const links = [
     gap: var(--s-4);
   }
 
-  .about-copy h2 {
-    max-width: 16ch;
-    margin-bottom: var(--s-3);
+  .about-copy > p {
+    color: var(--ink-2);
+    max-width: 60ch;
   }
 
-  .about-copy p {
-    color: var(--fg-2);
-    max-width: 62ch;
-  }
-
-  .about-copy .about-lede {
-    color: var(--fg);
+  .about-copy > .about-lede {
     font-size: var(--t-md);
     line-height: 1.5;
+    color: var(--ink);
+  }
+
+  .ways {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-5);
+    margin-top: var(--s-4);
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--line);
+  }
+
+  .ways h3 {
+    font-size: var(--t-base);
+    font-family: var(--font-text);
+    font-weight: 700;
+    letter-spacing: 0;
+    margin-bottom: var(--s-1);
+  }
+
+  .ways p {
+    font-size: var(--t-sm);
+    color: var(--ink-2);
   }
 
   .about-links {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--s-2);
-    margin-top: var(--s-4);
+    gap: 0 var(--s-5);
   }
 
-  .about-links a {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    min-height: 2.75rem;
-    padding: 0.5rem 1rem;
-    border: 1.5px solid var(--line-2);
-    border-radius: var(--r-pill);
-    font-size: var(--t-sm);
-    font-weight: 700;
-    text-decoration: none;
-    transition:
-      border-color 200ms var(--ease-out),
-      background-color 200ms var(--ease-out),
-      transform 300ms var(--ease-spring);
-  }
-
-  .about-links :global(svg) {
-    width: 1rem;
-    height: 1rem;
-    color: var(--sodio);
-  }
-
-  @media (hover: hover) {
-    .about-links a:hover {
-      border-color: var(--fg);
-      background: var(--bg-2);
-      transform: translateY(-2px);
-    }
-  }
-
-  @media (max-width: 63.99rem) {
+  @media (max-width: 52rem) {
     .about-grid {
       grid-template-columns: 1fr;
     }
 
-    .portrait-frame {
-      width: min(70%, 15rem);
+    .portrait {
+      position: static;
+      grid-template-columns: 7rem minmax(0, 1fr);
+      align-items: center;
+      max-width: none;
+    }
+
+    .portrait img {
+      outline-width: 6px;
+      border-radius: var(--r-lg);
+    }
+
+    .ways {
+      grid-template-columns: 1fr;
     }
   }
 </style>

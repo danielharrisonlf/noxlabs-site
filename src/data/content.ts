@@ -1,94 +1,106 @@
-/** Processo, princípios e perguntas frequentes. */
+/** Como funciona, segurança e perguntas frequentes. */
+import type { IconName } from "./icons";
 
 export const steps = [
   {
-    title: "Diagnóstico",
-    meta: "Conversa de 30 min",
-    text: "Você descreve o problema; eu pergunto até entender o que dói, quanto custa e o que já foi tentado. Se eu não for a pessoa certa para resolver, digo na hora.",
+    title: "Conversa de 30 minutos",
+    text: "Você conta qual rotina toma mais tempo da equipe. Se automação não for o caminho, eu digo na hora.",
   },
   {
-    title: "Proposta",
-    meta: "Por escrito",
-    text: "Escopo, o que fica de fora, riscos, etapas e preço, numa página que o seu sócio entende sem tradução.",
+    title: "Diagnóstico da rotina",
+    text: "Vejo como o trabalho é feito hoje, com quem faz: onde se digita duas vezes, onde se espera resposta, onde o erro aparece.",
   },
   {
-    title: "Entregas incrementais",
-    meta: "Ciclos curtos",
-    text: "Cada ciclo termina com algo que você usa ou testa. Toda semana, um resumo por escrito: o que ficou pronto, o que vem e o que travou.",
+    title: "Proposta por escrito",
+    text: "O que será feito, o que fica de fora, prazo de cada etapa e preço. Numa página que você lê em cinco minutos.",
   },
   {
-    title: "Operação",
-    meta: "No ar e documentado",
-    text: "Deploy, monitoramento, documentação e passagem para o seu time. Se preferir, sigo cuidando do sistema, no formato combinado na proposta.",
+    title: "Primeira rotina em uso",
+    text: "Começo pela rotina que mais devolve tempo. A equipe usa, a gente mede, ajusta e só então passa para a próxima.",
   },
 ] as const;
 
-export const principles = [
+export const security: { icon: IconName; title: string; text: string }[] = [
   {
-    title: "O código é seu",
-    text: "Repositório e infraestrutura na sua conta desde o primeiro dia. Se a parceria acabar, nada para.",
+    icon: "lock",
+    title: "Cada pessoa vê só o que deve",
+    text: "Acesso por pessoa e por função. Quem sai da empresa perde o acesso no mesmo dia.",
   },
   {
-    title: "Documentação que alguém lê",
-    text: "Como rodar, como operar e por que cada decisão foi tomada, escrito junto com o código.",
+    icon: "eye",
+    title: "Tudo fica registrado",
+    text: "Quem fez o quê e quando, inclusive o que o assistente de IA fez. Se alguém perguntar, há resposta.",
   },
   {
-    title: "Testes onde o erro custa caro",
-    text: "Regras de negócio, permissões e integrações têm teste automatizado. Telas triviais, não.",
+    icon: "person",
+    title: "Decisão importante passa por uma pessoa",
+    text: "O assistente prepara, a equipe aprova. Envio de guia, cobrança e resposta sensível não saem sem conferência, se for assim que você quiser.",
   },
   {
-    title: "Segurança e LGPD no desenho",
-    text: "Dado mínimo, acesso por papel, segredo fora do código e trilha de auditoria quando o caso pede. Não substitui o seu jurídico; facilita o trabalho dele.",
+    icon: "shield",
+    title: "Dado do cliente sai só o necessário",
+    text: "A IA recebe apenas o que precisa para a tarefa, com fornecedores que assinam contrato de tratamento de dados.",
   },
   {
-    title: "Comunicação semanal por escrito",
-    text: "Você não precisa perguntar como está o projeto. O resumo chega antes.",
+    icon: "doc",
+    title: "Os dados e o sistema são seus",
+    text: "Contas, acessos e documentação ficam no nome da sua empresa. Se a parceria acabar, nada para.",
   },
-  {
-    title: "Tecnologia aberta",
-    text: "Ferramentas de mercado e código aberto. Nenhuma peça proprietária minha que prenda você à Noxlabs.",
-  },
-] as const;
+];
 
 export const faq = [
   {
     q: "Quanto custa?",
     a: [
-      "Depende do escopo, por isso não publico tabela. Depois da conversa inicial você recebe uma proposta com escopo, formato e preço.",
-      "Se o orçamento não cobrir o que você quer, eu digo o que cabe nele e o que fica para depois.",
+      "Depende do tamanho da rotina, por isso não há tabela. Depois da conversa inicial você recebe uma proposta por escrito com escopo, prazo e preço.",
+      "Se o orçamento não cobrir tudo, a proposta mostra o que cabe agora e o que pode ficar para depois. Começar por uma rotina só é comum.",
     ],
   },
   {
-    q: "Qual é o prazo?",
+    q: "Quanto tempo leva?",
     a: [
-      "O prazo sai da proposta, etapa por etapa, depois que o escopo está claro. Prefiro cortar escopo a esticar prazo: a primeira entrega é desenhada para entrar em uso cedo.",
-      "Você acompanha o andamento toda semana, então atraso nunca é surpresa.",
+      "O prazo sai da proposta, etapa por etapa. A primeira entrega é pensada para entrar em uso cedo, com uma rotina de cada vez, em vez de um projeto grande que só aparece no fim.",
     ],
   },
   {
-    q: "É seguro usar IA com dados sensíveis dos meus clientes?",
+    q: "Preciso trocar os sistemas que já uso?",
     a: [
-      "Pode ser, se o desenho cuidar disso. Isso significa mandar ao modelo só o necessário, mascarar dados pessoais, escolher provedor e região com contrato de tratamento de dados, registrar o que o agente fez e exigir aprovação humana nas ações críticas.",
-      "Quando o risco não compensa, a recomendação é não usar IA naquele ponto. Você ouve isso no diagnóstico, não depois do contrato.",
+      "Na maioria das vezes, não. O ponto de partida é o que a sua empresa já usa: sistema de gestão, sistema contábil, planilhas, e-mail, WhatsApp.",
+      "Se um sistema não permite nenhum tipo de integração, isso aparece no diagnóstico, com as alternativas e o custo de cada uma, antes de qualquer contrato.",
     ],
   },
   {
-    q: "Quem mantém o sistema depois da entrega?",
+    q: "Minha equipe vai conseguir usar?",
     a: [
-      "Você escolhe. O seu time assume com documentação e uma passagem acompanhada, ou eu sigo cuidando de correções, atualizações e evolução, no formato que combinarmos.",
+      "A ideia é que a equipe faça menos coisas, não aprenda mais telas. Boa parte das automações roda sem ninguém abrir nada: a pessoa só recebe o que precisa conferir.",
+      "Quando há tela nova, ela é desenhada com quem vai usar e vem com um guia curto e acompanhamento nas primeiras semanas.",
     ],
   },
   {
-    q: "De quem é o código?",
+    q: "E os dados dos meus clientes?",
     a: [
-      "Seu. O repositório fica na sua conta, a infraestrutura no seu nome e as credenciais com você. Não uso framework proprietário nem licença que prenda você à Noxlabs.",
+      "Ficam com acesso controlado por pessoa, registro do que foi feito e só o necessário sai para serviços de IA, com fornecedores que assinam contrato de tratamento de dados.",
+      "O desenho segue a LGPD desde o começo. Não substitui o seu jurídico, mas facilita o trabalho dele.",
+    ],
+  },
+  {
+    q: "A IA não vai errar com o meu cliente?",
+    a: [
+      "Pode errar, como uma pessoa. Por isso ela trabalha com limites: responde o que está registrado, encaminha o que não sabe e não envia nada sensível sem aprovação, se você preferir assim.",
+      "Onde o risco não compensa, a recomendação é não usar IA naquele ponto. Você ouve isso no diagnóstico.",
+    ],
+  },
+  {
+    q: "E depois da entrega, quem cuida?",
+    a: [
+      "Você escolhe: eu sigo cuidando de ajustes, atualizações e novas rotinas no formato que combinarmos, ou a sua equipe de TI assume com documentação e uma passagem acompanhada.",
     ],
   },
   {
     q: "A Noxlabs é uma pessoa só?",
     a: [
-      "Sim. Quem conversa com você é quem desenha a arquitetura e escreve o código, sem repasse para um time que você nunca viu.",
-      "Isso limita quantos projetos assumo ao mesmo tempo. Se a agenda estiver cheia, eu aviso a data em que posso começar.",
+      "Sim. Quem conversa com você é quem desenha a solução e constrói, sem repasse para uma equipe que você nunca viu.",
+      "Isso limita quantos projetos entram ao mesmo tempo. Se a agenda estiver cheia, você fica sabendo a data em que dá para começar.",
     ],
   },
 ] as const;

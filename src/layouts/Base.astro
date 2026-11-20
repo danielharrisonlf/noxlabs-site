@@ -8,14 +8,16 @@ import { site } from "../data/site";
 interface Props {
   title?: string;
   description?: string;
-  /** Caminho canônico, com barra final: "/" ou "/casos/kairos/". */
+  /** Caminho canônico, com barra final: "/" ou "/casos/clinicflow/". */
   path: string;
   type?: "website" | "article";
   /** JSON-LD adicional desta página. */
   schema?: Record<string, unknown>[];
+  /** Assunto do e-mail dos botões fixos desta página. */
+  mailto?: string;
 }
 
-const { title = site.title, description = site.description, path, type = "website", schema = [] } = Astro.props;
+const { title = site.title, description = site.description, path, type = "website", schema = [], mailto = site.talkMailto } = Astro.props;
 
 const canonical = new URL(path, site.url).href;
 const ogImage = new URL("/og.png", site.url).href;
@@ -32,15 +34,24 @@ const org = {
   description: site.description,
   areaServed: { "@type": "Country", name: "Brasil" },
   founder: { "@id": `${site.url}/#daniel` },
-  sameAs: [site.links.github, site.links.linkedin],
+  sameAs: [site.links.linkedin],
   knowsAbout: [
-    "Desenvolvimento de software",
-    "Inteligência artificial aplicada",
-    "Model Context Protocol",
-    "Arquitetura de microsserviços",
-    "Integrações com WhatsApp Cloud API",
-    "Self-hosting com Docker e Dokploy",
+    "Automação de processos para escritórios de contabilidade",
+    "Automação de rotinas administrativas",
+    "Atendimento por WhatsApp com inteligência artificial",
+    "Sistemas sob medida para empresas",
+    "Integração entre sistemas de gestão, planilhas e bancos",
+    "Painéis de gestão e relatórios",
+    "LGPD em sistemas e automações",
   ],
+  makesOffer: [
+    "Automação de rotinas",
+    "Atendimento e WhatsApp com IA",
+    "Sistemas sob medida",
+    "Integração entre sistemas",
+    "Painéis e relatórios para gestores",
+    "Diagnóstico de processos",
+  ].map((name) => ({ "@type": "Offer", itemOffered: { "@type": "Service", name } })),
 };
 
 const person = {
@@ -53,7 +64,7 @@ const person = {
   image: `${site.url}/img/daniel-harrison.webp`,
   email: site.email,
   worksFor: { "@id": `${site.url}/#org` },
-  sameAs: [site.links.github, site.links.linkedin, site.links.portfolio],
+  sameAs: [site.links.linkedin, site.links.portfolio, site.links.github],
 };
 
 const website = {
@@ -78,9 +89,8 @@ const graph = [org, person, website, ...schema];
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <meta name="author" content={site.founder.name} />
-    <meta name="color-scheme" content="light dark" />
-    <meta name="theme-color" content="#f5f6fc" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0d1438" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#f6f8f4" />
 
     <meta property="og:type" content={type} />
     <meta property="og:site_name" content={site.name} />
@@ -91,7 +101,10 @@ const graph = [org, person, website, ...schema];
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Noxlabs: software e IA que saem do papel e ficam no ar. Rastros de luz sobre um céu de hora azul." />
+    <meta
+      property="og:image:alt"
+      content="Noxlabs: sua equipe não foi contratada para copiar e colar. Uma lista de rotinas do escritório marcadas como feitas."
+    />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
@@ -103,24 +116,13 @@ const graph = [org, person, website, ...schema];
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
-    <link rel="preload" href="/fonts/funnel-display-latin-var.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/atkinson-next-latin-var.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/bricolage-grotesque-latin-var.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/figtree-latin-var.woff2" as="font" type="font/woff2" crossorigin />
 
     <script is:inline>
-      // Tema resolvido antes da primeira pintura: escolha salva ou preferência do sistema.
-      try {
-        const saved = localStorage.getItem("noxlabs-theme");
-        if (saved === "light" || saved === "dark") document.documentElement.dataset.theme = saved;
-      } catch {
-        // Armazenamento bloqueado: segue a preferência do sistema.
-      }
-      // Sem animation-timeline, as entradas por rolagem usam IntersectionObserver (ver global.css).
-      if (
-        window.CSS &&
-        !CSS.supports("animation-timeline: view()") &&
-        !matchMedia("(prefers-reduced-motion: reduce)").matches
-      ) {
-        document.documentElement.classList.add("reveal-io");
+      // Entradas por rolagem só quando há script e movimento permitido (ver global.css).
+      if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.documentElement.classList.add("reveal-on");
       }
     </script>
 
@@ -128,16 +130,16 @@ const graph = [org, person, website, ...schema];
   </head>
   <body>
     <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
-    <Header />
+    <Header mailto={mailto} />
     <main id="conteudo" tabindex="-1">
       <slot />
     </main>
     <Footer />
-    <MobileCta />
+    <MobileCta mailto={mailto} />
     <script>
-      import { revealFallback } from "../scripts/motion";
+      import { initMotion } from "../scripts/motion";
 
-      revealFallback();
+      initMotion();
     </script>
   </body>
 </html>

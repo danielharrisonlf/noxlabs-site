@@ -2,335 +2,151 @@
 import { site } from "../data/site";
 import Icon from "./Icon.astro";
 
-/*
- * Céu de longa exposição: rastros que sobem da borda de baixo e terminam em
- * três provas que se pode conferir. Duas composições desenhadas:
- * - larga (>= 64rem): coluna 520 x 620 à direita do texto, rastros vindo de
- *   baixo, à direita do texto, sem cruzá-lo;
- * - estreita: coluna 360 x 400 sob os botões, os rastros sobem pela esquerda e
- *   cada prova fica à direita do seu ponto de luz.
- */
-type Tone = "sodio" | "freio" | "mercurio";
-type Trail = { d: string; tone: Tone; lead?: boolean };
-type Layout = {
-  cls: string;
-  viewBox: string;
-  nodes: { x: number; y: number; tone: Tone }[];
-  trails: Trail[];
-  ambient: Trail[];
-};
-
-const wide: Layout = {
-  cls: "ex-wide",
-  viewBox: "0 0 520 620",
-  nodes: [
-    { x: 150, y: 120, tone: "freio" },
-    { x: 80, y: 310, tone: "mercurio" },
-    { x: 170, y: 500, tone: "sodio" },
-  ],
-  trails: [
-    { d: "M -260 900 C -120 640, -40 260, 150 120", tone: "sodio", lead: true },
-    { d: "M -200 900 C -90 640, -10 280, 150 120", tone: "freio" },
-    { d: "M -300 900 C -150 700, -60 420, 80 310", tone: "mercurio", lead: true },
-    { d: "M -230 900 C -110 700, -30 430, 80 310", tone: "sodio" },
-    { d: "M -160 900 C -60 760, 40 560, 170 500", tone: "freio", lead: true },
-    { d: "M -340 900 C -170 780, 0 560, 170 500", tone: "mercurio" },
-  ],
-  ambient: [
-    { d: "M -60 900 C 120 700, 500 620, 1500 560", tone: "mercurio" },
-    { d: "M -200 900 C 0 780, 400 700, 1500 690", tone: "sodio" },
-  ],
-};
-
-const tall: Layout = {
-  cls: "ex-tall",
-  viewBox: "0 0 360 400",
-  nodes: [
-    { x: 70, y: 50, tone: "freio" },
-    { x: 70, y: 190, tone: "mercurio" },
-    { x: 70, y: 330, tone: "sodio" },
-  ],
-  trails: [
-    { d: "M -60 600 C 0 420, 20 140, 70 50", tone: "sodio", lead: true },
-    { d: "M -20 600 C 30 430, 40 150, 70 50", tone: "freio" },
-    { d: "M -40 600 C 10 440, 30 270, 70 190", tone: "mercurio", lead: true },
-    { d: "M 0 600 C 40 450, 50 280, 70 190", tone: "sodio" },
-    { d: "M -20 600 C 20 470, 40 370, 70 330", tone: "freio", lead: true },
-    { d: "M 20 600 C 50 480, 55 380, 70 330", tone: "mercurio" },
-  ],
-  ambient: [],
-};
-
-const layouts = [wide, tall];
-const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
-const at = (i: number) =>
-  [
-    `--wx:${pct(wide.nodes[i].x + 38, 520)}`,
-    `--wy:${pct(wide.nodes[i].y, 620)}`,
-    `--tx:${pct(tall.nodes[i].x + 30, 360)}`,
-    `--ty:${pct(tall.nodes[i].y, 400)}`,
-    `--i:${i}`,
-  ].join(";");
+/* A rotina do exemplo: cada item se marca como feito, em sequência, uma vez. */
+const routine = [
+  { time: "08:00", text: "Lembrete de vencimento enviado aos clientes do mês" },
+  { time: "08:04", text: "Extratos do banco importados e conferidos" },
+  { time: "08:10", text: "Notas fiscais salvas na pasta de cada cliente" },
+  { time: "08:15", text: "Documentos que faltam pedidos pelo WhatsApp" },
+  { time: "08:16", text: "Dois lançamentos que não bateram, separados para conferência", review: true },
+];
 ---
 
-<section class="hero grain" aria-labelledby="hero-title" data-hero>
-  <!-- Céu do celular e do tablet: três rastros finos sobem pela direita, atrás do título. -->
-  <svg class="hero-sky" viewBox="0 0 390 844" preserveAspectRatio="xMaxYMin slice" aria-hidden="true" focusable="false">
-    {
-      [
-        { d: "M 520 900 C 400 680, 440 420, 372 60", tone: "sodio" },
-        { d: "M 560 880 C 440 660, 470 400, 404 20", tone: "freio" },
-        { d: "M 480 940 C 390 740, 410 500, 350 200", tone: "mercurio" },
-      ].map((t) => (
-        <g class={`tone-${t.tone}`}>
-          <path class="sky-glow" d={t.d} pathLength="1" />
-          <path class="sky-core" d={t.d} pathLength="1" />
-        </g>
-      ))
-    }
-  </svg>
+<section class="hero" aria-labelledby="hero-title">
   <div class="wrap hero-grid">
     <div class="hero-copy">
-      <h1 id="hero-title">Software e IA que saem do papel e ficam no ar.</h1>
-      <p class="hero-lede">
-        A Noxlabs é a consultoria de Daniel Harrison. Desenho, construo e opero produtos, integrações e agentes de IA para
-        empresas que precisam de sistema funcionando, não de apresentação.
+      <p class="kicker hero-kicker">
+        <Icon name="building" />
+        Para contabilidade e pequenas e médias empresas
       </p>
-      <p class="hero-own">Você fala direto com quem escreve o código. E o código é seu.</p>
+      <h1 id="hero-title">Sua equipe não foi contratada para copiar e colar.</h1>
+      <p class="hero-lede">
+        A Noxlabs cria automações, assistentes de WhatsApp com IA e sistemas sob medida que tiram da rotina o trabalho
+        repetitivo: cobrar documento, digitar de novo, responder a mesma pergunta, vigiar prazo.
+      </p>
       <div class="hero-actions" data-cta-anchor>
-        <a class="btn btn-primary" href={site.diagnosisMailto}>
-          Pedir diagnóstico de 30 min
+        <a class="btn btn-primary" href={site.talkMailto}>
+          Marcar conversa de 30 min
           <Icon name="arrow-right" />
         </a>
-        <a class="btn btn-ghost" href="#kairos">Seguir um pedido no Kairos</a>
+        <a class="btn btn-secondary" href="#estimativa">
+          <Icon name="calculator" class="no-nudge" />
+          Estimar horas liberadas
+        </a>
       </div>
-      <p class="hero-note">Uma conversa de 30 minutos sobre o problema. Você sai com um próximo passo claro.</p>
-    </div>
-
-    <div class="exposure" data-exposure>
-      {
-        layouts.map((layout) => (
-          <svg class={`trails ${layout.cls}`} viewBox={layout.viewBox} aria-hidden="true" focusable="false">
-            <g class="ambient">
-              {layout.ambient.map((t) => (
-                <path d={t.d} class={`tone-${t.tone}`} pathLength="1000" />
-              ))}
-            </g>
-            <g class="layer">
-              {layout.trails.map((t, i) => (
-                <g class={`trail tone-${t.tone}`} style={`--i:${i}`}>
-                  <path class="glow-wide" d={t.d} pathLength="1000" />
-                  <path class="glow" d={t.d} pathLength="1000" />
-                  <path class="core" d={t.d} pathLength="1000" />
-                  {t.lead && <path class="packet" d={t.d} pathLength="1000" />}
-                </g>
-              ))}
-              {layout.nodes.map((n, i) => (
-                <g class={`node tone-${n.tone}`} style={`--i:${i}`} data-node={i}>
-                  <circle class="node-halo" cx={n.x} cy={n.y} r="20" />
-                  <circle class="node-core" cx={n.x} cy={n.y} r="6.5" />
-                </g>
-              ))}
-            </g>
-          </svg>
-        ))
-      }
-
-      <ul class="proofs" role="list" aria-label="Provas que você pode conferir">
-        <li style={at(0)}>
-          <p class="proof-title live">Kairos no ar</p>
-          <p class="proof-text">Produto próprio em produção, com cadastro aberto de empresas.</p>
-          <a class="proof-link" href={site.links.kairos}>kairos.noxlabs.tech</a>
-        </li>
-        <li style={at(1)}>
-          <p class="proof-title">
-            <span>
-              <span class="tabular" data-count="49" aria-hidden="true">49</span><span class="visually-hidden">49</span>
-              ferramentas MCP
-            </span>
-          </p>
-          <p class="proof-text">Agentes de IA entram com o login e o escopo de cada usuário.</p>
-        </li>
-        <li style={at(2)}>
-          <p class="proof-title">Código aberto</p>
-          <p class="proof-text">Repositórios públicos para você ler antes de contratar.</p>
-          <a class="proof-link" href={site.links.github}>github.com/danielharrisonlf</a>
-        </li>
+      <ul class="hero-assure" role="list">
+        <li><Icon name="check" />Você fala com quem constrói</li>
+        <li><Icon name="check" />Começa pelos sistemas que você já usa</li>
+        <li><Icon name="check" />Dados de clientes tratados conforme a LGPD</li>
       </ul>
     </div>
+
+    <figure class="routine" aria-labelledby="routine-cap">
+      <div class="routine-card">
+        <div class="routine-head">
+          <div>
+            <p class="routine-title">Rotina de segunda-feira</p>
+            <p class="routine-sub">Escritório contábil de exemplo</p>
+          </div>
+          <span class="tag tag-neutral">Exemplo</span>
+        </div>
+        <div class="routine-progress" aria-hidden="true">
+          <span class="routine-bar"></span>
+        </div>
+        <ol role="list" class="routine-list">
+          {
+            routine.map((item, i) => (
+              <li class:list={["routine-item", { "is-review": item.review }]} style={`--i:${i}`}>
+                <span class="routine-time tabular">{item.time}</span>
+                <span class="routine-status" aria-hidden="true">
+                  <span class="st-pending" />
+                  <span class="st-done">
+                    {item.review ? <Icon name="eye" /> : <Icon name="check" />}
+                  </span>
+                </span>
+                <span class="routine-text">{item.text}</span>
+                <span class="routine-tag">
+                  <span class="tag tag-neutral tag-wait" aria-hidden="true">
+                    Na fila
+                  </span>
+                  {item.review ? (
+                    <span class="tag tag-review tag-final">Para você revisar</span>
+                  ) : (
+                    <span class="tag tag-done tag-final">Feito</span>
+                  )}
+                </span>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+      <figcaption id="routine-cap">
+        Ilustração de uma rotina automatizada: o sistema faz o repetitivo e separa para a equipe só o que precisa de olho
+        humano. Não é dado de cliente.
+      </figcaption>
+    </figure>
   </div>
 </section>
 
-<script>
-  import { finePointer, pauseOffscreen, reducedMotion } from "../scripts/motion";
-
-  const hero = document.querySelector<HTMLElement>("[data-hero]");
-  const exposure = document.querySelector<HTMLElement>("[data-exposure]");
-
-  if (hero && exposure && !reducedMotion()) {
-    pauseOffscreen(hero);
-
-    // "49" sobe de 30 até 49 quando a prova aparece na tela (uma vez).
-    const counter = exposure.querySelector<HTMLElement>("[data-count]");
-    if (counter && "IntersectionObserver" in window) {
-      const target = Number(counter.dataset.count);
-      const from = 30;
-      const io = new IntersectionObserver((entries) => {
-        if (!entries.some((e) => e.isIntersecting)) return;
-        io.disconnect();
-        const start = performance.now() + 350;
-        const tick = (now: number) => {
-          const t = Math.min(Math.max((now - start) / 900, 0), 1);
-          counter.textContent = String(Math.round(from + (target - from) * (1 - (1 - t) ** 3)));
-          if (t < 1) requestAnimationFrame(tick);
-        };
-        counter.textContent = String(from);
-        requestAnimationFrame(tick);
-      });
-      io.observe(counter);
-    }
-
-    // No desktop, o céu responde ao ponteiro: camadas em profundidades diferentes
-    // e o ponto de luz mais próximo cresce.
-    if (finePointer()) {
-      let frame = 0;
-      let px = 0;
-      let py = 0;
-      let cx = 0;
-      let cy = 0;
-      const nodes = [...exposure.querySelectorAll<SVGGElement>(".ex-wide [data-node]")];
-      const apply = () => {
-        frame = 0;
-        exposure.style.setProperty("--px", px.toFixed(3));
-        exposure.style.setProperty("--py", py.toFixed(3));
-        for (const node of nodes) {
-          const r = node.getBoundingClientRect();
-          const d = Math.hypot(r.left + r.width / 2 - cx, r.top + r.height / 2 - cy);
-          node.style.setProperty("--near", Math.max(0, 1 - d / 260).toFixed(3));
-        }
-      };
-      hero.addEventListener("pointermove", (e) => {
-        const r = hero.getBoundingClientRect();
-        px = ((e.clientX - r.left) / r.width) * 2 - 1;
-        py = ((e.clientY - r.top) / r.height) * 2 - 1;
-        cx = e.clientX;
-        cy = e.clientY;
-        if (!frame) frame = requestAnimationFrame(apply);
-      });
-      hero.addEventListener("pointerleave", () => {
-        px = 0;
-        py = 0;
-        cx = -9999;
-        cy = -9999;
-        if (!frame) frame = requestAnimationFrame(apply);
-      });
-    }
-  }
-</script>
-
 <style>
   .hero {
-    overflow: hidden;
-    padding-top: calc(var(--header-h) + env(safe-area-inset-top) + clamp(1rem, 4vw, 4rem));
-    padding-bottom: clamp(2.5rem, 5vw, 5rem);
-    background:
-      radial-gradient(70% 45% at 35% 75%, var(--haze), transparent 65%),
-      radial-gradient(70% 60% at 100% 0%, var(--haze-2), transparent 60%),
-      linear-gradient(180deg, var(--sky-top), var(--sky-mid) 50%, var(--sky-low) 88%, var(--bg));
-  }
-
-  /* O céu termina exatamente no fundo da página: os rastros se dissolvem na borda. */
-  .hero {
     position: relative;
+    overflow: hidden;
+    padding: calc(var(--header-h) + clamp(2rem, 1rem + 4vw, 5rem)) 0 clamp(3.5rem, 2rem + 5vw, 7rem);
     isolation: isolate;
   }
 
+  /* Papel quadriculado que some nas bordas: a planilha ao fundo, sem pesar. */
   .hero::before {
     content: "";
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1;
-    height: calc(clamp(2.5rem, 5vw, 5rem) + 3rem);
-    background: linear-gradient(to bottom, transparent, var(--bg));
-    pointer-events: none;
-  }
-
-  .hero-sky {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 100%;
-    height: min(100svh, 56rem);
-    z-index: 0;
-    pointer-events: none;
-  }
-
-  .hero-sky {
-    -webkit-mask-image: linear-gradient(90deg, transparent 58%, #000 82%);
-    mask-image: linear-gradient(90deg, transparent 58%, #000 82%);
-  }
-
-  .hero-sky path {
-    fill: none;
-    stroke: var(--c);
-    stroke-linecap: round;
-  }
-
-  .sky-glow {
-    stroke-width: 9;
-    opacity: var(--trail-glow);
-  }
-
-  .sky-core {
-    stroke-width: 1.75;
-    opacity: 0.85;
-  }
-
-  @media (min-width: 64rem) {
-    .hero-sky {
-      display: none;
-    }
+    inset: 0;
+    z-index: -1;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 32px 32px;
+    background-position: center top;
+    opacity: 0.55;
+    mask-image: radial-gradient(70% 70% at 75% 45%, #000 10%, transparent 75%);
   }
 
   .hero-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: clamp(2.5rem, 2rem + 3vw, 5rem);
     align-items: center;
-    gap: clamp(1.5rem, 4vw, 4rem);
-    min-height: min(calc(100svh - var(--header-h) - 6rem), 46rem);
   }
 
   .hero-copy {
-    position: relative;
-    z-index: 3;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    justify-items: start;
+    gap: var(--s-5);
   }
 
-  /* O título acompanha a altura da tela também: em 1280 x 600 o botão ainda aparece. */
+  .hero-kicker {
+    align-items: start;
+  }
+
+  .hero-kicker :global(svg) {
+    flex: none;
+    width: 1.15rem;
+    height: 1.15rem;
+    margin-top: 0.15em;
+  }
+
   .hero h1 {
-    font-size: clamp(2.5rem, min(1.4rem + 5vw, 1.2rem + 7.2svh), 5.5rem);
-    font-weight: 500;
-    line-height: 0.98;
-    letter-spacing: -0.04em;
-    max-width: 12ch;
+    font-size: var(--t-display);
+    font-weight: 650;
+    line-height: 1.03;
+    letter-spacing: -0.025em;
+    max-width: 15ch;
   }
 
   .hero-lede {
-    margin-top: var(--s-6);
     font-size: var(--t-md);
     line-height: 1.5;
-    color: var(--fg-2);
-    max-width: 44ch;
-  }
-
-  .hero-own {
-    margin-top: var(--s-3);
-    font-size: var(--t-md);
-    line-height: 1.5;
-    font-weight: 700;
+    color: var(--ink-2);
     max-width: 44ch;
   }
 
@@ -338,455 +154,231 @@ const at = (i: number) =>
     display: flex;
     flex-wrap: wrap;
     gap: var(--s-3);
-    margin-top: var(--s-7);
+    margin-top: var(--s-2);
   }
 
-  .hero-note {
-    margin-top: var(--s-4);
-    font-size: var(--t-sm);
-    color: var(--fg-3);
-    max-width: 52ch;
-  }
-
-  /* Coluna de provas: proporção fixa, então os nós do SVG e os textos coincidem. */
-  .exposure {
-    --px: 0;
-    --py: 0;
-    position: relative;
-    width: 100%;
-    max-width: 32.5rem;
-    aspect-ratio: 520 / 620;
-    justify-self: end;
-  }
-
-  .trails {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-    z-index: -1;
-  }
-
-  .ex-tall {
-    display: none;
-  }
-
-  .trails path {
-    fill: none;
-    stroke-linecap: round;
-  }
-
-  .tone-sodio {
-    --c: var(--sodio);
-  }
-  .tone-freio {
-    --c: var(--freio);
-  }
-  .tone-mercurio {
-    --c: var(--mercurio);
-  }
-
-  .ambient path {
-    stroke: var(--c);
-    stroke-width: 1.25;
-    opacity: 0.35;
-  }
-
-  .trail path {
-    stroke: var(--c);
-  }
-
-  .glow-wide {
-    stroke-width: 16;
-    opacity: calc(var(--trail-glow) * 0.45);
-  }
-
-  .glow {
-    stroke-width: 6;
-    opacity: var(--trail-glow);
-  }
-
-  .core {
-    stroke-width: 1.75;
-  }
-
-  .trail .packet {
-    stroke: color-mix(in srgb, #fff calc(var(--packet-white) * 100%), var(--c));
-    stroke-width: 3.5;
-    stroke-dasharray: 60 1000;
-    stroke-dashoffset: 60;
-    opacity: 0;
-  }
-
-  .node-halo {
-    fill: var(--c);
-    opacity: 0.2;
-  }
-
-  .node-core {
-    fill: var(--c);
-    stroke: var(--bg-2);
-    stroke-width: 2.5;
-  }
-
-  /* A lista ocupa a coluna inteira: é o bloco de contenção das provas, e o paralaxe a move inteira. */
-  .proofs {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-  }
-
-  .proofs li {
-    position: absolute;
-    left: var(--wx);
-    top: var(--wy);
-    right: 0;
-    transform: translateY(-1.05em);
-  }
-
-  .proof-title {
+  .hero-assure {
     display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-5);
+    font-size: var(--t-sm);
+    color: var(--ink-2);
+  }
+
+  .hero-assure li {
+    display: inline-flex;
     align-items: center;
-    gap: 0.45em;
+    gap: 0.4rem;
+  }
+
+  .hero-assure :global(svg) {
+    width: 1.05rem;
+    height: 1.05rem;
+    color: var(--pine);
+    stroke-width: 2.4;
+  }
+
+  /* ---- Rotina de exemplo ---- */
+  .routine {
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  .routine-card {
+    padding: clamp(1.1rem, 0.8rem + 1.2vw, 1.75rem);
+    border: 1px solid var(--line);
+    border-radius: var(--r-xl);
+    background: var(--surface);
+    box-shadow: var(--shadow-3);
+  }
+
+  .routine-head {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: var(--s-3);
+  }
+
+  .routine-title {
     font-family: var(--font-display);
     font-size: var(--t-lg);
-    font-weight: 600;
-    line-height: 1.1;
+    font-weight: 650;
+    line-height: 1.15;
     letter-spacing: -0.02em;
   }
 
-  .proof-text {
-    margin-top: var(--s-1);
+  .routine-sub {
     font-size: var(--t-sm);
-    line-height: 1.45;
-    color: var(--fg-2);
-    max-width: 30ch;
+    color: var(--ink-3);
   }
 
-  .proof-link {
-    display: inline-flex;
+  .routine-progress {
+    height: 6px;
+    margin-block: var(--s-4) var(--s-2);
+    border-radius: 6px;
+    background: var(--sunken);
+    overflow: hidden;
+  }
+
+  .routine-bar {
+    display: block;
+    height: 100%;
+    width: 80%;
+    border-radius: inherit;
+    background: var(--pine);
+    transform-origin: left center;
+    animation: bar-fill 2.4s var(--ease-in-out) 0.5s both;
+  }
+
+  .routine-item {
+    display: grid;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
     align-items: center;
-    min-height: 2.75rem;
+    gap: var(--s-3);
+    padding-block: 0.8rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .routine-item:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .routine-time {
+    font-size: var(--t-xs);
+    font-weight: 600;
+    color: var(--ink-3);
+  }
+
+  .routine-status {
+    position: relative;
+    display: grid;
+    width: 1.6rem;
+    height: 1.6rem;
+  }
+
+  .st-pending,
+  .st-done {
+    grid-area: 1 / 1;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+  }
+
+  .st-pending {
+    border: 2px dashed var(--line-2);
+  }
+
+  .st-done {
+    background: var(--pine);
+    color: #ffffff;
+  }
+
+  .is-review .st-done {
+    background: var(--marca);
+    color: var(--marca-ink);
+  }
+
+  .st-done :global(svg) {
+    width: 0.95rem;
+    height: 0.95rem;
+    stroke-width: 2.6;
+  }
+
+  .routine-text {
     font-size: var(--t-sm);
-    font-weight: 700;
-    color: var(--link);
-    text-underline-offset: 0.3em;
+    line-height: 1.4;
   }
 
-  /* ---- Movimento ---- */
-  @media (prefers-reduced-motion: no-preference) {
-    /* 1. A exposição se forma uma vez no carregamento. */
-    .trail path:not(.packet),
-    .ambient path {
-      stroke-dasharray: 1000;
-      animation: trail-draw 1.8s var(--ease-out) both;
-      animation-delay: calc(80ms + var(--i, 0) * 70ms);
-    }
-
-    .hero-sky path {
-      stroke-dasharray: 1;
-      animation: sky-draw 2.4s var(--ease-out) 200ms both;
-    }
-
-    .ambient path {
-      animation-duration: 3.2s;
-    }
-
-    /* 2. Depois, vida contínua e discreta: uma luz corre por um rastro de cada
-          vez, em intervalos longos; os pontos respiram devagar. */
-    .trail .packet {
-      animation:
-        packet-run 1.4s var(--ease-in-out) calc(0.5s + var(--i) * 120ms) both,
-        packet-loop 9s linear calc(3.5s + var(--i) * 1.5s) infinite;
-    }
-
-    .node {
-      transform-box: fill-box;
-      transform-origin: center;
-      animation: node-on 700ms var(--ease-out) calc(0.9s + var(--i) * 140ms) both;
-    }
-
-    .node-halo {
-      transform-box: fill-box;
-      transform-origin: center;
-      animation: node-breathe 5.2s ease-in-out calc(2.4s + var(--i) * 0.9s) infinite;
-    }
-
-    .proofs li {
-      animation: proof-in 600ms var(--ease-out) both;
-      animation-delay: calc(0.35s + var(--i) * 140ms);
-    }
-
-    /* Fora da tela, nada corre. */
-    .hero.is-offscreen :is(.packet, .node-halo, .hero-sky path) {
-      animation-play-state: paused;
-    }
-
-    /* 3. Ponteiro (desktop): camadas em profundidades diferentes. */
-    .layer {
-      transform: translate(calc(var(--px) * 10px), calc(var(--py) * 8px));
-      transition: transform 900ms var(--ease-out);
-    }
-
-    .ambient {
-      transform: translate(calc(var(--px) * 22px), calc(var(--py) * 14px));
-      transition: transform 1200ms var(--ease-out);
-    }
-
-    .proofs {
-      transform: translate(calc(var(--px) * 10px), calc(var(--py) * 8px));
-      transition: transform 900ms var(--ease-out);
-    }
-
-    .ex-wide .node .node-core {
-      transform-box: fill-box;
-      transform-origin: center;
-      transform: scale(calc(1 + var(--near, 0) * 0.45));
-      transition: transform 500ms var(--ease-out);
-    }
-
-    /* 4. Rolagem: o céu se afasta em profundidade enquanto o texto sobe. */
-    @supports (animation-timeline: scroll()) {
-      @media (min-width: 64rem) {
-        .exposure .trails {
-          animation: hero-depth linear both;
-          animation-timeline: scroll(root);
-          animation-range: 0 100svh;
-        }
-
-        .hero-copy {
-          animation: hero-lift linear both;
-          animation-timeline: scroll(root);
-          animation-range: 0 100svh;
-        }
-      }
-    }
+  .routine-tag {
+    display: grid;
+    justify-items: end;
   }
 
-  @keyframes trail-draw {
-    from {
-      stroke-dashoffset: 1000;
-    }
+  .routine-tag .tag {
+    grid-area: 1 / 1;
+  }
+
+  /* Coreografia única da página: cada item vira "feito" em sequência. */
+  .st-pending,
+  .tag-wait {
+    animation: st-out 240ms var(--ease-out) both;
+    animation-delay: calc(700ms + var(--i) * 420ms);
+  }
+
+  .st-done,
+  .tag-final {
+    animation: st-in 420ms var(--ease-spring) both;
+    animation-delay: calc(700ms + var(--i) * 420ms);
+  }
+
+  @keyframes st-out {
     to {
-      stroke-dashoffset: 0;
+      opacity: 0;
+      transform: scale(0.6);
     }
   }
 
-  @keyframes packet-run {
-    0% {
-      stroke-dashoffset: 60;
-      opacity: 0;
-    }
-    10%,
-    90% {
-      opacity: 1;
-    }
-    100% {
-      stroke-dashoffset: -1000;
-      opacity: 0;
-    }
-  }
-
-  /* Corre nos primeiros 20% do ciclo e descansa o resto. */
-  @keyframes packet-loop {
-    0% {
-      stroke-dashoffset: 60;
-      opacity: 0;
-      animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
-    }
-    2%,
-    18% {
-      opacity: 0.85;
-    }
-    20%,
-    100% {
-      stroke-dashoffset: -1000;
-      opacity: 0;
-    }
-  }
-
-  @keyframes node-on {
+  @keyframes st-in {
     from {
+      opacity: 0;
       transform: scale(0.4);
-      opacity: 0.4;
     }
   }
 
-  @keyframes node-breathe {
-    0%,
-    100% {
-      transform: scale(1);
-      opacity: 0.2;
-    }
-    50% {
-      transform: scale(1.4);
-      opacity: 0.32;
-    }
-  }
-
-  @keyframes proof-in {
+  @keyframes bar-fill {
     from {
-      opacity: 0;
-      translate: -10px 0;
+      transform: scaleX(0);
     }
   }
 
-  @keyframes sky-draw {
-    from {
-      stroke-dashoffset: 1;
-    }
-    to {
-      stroke-dashoffset: 0;
-    }
+  .routine figcaption {
+    font-size: var(--t-xs);
+    color: var(--ink-3);
+    max-width: 52ch;
+    padding-inline: var(--s-2);
   }
 
-  @keyframes hero-depth {
-    to {
-      translate: 0 70px;
-      opacity: 0.55;
-    }
-  }
-
-  @keyframes hero-lift {
-    to {
-      translate: 0 -40px;
-    }
-  }
-
-  /* ---- Abaixo de 64rem: coluna estreita com os pontos à esquerda ---- */
   @media (max-width: 63.99rem) {
-    .ex-wide {
-      display: none;
-    }
-
-    .ex-tall {
-      display: block;
-    }
-
-    .exposure {
-      aspect-ratio: 360 / 400;
-      max-width: 26rem;
-    }
-
-    .proofs li {
-      left: var(--tx);
-      top: var(--ty);
-    }
-  }
-
-  /* Tablet (640–1023): uma coluna, como no celular, com mais ar; provas sob os botões. */
-  @media (min-width: 40rem) and (max-width: 63.99rem) {
     .hero-grid {
       grid-template-columns: 1fr;
-      min-height: 0;
     }
 
-    .hero h1 {
-      font-size: clamp(3rem, 1rem + 6vw, 4.5rem);
-    }
-
-    .exposure {
-      justify-self: start;
-      max-width: 30rem;
+    .routine {
+      max-width: 36rem;
     }
   }
 
-  /* Celular: título, texto curto, botões na primeira tela; frase de posse e provas depois. */
   @media (max-width: 39.99rem) {
-    .hero-grid {
-      grid-template-columns: 1fr;
-      min-height: 0;
-      gap: var(--s-6);
-    }
-
-    .hero h1 {
-      font-size: clamp(2.25rem, 1.2rem + 6.4vw, 3rem);
-      letter-spacing: -0.035em;
-    }
-
-    .hero-lede {
-      margin-top: var(--s-4);
-      font-size: 1.0625rem;
+    .hero {
+      padding-top: calc(var(--header-h) + 1.25rem);
     }
 
     .hero-actions {
-      order: 3;
-      margin-top: var(--s-5);
-      gap: var(--s-2);
-    }
-
-    .hero-own {
-      order: 4;
-      margin-top: var(--s-5);
-      font-size: 1.0625rem;
-    }
-
-    .hero-note {
-      order: 5;
-      margin-top: var(--s-2);
+      width: 100%;
     }
 
     .hero-actions .btn {
-      width: 100%;
-      max-width: 26rem;
+      flex: 1 1 100%;
     }
 
-    .exposure {
-      justify-self: stretch;
-      max-width: 24rem;
+    .routine-item {
+      grid-template-columns: auto minmax(0, 1fr) auto;
     }
 
-    .proof-title {
-      font-size: 1.25rem;
-    }
-
-    .proof-text {
-      font-size: 0.875rem;
-    }
-  }
-
-  /* Desktop baixo (1280 x 600): botões sobem antes da frase de posse. */
-  @media (min-width: 64rem) and (max-height: 42.5rem) {
-    .hero {
-      padding-top: calc(var(--header-h) + 1rem);
-    }
-
-    .hero-lede {
-      margin-top: var(--s-4);
-    }
-
-    .hero-actions {
-      order: 3;
-      margin-top: var(--s-5);
-    }
-
-    .hero-own {
-      order: 4;
-      margin-top: var(--s-4);
-    }
-
-    .hero-note {
+    .routine-time {
       display: none;
     }
   }
 
-  /* Paisagem baixa (celular deitado): menos respiro no topo. */
-  @media (max-height: 30rem) and (orientation: landscape) {
-    .hero {
-      padding-top: calc(var(--header-h) + 1.5rem);
+  @media (max-width: 23rem) {
+    .routine-item {
+      grid-template-columns: auto minmax(0, 1fr);
     }
 
-    .hero h1 {
-      font-size: clamp(2rem, 1rem + 6svh, 3rem);
-    }
-
-    .hero-lede {
-      margin-top: var(--s-3);
-    }
-
-    .hero-actions {
-      margin-top: var(--s-4);
+    .routine-tag {
+      grid-column: 2;
+      justify-items: start;
     }
   }
 </style>

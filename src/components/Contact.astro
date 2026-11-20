@@ -1,49 +1,50 @@
 ---
-import { mailScript, site } from "../data/site";
+import { mailScript, site, talkMailto, whatsappHref } from "../data/site";
 import Icon from "./Icon.astro";
 
-/* Faixa de rastros ao pé do bloco: entram pela esquerda e sobem em direção ao roteiro. */
-const trails = [
-  { d: "M -20 250 C 360 250, 760 190, 1220 40", tone: "sodio" },
-  { d: "M -20 220 C 420 215, 820 150, 1220 60", tone: "mercurio" },
-  { d: "M -20 275 C 480 270, 860 210, 1220 90", tone: "freio" },
-  { d: "M -20 200 C 300 190, 700 120, 1220 20", tone: "sodio" },
-] as const;
+interface Props {
+  /** Assunto do e-mail, quando a página pede um contexto (ex.: contabilidade). */
+  topic?: string;
+  title?: string;
+}
+
+const { topic, title = "Conte qual rotina está tomando o tempo da sua equipe." } = Astro.props;
+const mailto = topic ? talkMailto(topic) : site.talkMailto;
+const whats = whatsappHref();
+const subject = topic ? `${site.talkSubject}: ${topic}` : site.talkSubject;
 ---
 
-<section class="contact night grain" id="contato" aria-labelledby="contato-title">
-  <svg class="contact-trails" viewBox="0 0 1200 280" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-    {
-      trails.map((t) => (
-        <g class={`tone-${t.tone}`}>
-          <path class="ct-glow" d={t.d} pathLength="1" />
-          <path class="ct-core" d={t.d} pathLength="1" />
-        </g>
-      ))
-    }
-  </svg>
-
+<section class="contact band" id="contato" aria-labelledby="contato-title">
   <div class="wrap contact-grid">
     <div class="contact-copy">
-      <h2 id="contato-title" data-reveal="head">Traga o problema. Saia com um próximo passo.</h2>
+      <h2 id="contato-title" data-reveal>{title}</h2>
       <p class="contact-lede" data-reveal style="--i:1">
-        Escreva em poucas linhas o que está travando: um processo manual, um sistema lento, uma ideia de produto, uma conta
-        de nuvem alta. Eu leio e respondo pessoalmente para marcarmos os 30 minutos.
+        Escreva em poucas linhas como é a rotina hoje. Eu leio, respondo pessoalmente e marcamos uma conversa de 30 minutos
+        para ver se a automação compensa no seu caso.
       </p>
 
       <div class="contact-actions" data-reveal style="--i:2" data-cta-anchor>
-        <a class="btn btn-primary" href={site.diagnosisMailto}>
-          Escrever o e-mail
+        <a class="btn btn-primary" href={mailto}>
           <Icon name="mail" class="no-nudge" />
+          Escrever o e-mail
         </a>
         {
           site.scheduleUrl && (
-            <a class="btn btn-ghost" href={site.scheduleUrl}>
+            <a class="btn btn-secondary" href={site.scheduleUrl}>
+              <Icon name="calendar" class="no-nudge" />
               Escolher horário na agenda
             </a>
           )
         }
-        <button class="btn btn-ghost" type="button" data-copy={site.email}>
+        {
+          whats && (
+            <a class="btn btn-secondary" href={whats}>
+              <Icon name="phone" class="no-nudge" />
+              Chamar no WhatsApp
+            </a>
+          )
+        }
+        <button class="btn btn-secondary" type="button" data-copy={site.email}>
           <span class="copy-icon"><Icon name="copy" class="no-nudge" /></span>
           <span class="check-icon"><Icon name="check" class="no-nudge" /></span>
           <span data-copy-label>Copiar e-mail</span>
@@ -56,16 +57,16 @@ const trails = [
       <p class="contact-status" role="status" aria-live="polite" data-copy-status></p>
     </div>
 
-    <aside class="letter" aria-labelledby="letter-title" data-reveal="tilt" style="--i:1">
+    <aside class="letter" aria-labelledby="letter-title" data-reveal style="--i:1">
       <h3 id="letter-title">O e-mail já abre com este roteiro</h3>
       <p class="letter-subject">
         <span>Assunto</span>
-        Diagnóstico de 30 min com a Noxlabs
+        {subject}
       </p>
       <ul role="list" class="letter-lines">
         {mailScript.map((line) => <li>{line}</li>)}
       </ul>
-      <p class="letter-note">Não precisa de apresentação pronta. Rascunho serve.</p>
+      <p class="letter-note">Não precisa de nada pronto. Duas linhas já bastam para começar.</p>
     </aside>
   </div>
 </section>
@@ -97,72 +98,22 @@ const trails = [
 
 <style>
   .contact {
-    --band: clamp(7rem, 4rem + 12vw, 15rem);
     position: relative;
     overflow: hidden;
-    padding-block: clamp(4.5rem, 3rem + 7vw, 9rem) calc(var(--band) + 1.5rem);
-    background:
-      radial-gradient(90% 80% at 75% 40%, var(--haze), transparent 60%),
-      radial-gradient(60% 60% at 0% 100%, var(--haze-2), transparent 60%),
-      linear-gradient(180deg, var(--sky-low), var(--sky-mid) 45%, var(--sky-top));
-    background-color: var(--bg);
+    padding-block: clamp(4.5rem, 3rem + 6vw, 8rem);
   }
 
-  .contact-trails {
+  /* Papel quadriculado claro no canto, a mesma folha do topo da página. */
+  .contact::before {
+    content: "";
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: var(--band);
+    inset: 0;
+    background-image:
+      linear-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(255 255 255 / 0.05) 1px, transparent 1px);
+    background-size: 32px 32px;
+    mask-image: radial-gradient(60% 80% at 90% 20%, #000, transparent 70%);
     pointer-events: none;
-  }
-
-  .contact-trails path {
-    fill: none;
-    stroke: var(--c);
-    stroke-linecap: round;
-  }
-
-  .tone-sodio {
-    --c: var(--sodio);
-  }
-  .tone-freio {
-    --c: var(--freio);
-  }
-  .tone-mercurio {
-    --c: var(--mercurio);
-  }
-
-  /* Os rastros do pé do bloco se desenham enquanto o contato entra na tela. */
-  @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .contact-trails path {
-        stroke-dasharray: 1;
-        animation: ct-draw linear both;
-        animation-timeline: view();
-        animation-range: entry 0% cover 55%;
-      }
-    }
-  }
-
-  @keyframes ct-draw {
-    from {
-      stroke-dashoffset: 1;
-    }
-    to {
-      stroke-dashoffset: 0;
-    }
-  }
-
-  .ct-glow {
-    stroke-width: 10;
-    opacity: calc(var(--trail-glow) * 0.6);
-  }
-
-  .ct-core {
-    stroke-width: 1.5;
-    opacity: 0.7;
   }
 
   .contact-grid {
@@ -179,24 +130,25 @@ const trails = [
   }
 
   .contact h2 {
-    font-size: var(--t-display);
-    line-height: 0.98;
-    letter-spacing: -0.04em;
-    max-width: 12ch;
+    font-size: var(--t-2xl);
+    font-weight: 700;
+    line-height: 1.04;
+    letter-spacing: -0.022em;
+    max-width: 18ch;
   }
 
   .contact-lede {
     font-size: var(--t-md);
     line-height: 1.5;
-    color: var(--fg-2);
-    max-width: 46ch;
+    color: var(--ink-2);
+    max-width: 48ch;
   }
 
   .contact-actions {
     display: flex;
     flex-wrap: wrap;
     gap: var(--s-3);
-    margin-top: var(--s-3);
+    margin-top: var(--s-2);
   }
 
   .copy-icon,
@@ -211,23 +163,18 @@ const trails = [
 
   [data-copied="true"] .check-icon {
     display: inline-flex;
-    color: var(--sodio);
+    color: var(--marca);
   }
 
-  /* Confirmação: o visto se desenha e um anel de luz sai do botão. */
   @media (prefers-reduced-motion: no-preference) {
     [data-copied="true"] .check-icon :global(path) {
       stroke-dasharray: 22;
-      animation: check-draw 420ms var(--ease-out) both;
-    }
-
-    [data-copied="true"] {
-      animation: copy-ring 700ms var(--ease-out);
+      animation: check-draw 380ms var(--ease-out) both;
     }
 
     [data-copied="true"] [data-copy-label] {
       display: inline-block;
-      animation: copy-label 360ms var(--ease-out);
+      animation: copy-label 300ms var(--ease-out);
     }
   }
 
@@ -237,15 +184,6 @@ const trails = [
     }
     to {
       stroke-dashoffset: 0;
-    }
-  }
-
-  @keyframes copy-ring {
-    from {
-      box-shadow: 0 0 0 0 color-mix(in srgb, var(--sodio) 60%, transparent);
-    }
-    to {
-      box-shadow: 0 0 0 14px transparent;
     }
   }
 
@@ -259,8 +197,9 @@ const trails = [
   .contact-email a {
     font-size: var(--t-md);
     font-weight: 700;
-    color: var(--fg);
-    text-decoration-color: color-mix(in srgb, var(--fg) 40%, transparent);
+    color: var(--ink);
+    text-decoration-color: var(--marca);
+    text-decoration-thickness: 2px;
     overflow-wrap: anywhere;
   }
 
@@ -269,13 +208,14 @@ const trails = [
     font-size: var(--t-sm);
   }
 
+  /* O roteiro do e-mail, como uma folha branca sobre a mesa verde. */
   .letter {
-    position: relative;
     padding: clamp(1.5rem, 1rem + 2vw, 2.25rem);
-    border: 1px solid var(--line);
     border-radius: var(--r-lg);
-    background: var(--bg-2);
-    box-shadow: var(--shadow-2);
+    background: #ffffff;
+    color: #0f2a22;
+    box-shadow: 0 30px 60px -28px rgb(0 0 0 / 0.6);
+    rotate: -1.2deg;
   }
 
   .letter h3 {
@@ -287,26 +227,26 @@ const trails = [
     display: grid;
     padding-bottom: var(--s-3);
     margin-bottom: var(--s-3);
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid #d6e0d7;
     font-weight: 700;
   }
 
   .letter-subject span {
     font-size: var(--t-xs);
-    font-weight: 400;
-    color: var(--fg-3);
+    font-weight: 500;
+    color: #52665d;
   }
 
   .letter-lines li {
     padding-block: 0.45rem;
-    border-bottom: 1px dashed var(--line);
-    color: var(--fg-2);
+    border-bottom: 1px dashed #d6e0d7;
+    color: #3a5047;
   }
 
   .letter-note {
     margin-top: var(--s-4);
     font-size: var(--t-sm);
-    color: var(--fg-3);
+    color: #52665d;
   }
 
   @media (max-width: 63.99rem) {
@@ -316,6 +256,7 @@ const trails = [
 
     .letter {
       max-width: 32rem;
+      rotate: none;
     }
   }
 

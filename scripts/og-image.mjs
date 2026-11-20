@@ -1,91 +1,91 @@
-// Gera public/og.png (1200x630) e os ícones PNG a partir de HTML/SVG,
-// com as mesmas fontes do site. Rode com `pnpm og`; o favicon.ico sai do
-// PNG de 32 px via ffmpeg, se estiver instalado.
+// Gera public/og.png (1200x630), os ícones PNG e o favicon.svg a partir de
+// HTML/SVG, com as mesmas fontes do site. Rode com `pnpm og`; o favicon.ico
+// sai do PNG de 32 px via ffmpeg, se estiver instalado.
 import { execFileSync } from "node:child_process";
-import { readFileSync, rmSync } from "node:fs";
+import { readFileSync, rmSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { chromium } from "@playwright/test";
 
 const font = (file) => `data:font/woff2;base64,${readFileSync(resolve("public/fonts", file)).toString("base64")}`;
 
 const fonts = `
-  @font-face { font-family: Funnel; src: url(${font("funnel-display-latin-var.woff2")}) format("woff2"); font-weight: 300 800; }
-  @font-face { font-family: Atkinson; src: url(${font("atkinson-next-latin-var.woff2")}) format("woff2"); font-weight: 200 800; }
+  @font-face { font-family: Bricolage; src: url(${font("bricolage-grotesque-latin-var.woff2")}) format("woff2"); font-weight: 200 800; }
+  @font-face { font-family: Figtree; src: url(${font("figtree-latin-var.woff2")}) format("woff2"); font-weight: 300 900; }
 `;
 
-// O "n" de rastro de luz, com a fonte acesa na ponta.
-const mark = (size, { tile = false } = {}) => `
-  <svg width="${size}" height="${size}" viewBox="0 0 32 32">
-    <defs>
-      <linearGradient id="t${size}" x1="7" y1="26" x2="25" y2="8" gradientUnits="userSpaceOnUse">
-        <stop offset="0" stop-color="#ffb547"/><stop offset="1" stop-color="#ff7a5c"/>
-      </linearGradient>
-    </defs>
-    ${tile ? '<rect width="32" height="32" rx="8" fill="#0d1438"/>' : ""}
-    <path d="${tile ? "M10 25V16a6 6 0 0 1 12 0v8" : "M8 26V15.5a8 8 0 0 1 16 0V24"}" fill="none" stroke="url(#t${size})"
-      stroke-width="${tile ? 3.4 : 3.6}" stroke-linecap="round"/>
-    <circle cx="${tile ? 22 : 24}" cy="${tile ? 24.6 : 25}" r="${tile ? 2.3 : 2.6}" fill="#eef0ff"/>
+const PINE = "#0d5c49";
+const MARCA = "#ffe15a";
+
+// O "n" cuja perna direita termina num visto (o mesmo desenho de Logo.astro).
+const mark = (size) => `
+  <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 32 32">
+    <rect width="32" height="32" rx="9" fill="${PINE}"/>
+    <path d="M9.5 23V14.6a4.1 4.1 0 0 1 8.2 0v2" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M17.7 16.6V22.6L23.8 13.2" fill="none" stroke="${MARCA}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>`;
 
-// Rastros que sobem da borda de baixo e terminam em três pontos de luz.
-const trail = (d, color, w = 2) => `
-  <path d="${d}" stroke="${color}" stroke-width="${w * 8}" opacity=".08" fill="none" stroke-linecap="round"/>
-  <path d="${d}" stroke="${color}" stroke-width="${w * 3}" opacity=".22" fill="none" stroke-linecap="round"/>
-  <path d="${d}" stroke="${color}" stroke-width="${w}" fill="none" stroke-linecap="round"/>`;
-
-const trails = [
-  ["M 640 700 C 760 470, 840 230, 1010 150", "#ffb547"],
-  ["M 690 700 C 790 470, 870 250, 1010 150", "#ff7a5c"],
-  ["M 600 700 C 740 520, 820 360, 950 300", "#8fd3ff"],
-  ["M 670 700 C 780 520, 860 370, 950 300", "#ffb547"],
-  ["M 760 700 C 850 590, 930 480, 1030 450", "#ff7a5c"],
-  ["M 560 700 C 730 600, 880 480, 1030 450", "#8fd3ff"],
-]
-  .map(([d, c]) => trail(d, c))
-  .join("");
-
-const nodes = [
-  [1010, 150, "#ff7a5c"],
-  [950, 300, "#8fd3ff"],
-  [1030, 450, "#ffb547"],
-]
-  .map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="20" fill="${c}" opacity=".2"/><circle cx="${x}" cy="${y}" r="7" fill="${c}" stroke="#141c4b" stroke-width="3"/>`)
-  .join("");
+const rows = [
+  ["Lembrete de vencimento enviado aos clientes", "Feito"],
+  ["Extratos do banco importados e conferidos", "Feito"],
+  ["Documentos que faltam pedidos pelo WhatsApp", "Feito"],
+  ["Dois lançamentos separados para conferência", "Revisar"],
+];
 
 const og = `<!doctype html><html><head><meta charset="utf-8"><style>
   ${fonts}
   * { margin: 0; box-sizing: border-box; }
-  body { width: 1200px; height: 630px; position: relative; overflow: hidden; color: #eef0ff; font-family: Atkinson;
-    background:
-      radial-gradient(110% 80% at 0% 110%, rgba(255,150,70,.22), transparent 62%),
-      radial-gradient(70% 60% at 100% 0%, rgba(110,140,255,.2), transparent 60%),
-      linear-gradient(180deg, #060b26, #0d1540 55%, #1d1d55); }
-  svg.sky { position: absolute; inset: 0; }
-  .l { position: absolute; left: 72px; top: 64px; bottom: 60px; width: 640px; display: flex; flex-direction: column; justify-content: space-between; }
-  .brand { display: flex; align-items: center; gap: 12px; font-family: Funnel; font-weight: 600; font-size: 38px; letter-spacing: -0.03em; }
-  h1 { font-family: Funnel; font-weight: 500; font-size: 82px; line-height: .98; letter-spacing: -0.04em; }
-  .url { font-size: 24px; font-weight: 700; color: #ffc56e; }
-  .p { position: absolute; font-family: Funnel; font-weight: 600; font-size: 28px; letter-spacing: -0.02em; }
-  .p small { display: block; font-family: Atkinson; font-weight: 400; font-size: 18px; color: #b8bfe8; letter-spacing: 0; }
+  body { width: 1200px; height: 630px; position: relative; overflow: hidden; color: #0f2a22; font-family: Figtree;
+    background-color: #f6f8f4;
+    background-image: linear-gradient(#d6e0d7 1px, transparent 1px), linear-gradient(90deg, #d6e0d7 1px, transparent 1px);
+    background-size: 32px 32px; }
+  body::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, #f6f8f4 46%, rgba(246,248,244,.4)); }
+  .l { position: absolute; left: 72px; top: 64px; bottom: 60px; width: 600px; display: flex; flex-direction: column; justify-content: space-between; }
+  .brand { display: flex; align-items: center; gap: 14px; font-family: Bricolage; font-weight: 700; font-size: 40px; letter-spacing: -0.035em; }
+  h1 { font-family: Bricolage; font-weight: 650; font-size: 68px; line-height: 1.03; letter-spacing: -0.025em; }
+  .url { font-size: 24px; font-weight: 700; color: ${PINE}; }
+  .card { position: absolute; right: 64px; top: 96px; width: 440px; padding: 28px; border-radius: 28px; background: #fff;
+    border: 1px solid #d6e0d7; box-shadow: 0 40px 80px -30px rgba(15,42,34,.38); }
+  .card h2 { font-family: Bricolage; font-weight: 650; font-size: 26px; letter-spacing: -0.02em; }
+  .card p.s { color: #52665d; font-size: 16px; margin-bottom: 14px; }
+  .bar { height: 6px; border-radius: 6px; background: #ebf1ea; margin-bottom: 6px; }
+  .bar span { display: block; height: 100%; width: 75%; border-radius: 6px; background: ${PINE}; }
+  .row { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid #d6e0d7; font-size: 17px; }
+  .row:last-child { border-bottom: 0; }
+  .dot { flex: none; width: 26px; height: 26px; border-radius: 50%; background: ${PINE}; display: grid; place-items: center; }
+  .dot.r { background: ${MARCA}; }
+  .row span.t { flex: 1; }
+  .tag { font-size: 14px; font-weight: 700; padding: 3px 9px; border-radius: 6px; background: #d5ece2; color: #0a4a3a; }
+  .tag.r { background: #fff4b8; color: #5c4a00; }
 </style></head><body>
-  <svg class="sky" viewBox="0 0 1200 630" width="1200" height="630">${trails}${nodes}</svg>
   <div class="l">
-    <div class="brand">${mark(46)}noxlabs</div>
-    <h1>Software e IA que saem do papel e ficam no ar.</h1>
+    <div class="brand">${mark(52)}noxlabs</div>
+    <h1>Sua equipe não foi contratada para copiar e colar.</h1>
     <div class="url">noxlabs.tech</div>
   </div>
-  <div class="p" style="left:1040px;top:130px">Kairos<small>no ar</small></div>
-  <div class="p" style="left:980px;top:280px">MCP<small>49 ferramentas</small></div>
-  <div class="p" style="left:1060px;top:430px">GitHub<small>código aberto</small></div>
+  <div class="card">
+    <h2>Rotina de segunda-feira</h2>
+    <p class="s">Exemplo ilustrativo</p>
+    <div class="bar"><span></span></div>
+    ${rows
+      .map(
+        ([t, s]) => `<div class="row"><span class="dot ${s === "Revisar" ? "r" : ""}">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${s === "Revisar" ? "#5c4a00" : "#fff"}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>
+        </span><span class="t">${t}</span><span class="tag ${s === "Revisar" ? "r" : ""}">${s}</span></div>`,
+      )
+      .join("")}
+  </div>
 </body></html>`;
 
 const icon = (size, pad) => `<!doctype html><html><head><style>
-  * { margin: 0; } body { width: ${size}px; height: ${size}px; display: grid; place-items: center; background: #0d1438; }
+  * { margin: 0; } body { width: ${size}px; height: ${size}px; display: grid; place-items: center; background: ${PINE}; }
+  svg rect { fill: ${PINE}; }
 </style></head><body>${mark(size - pad * 2)}</body></html>`;
 
 const favicon = `<!doctype html><html><head><style>
   * { margin: 0; } body { width: 32px; height: 32px; background: transparent; }
-</style></head><body>${mark(32, { tile: true })}</body></html>`;
+</style></head><body>${mark(32)}</body></html>`;
+
+writeFileSync("public/favicon.svg", `${mark(32).trim()}\n`);
 
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1200, height: 630 } });
@@ -94,9 +94,9 @@ await page.evaluate(() => document.fonts.ready);
 await page.screenshot({ path: "public/og.png" });
 
 for (const [size, pad, file] of [
-  [512, 72, "public/icon-512.png"],
-  [192, 26, "public/icon-192.png"],
-  [180, 24, "public/apple-touch-icon.png"],
+  [512, 56, "public/icon-512.png"],
+  [192, 20, "public/icon-192.png"],
+  [180, 18, "public/apple-touch-icon.png"],
 ]) {
   await page.setViewportSize({ width: size, height: size });
   await page.setContent(icon(size, pad));
@@ -109,7 +109,7 @@ await browser.close();
 
 try {
   execFileSync("ffmpeg", ["-loglevel", "error", "-y", "-i", "public/favicon-32.png", "public/favicon.ico"]);
-  console.log("og.png, ícones e favicon.ico gerados.");
+  console.log("og.png, ícones, favicon.svg e favicon.ico gerados.");
 } catch {
   console.warn("ffmpeg indisponível: favicon.ico não foi regenerado.");
 } finally {

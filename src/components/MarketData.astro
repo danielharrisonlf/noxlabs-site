@@ -1,0 +1,72 @@
+---
+/** Números do mercado, cada um com fonte e ano. Nenhum é resultado da Noxlabs. */
+import { statById } from "../data/stats";
+import Stat from "./Stat.astro";
+
+interface Props {
+  ids: string[];
+  title: string;
+  lede: string;
+  id?: string;
+}
+
+const { ids, title, lede, id = "numeros" } = Astro.props;
+const items = ids.map(statById).filter((s) => s !== undefined);
+---
+
+{
+  items.length > 0 && (
+    <section class="section market" id={id} aria-labelledby={`${id}-title`}>
+      <div class="wrap">
+        <header class="section-head" data-reveal>
+          <h2 id={`${id}-title`} class="section-title">
+            {title}
+          </h2>
+          <p class="section-lede">{lede}</p>
+        </header>
+        <div class:list={["market-grid", { "is-odd": items.length % 3 === 1, "is-uneven": items.length % 2 === 1 }]}>
+          {items.map((s, i) => (
+            <Stat stat={s} index={i % 3} size={i === 0 ? "lg" : "md"} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .market-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-5);
+  }
+
+  /* Com 4, 7 ou 10 dados, o primeiro ocupa duas colunas e a grade fecha sem buraco. */
+  .market-grid.is-odd > :global(:first-child) {
+    grid-column: span 2;
+  }
+
+  @media (max-width: 63.99rem) {
+    .market-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .market-grid.is-odd > :global(:first-child) {
+      grid-column: auto;
+    }
+
+    .market-grid.is-uneven > :global(:first-child) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 39.99rem) {
+    .market-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .market-grid > :global(*) {
+      grid-column: auto !important;
+    }
+  }
+</style>

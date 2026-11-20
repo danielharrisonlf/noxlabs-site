@@ -1,0 +1,601 @@
+---
+/**
+ * Estimativa ilustrativa de horas liberadas. Sem JS, mostra a conta com os
+ * valores iniciais; com JS, recalcula a cada ajuste e monta o e-mail com os
+ * números. Nada é enviado a lugar nenhum: a conta roda no navegador.
+ */
+import {
+  brl,
+  estimate,
+  estimatorDefaults as d,
+  estimatorLimits as lim,
+  HOURS_PER_MONTH,
+  num,
+  WEEKS_PER_MONTH,
+} from "../data/estimator";
+import { talkMailto } from "../data/site";
+import Icon from "./Icon.astro";
+
+const r = estimate(d);
+/** Quanto do trilho fica preenchido, em %. */
+const fill = (v: number, l: { min: number; max: number }) => Math.round(((v - l.min) / (l.max - l.min)) * 100);
+const freedPct = Math.round((r.freed / r.repetitive) * 100);
+
+const mailLines = (x: typeof d, res: ReturnType<typeof estimate>) => [
+  "Fiz a estimativa no site:",
+  `- ${x.people} pessoas, ${x.hours} h por semana cada em tarefas repetitivas`,
+  `- Custo mensal por pessoa: ${brl(x.cost)}`,
+  `- Parcela automatizável considerada: ${x.share}%`,
+  `- Resultado: ${num(res.freed)} horas por mês, cerca de ${brl(res.month)} por mês em horas de trabalho`,
+];
+const initialMail = talkMailto("Estimativa de horas liberadas", mailLines(d, r));
+---
+
+<section class="section est" id="estimativa" aria-labelledby="est-title">
+  <div class="wrap">
+    <header class="section-head" data-reveal>
+      <h2 id="est-title" class="section-title">Quanto tempo a sua equipe pode recuperar?</h2>
+      <p class="section-lede">
+        Ajuste os números para a sua empresa. A conta é simples, as premissas estão abaixo e nada sai do seu navegador.
+      </p>
+    </header>
+
+    <div class="est-grid" data-estimator>
+      <form class="est-form" aria-labelledby="est-title" data-est-form>
+        <div class="field">
+          <label for="est-people">Pessoas que fazem tarefas repetitivas</label>
+          <div class="range-row">
+            <input
+              id="est-people"
+              name="people"
+              type="range"
+              min={lim.people.min}
+              max={lim.people.max}
+              step={lim.people.step}
+              value={d.people}
+              style={`--fill:${fill(d.people, lim.people)}%`}
+              aria-describedby="est-people-hint"
+            />
+            <output for="est-people" class="range-val tabular" data-out="people">{d.people}</output>
+          </div>
+          <p class="hint" id="est-people-hint">Quem digita, confere, cobra, responde ou organiza a mesma coisa toda semana.</p>
+        </div>
+
+        <div class="field">
+          <label for="est-hours">Horas por semana, por pessoa, nessas tarefas</label>
+          <div class="range-row">
+            <input
+              id="est-hours"
+              name="hours"
+              type="range"
+              min={lim.hours.min}
+              max={lim.hours.max}
+              step={lim.hours.step}
+              value={d.hours}
+              style={`--fill:${fill(d.hours, lim.hours)}%`}
+              aria-describedby="est-hours-hint"
+            />
+            <output for="est-hours" class="range-val tabular" data-out="hours">{d.hours} h</output>
+          </div>
+          <p class="hint" id="est-hours-hint">Se não souber, pergunte à equipe quanto tempo vai em cópia, cobrança e conferência.</p>
+        </div>
+
+        <div class="field">
+          <label for="est-cost">Custo mensal de cada pessoa, com encargos</label>
+          <div class="money">
+            <span aria-hidden="true">R$</span>
+            <input
+              id="est-cost"
+              name="cost"
+              type="number"
+              inputmode="numeric"
+              min={lim.cost.min}
+              max={lim.cost.max}
+              step={lim.cost.step}
+              value={d.cost}
+              aria-describedby="est-cost-hint"
+            />
+          </div>
+          <p class="hint" id="est-cost-hint">Salário mais encargos e benefícios. Uma média serve.</p>
+        </div>
+
+        <div class="field">
+          <label for="est-share">Parte dessas tarefas que dá para automatizar</label>
+          <div class="range-row">
+            <input
+              id="est-share"
+              name="share"
+              type="range"
+              min={lim.share.min}
+              max={lim.share.max}
+              step={lim.share.step}
+              value={d.share}
+              style={`--fill:${fill(d.share, lim.share)}%`}
+              aria-describedby="est-share-hint"
+            />
+            <output for="est-share" class="range-val tabular" data-out="share">{d.share}%</output>
+          </div>
+          <p class="hint" id="est-share-hint">Uma hipótese sua. Começamos em 30% para não exagerar.</p>
+        </div>
+      </form>
+
+      <div class="est-result" aria-live="polite" aria-atomic="true" data-est-result>
+        <p class="res-label">Horas que podem voltar para a equipe</p>
+        <p class="res-big tabular"><span data-res="freed">{num(r.freed)}</span> <span class="res-unit">horas por mês</span></p>
+
+        <div class="res-bar" aria-hidden="true">
+          <span class="res-bar-fill" data-res-bar style={`--p:${freedPct}%`}></span>
+        </div>
+        <p class="res-bar-legend">
+          de <strong class="tabular" data-res="repetitive">{num(r.repetitive)}</strong> horas por mês hoje em tarefas repetitivas
+        </p>
+
+        <dl class="res-list">
+          <div>
+            <dt>Equivale a</dt>
+            <dd class="tabular"><span data-res="fte">{num(r.fte, 1)}</span> pessoa(s) em tempo integral</dd>
+          </div>
+          <div>
+            <dt>Em horas de trabalho</dt>
+            <dd class="tabular"><span data-res="month">{brl(r.month)}</span> por mês</dd>
+          </div>
+          <div>
+            <dt>Em um ano</dt>
+            <dd class="tabular"><span data-res="year">{brl(r.year)}</span></dd>
+          </div>
+        </dl>
+
+        <a class="btn btn-primary btn-block" href={initialMail} data-est-mail>
+          Enviar esta estimativa e marcar conversa
+          <Icon name="arrow-right" />
+        </a>
+        <p class="res-disclaimer">
+          Estimativa ilustrativa, não promessa de resultado. Horas liberadas viram capacidade para atender mais clientes ou
+          fazer trabalho de mais valor; não são economia automática de salário.
+        </p>
+      </div>
+    </div>
+
+    <details class="assumptions">
+      <summary>
+        <span>Como a conta é feita</span>
+        <Icon name="plus" />
+      </summary>
+      <ul role="list" class="checks">
+        <li>
+          Horas repetitivas por mês = pessoas × horas por semana × {WEEKS_PER_MONTH} semanas. O mês tem cerca de 4,3 semanas;
+          usamos {WEEKS_PER_MONTH} para não inflar.
+        </li>
+        <li>Horas liberadas = horas repetitivas × a parte que você indicou como automatizável.</li>
+        <li>
+          Custo da hora = custo mensal ÷ {HOURS_PER_MONTH} horas, o divisor usado na CLT para a jornada de 44 horas semanais.
+          Um divisor maior deixa a hora mais barata e o resultado mais baixo.
+        </li>
+        <li>Tempo integral = horas liberadas ÷ {HOURS_PER_MONTH} horas por mês.</li>
+        <li>Não entram na conta: erros evitados, multas por atraso, clientes a mais atendidos nem o custo da automação.</li>
+      </ul>
+    </details>
+  </div>
+</section>
+
+<script>
+  import { brl, estimate, num } from "../data/estimator";
+  import { talkMailto } from "../data/site";
+
+  const form = document.querySelector<HTMLFormElement>("[data-est-form]");
+  const result = document.querySelector<HTMLElement>("[data-est-result]");
+  const mail = document.querySelector<HTMLAnchorElement>("[data-est-mail]");
+  const bar = document.querySelector<HTMLElement>("[data-res-bar]");
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  if (form && result) {
+    const field = (name: string) => form.elements.namedItem(name) as HTMLInputElement;
+    const out = (name: string) => form.querySelector<HTMLOutputElement>(`[data-out="${name}"]`);
+    const res = (name: string) => result.querySelector<HTMLElement>(`[data-res="${name}"]`);
+    const shown = new Map<string, number>();
+    const frames = new Map<string, number>();
+
+    const clamp = (input: HTMLInputElement) => {
+      const v = Number(input.value);
+      const min = Number(input.min);
+      const max = Number(input.max);
+      if (!Number.isFinite(v)) return min;
+      return Math.min(Math.max(v, min), max);
+    };
+
+    // O número desliza até o novo valor; com movimento reduzido, troca direto.
+    const tween = (key: string, to: number, fmt: (n: number) => string) => {
+      const el = res(key);
+      if (!el) return;
+      const from = shown.get(key) ?? to;
+      shown.set(key, to);
+      cancelAnimationFrame(frames.get(key) ?? 0);
+      if (reduce.matches || from === to) {
+        el.textContent = fmt(to);
+        return;
+      }
+      const start = performance.now();
+      const step = (now: number) => {
+        const t = Math.min((now - start) / 320, 1);
+        const e = 1 - (1 - t) ** 3;
+        el.textContent = fmt(from + (to - from) * e);
+        if (t < 1) frames.set(key, requestAnimationFrame(step));
+      };
+      frames.set(key, requestAnimationFrame(step));
+    };
+
+    const update = () => {
+      const x = {
+        people: clamp(field("people")),
+        hours: clamp(field("hours")),
+        cost: clamp(field("cost")),
+        share: clamp(field("share")),
+      };
+      const r = estimate(x);
+      const p = out("people");
+      const h = out("hours");
+      const s = out("share");
+      for (const name of ["people", "hours", "share"]) {
+        const input = field(name);
+        const pct = ((Number(input.value) - Number(input.min)) / (Number(input.max) - Number(input.min))) * 100;
+        input.style.setProperty("--fill", `${pct}%`);
+      }
+      if (p) p.textContent = String(x.people);
+      if (h) h.textContent = `${x.hours} h`;
+      if (s) s.textContent = `${x.share}%`;
+      field("hours").setAttribute("aria-valuetext", `${x.hours} horas por semana`);
+      field("share").setAttribute("aria-valuetext", `${x.share} por cento`);
+      field("people").setAttribute("aria-valuetext", `${x.people} pessoas`);
+
+      tween("freed", r.freed, (n) => num(n));
+      tween("repetitive", r.repetitive, (n) => num(n));
+      tween("fte", r.fte, (n) => num(n, 1));
+      tween("month", r.month, brl);
+      tween("year", r.year, brl);
+      bar?.style.setProperty("--p", `${Math.round((r.freed / r.repetitive) * 100)}%`);
+
+      if (mail) {
+        mail.href = talkMailto("Estimativa de horas liberadas", [
+          "Fiz a estimativa no site:",
+          `- ${x.people} pessoas, ${x.hours} h por semana cada em tarefas repetitivas`,
+          `- Custo mensal por pessoa: ${brl(x.cost)}`,
+          `- Parcela automatizável considerada: ${x.share}%`,
+          `- Resultado: ${num(r.freed)} horas por mês, cerca de ${brl(r.month)} por mês em horas de trabalho`,
+        ]);
+      }
+    };
+
+    form.addEventListener("input", update);
+    form.addEventListener("submit", (event) => event.preventDefault());
+    // Campo de custo: corrige o valor fora do intervalo quando a pessoa sai dele.
+    field("cost").addEventListener("change", () => {
+      field("cost").value = String(clamp(field("cost")));
+      update();
+    });
+    // Primeiro cálculo sem animação.
+    shown.clear();
+    update();
+  }
+</script>
+
+<style>
+  .est {
+    background: var(--surface);
+    border-block: 1px solid var(--line);
+  }
+
+  .est-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: var(--s-5);
+    align-items: stretch;
+  }
+
+  .est-form {
+    display: grid;
+    gap: var(--s-5);
+    padding: clamp(1.25rem, 1rem + 1.5vw, 2.25rem);
+    border: 1px solid var(--line);
+    border-radius: var(--r-xl);
+    background-color: var(--bg);
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-blend-mode: normal;
+  }
+
+  .field {
+    display: grid;
+    gap: var(--s-2);
+    padding: var(--s-4);
+    border-radius: var(--r-md);
+    background: var(--surface);
+    border: 1px solid var(--line);
+  }
+
+  .field label {
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .hint {
+    font-size: var(--t-xs);
+    color: var(--ink-3);
+  }
+
+  .range-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 4.5rem;
+    gap: var(--s-4);
+    align-items: center;
+  }
+
+  .range-val {
+    justify-self: end;
+    min-width: 4.5rem;
+    padding: 0.35rem 0.5rem;
+    border-radius: var(--r-sm);
+    background: var(--marca-soft);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: var(--t-md);
+    font-weight: 700;
+    text-align: center;
+  }
+
+  /* Controle deslizante: trilho fino, alça grande o bastante para o polegar. */
+  input[type="range"] {
+    --track: var(--line);
+    width: 100%;
+    height: 2.75rem;
+    margin: 0;
+    background: transparent;
+    appearance: none;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, var(--pine) var(--fill, 0%), var(--track) var(--fill, 0%));
+  }
+
+  input[type="range"]::-moz-range-track {
+    height: 6px;
+    border-radius: 6px;
+    background: var(--track);
+  }
+
+  input[type="range"]::-moz-range-progress {
+    height: 6px;
+    border-radius: 6px;
+    background: var(--pine);
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-top: calc(3px - 0.875rem);
+    border: 3px solid #ffffff;
+    border-radius: 50%;
+    background: var(--pine);
+    box-shadow: 0 2px 8px rgb(15 42 34 / 0.35);
+    transition: transform var(--d-fast) var(--ease-out);
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 3px solid #ffffff;
+    border-radius: 50%;
+    background: var(--pine);
+    box-shadow: 0 2px 8px rgb(15 42 34 / 0.35);
+  }
+
+  input[type="range"]:active::-webkit-slider-thumb {
+    transform: scale(1.12);
+  }
+
+  input[type="range"]:focus-visible {
+    outline-offset: 2px;
+    border-radius: var(--r-sm);
+  }
+
+  .money {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: 3rem;
+    padding-inline: var(--s-4);
+    border: 1.5px solid var(--line-2);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    font-weight: 700;
+    color: var(--ink-2);
+  }
+
+  .money:focus-within {
+    border-color: var(--pine);
+    box-shadow: 0 0 0 3px var(--pine-soft);
+  }
+
+  .money input {
+    flex: 1;
+    min-width: 0;
+    min-height: 2.75rem;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .money input:focus-visible {
+    outline: none;
+  }
+
+  /* ---- Resultado ---- */
+  .est-result {
+    display: grid;
+    align-content: start;
+    gap: var(--s-3);
+    padding: clamp(1.5rem, 1rem + 2vw, 2.75rem);
+    border-radius: var(--r-xl);
+    background: var(--pine-deep);
+    color: #f2f7f3;
+    box-shadow: var(--shadow-2);
+  }
+
+  .res-label {
+    font-weight: 650;
+    color: #c3d8cd;
+  }
+
+  .res-big {
+    font-family: var(--font-display);
+    font-size: clamp(3.25rem, 2.2rem + 4vw, 5.5rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--marca);
+  }
+
+  .res-unit {
+    display: inline-block;
+    font-size: 0.32em;
+    letter-spacing: -0.01em;
+    color: #f2f7f3;
+  }
+
+  .res-bar {
+    height: 12px;
+    margin-top: var(--s-2);
+    border-radius: 12px;
+    background: rgb(255 255 255 / 0.14);
+    overflow: hidden;
+  }
+
+  .res-bar-fill {
+    display: block;
+    height: 100%;
+    width: var(--p);
+    border-radius: inherit;
+    background: var(--marca);
+    transition: width var(--d-slow) var(--ease-out);
+  }
+
+  .res-bar-legend {
+    font-size: var(--t-sm);
+    color: #c3d8cd;
+  }
+
+  .res-bar-legend strong {
+    color: #f2f7f3;
+  }
+
+  .res-list {
+    display: grid;
+    gap: 0;
+    margin-block: var(--s-3);
+    border-top: 1px solid rgb(255 255 255 / 0.16);
+  }
+
+  .res-list div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--s-1) var(--s-4);
+    padding-block: var(--s-3);
+    border-bottom: 1px solid rgb(255 255 255 / 0.16);
+  }
+
+  .res-list dt {
+    color: #c3d8cd;
+  }
+
+  .res-list dd {
+    font-weight: 700;
+  }
+
+  .est-result .btn-primary {
+    background: var(--marca);
+    color: #1d2a12;
+  }
+
+  @media (hover: hover) {
+    .est-result .btn-primary:hover {
+      background: #ffeb8a;
+    }
+  }
+
+  .est-result :focus-visible {
+    outline-color: var(--marca);
+  }
+
+  .res-disclaimer {
+    font-size: var(--t-xs);
+    color: #c3d8cd;
+  }
+
+  .assumptions {
+    margin-top: var(--s-5);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--bg);
+  }
+
+  .assumptions summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-4);
+    min-height: 3.5rem;
+    padding: var(--s-3) var(--s-5);
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .assumptions summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .assumptions summary :global(svg) {
+    flex: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    transition: transform var(--d-base) var(--ease-spring);
+  }
+
+  .assumptions[open] summary :global(svg) {
+    transform: rotate(45deg);
+  }
+
+  .assumptions ul {
+    padding: 0 var(--s-5) var(--s-5);
+    font-size: var(--t-sm);
+  }
+
+  @media (max-width: 56rem) {
+    .est-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 26rem) {
+    .range-row {
+      grid-template-columns: minmax(0, 1fr) 3.75rem;
+      gap: var(--s-2);
+    }
+
+    .range-val {
+      min-width: 3.75rem;
+    }
+
+    .field {
+      padding: var(--s-3);
+    }
+  }
+</style>

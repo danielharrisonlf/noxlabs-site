@@ -65,21 +65,17 @@ for (const [width, height, mobile] of [
   await page.waitForTimeout(800);
   const scrollFrames = await page.evaluate(() => window.__perf.frames.splice(0));
 
-  // Interações: seletor, Kairos, FAQ.
-  await page.evaluate(() => document.getElementById("servicos").scrollIntoView());
+  // Interações: calculadora (arrastar e digitar) e FAQ.
+  await page.evaluate(() => document.getElementById("estimativa").scrollIntoView());
   await page.waitForTimeout(500);
-  const tabs = page.locator("#servicos [role='tab']");
-  for (const i of [1, 3, 2]) {
-    await tabs.nth(i).click();
-    await page.waitForTimeout(700);
+  const range = page.locator("#est-hours");
+  await range.focus();
+  for (let i = 0; i < 12; i++) {
+    await page.keyboard.press("ArrowRight");
+    await page.waitForTimeout(60);
   }
-  await page.evaluate(() => document.querySelector("[data-flow]").scrollIntoView());
-  await page.waitForTimeout(500);
-  const next = page.locator("[data-flow] [data-next]").first();
-  for (let i = 0; i < 3; i++) {
-    await next.click();
-    await page.waitForTimeout(900);
-  }
+  await page.locator("#est-cost").fill("6500");
+  await page.waitForTimeout(600);
   await page.locator(".faq-item summary").nth(1).scrollIntoViewIfNeeded();
   await page.locator(".faq-item summary").nth(1).click();
   await page.waitForTimeout(700);

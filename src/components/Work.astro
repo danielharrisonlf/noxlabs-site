@@ -1,0 +1,325 @@
+---
+/** O que já construí: histórias em linguagem de negócio, com link para a página de cada caso. */
+import { detailCases, moreCases, srcset } from "../data/cases";
+import Icon from "./Icon.astro";
+---
+
+<section class="section work" id="casos" aria-labelledby="casos-title">
+  <div class="wrap">
+    <header class="section-head" data-reveal>
+      <h2 id="casos-title" class="section-title">O que já construí.</h2>
+      <p class="section-lede">
+        Sistemas que construí do começo ao fim. Cada um começou por um problema de rotina, não por uma tecnologia.
+      </p>
+    </header>
+
+    <ul role="list" class="cases">
+      {
+        detailCases.map((c, i) => (
+          <li class:list={["case", { "has-shot": c.image }]} data-reveal style={`--i:${i % 2}`}>
+            <a class="case-link" href={`/casos/${c.slug}/`}>
+              {c.image ? (
+                <span class="case-shot">
+                  <img
+                    src={c.image.src}
+                    srcset={srcset(c.image.src, c.image.width)}
+                    sizes="(min-width: 64rem) 36rem, 92vw"
+                    width={c.image.width}
+                    height={c.image.height}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </span>
+              ) : (
+                <span class="case-shot case-shot-plain" aria-hidden="true">
+                  <span class="plain-icon">
+                    <Icon name={c.icon} />
+                  </span>
+                </span>
+              )}
+              <span class="case-body">
+                <span class="case-status">{c.status}</span>
+                <span class="case-name">{c.name}</span>
+                <span class="case-summary">{c.summary}</span>
+                <span class="case-problem">
+                  <strong>O problema:</strong> {c.hook}
+                </span>
+                <span class="case-go">
+                  Ver o caso
+                  <Icon name="arrow-right" />
+                </span>
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <h3 class="more-title" data-reveal>Também construí</h3>
+    <ul role="list" class="more">
+      {
+        moreCases.map((c, i) => (
+          <li data-reveal style={`--i:${i % 4}`}>
+            <span class="more-icon">
+              <Icon name={c.icon} />
+            </span>
+            <span class="more-name">{c.name}</span>
+            <span class="more-summary">{c.summary}</span>
+            <span class="tag tag-neutral">{c.status}</span>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="work-note">
+      São sistemas próprios e projetos que construí, não clientes. Os ganhos descritos são o que cada sistema muda na rotina,
+      não números medidos em empresas.
+    </p>
+  </div>
+</section>
+
+<style>
+  .cases {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-5);
+  }
+
+  .case-link {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    height: 100%;
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-1);
+    overflow: hidden;
+    text-decoration: none;
+    transition:
+      transform var(--d-base) var(--ease-out),
+      box-shadow var(--d-base) var(--ease-out),
+      border-color var(--d-base) var(--ease-out);
+  }
+
+  .case-shot {
+    display: block;
+    aspect-ratio: 16 / 10;
+    background: var(--sunken);
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+  }
+
+  .case-shot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: left top;
+    transition: transform var(--d-slow) var(--ease-out);
+  }
+
+  /* Sem captura: o ícone do sistema sobre papel quadriculado. */
+  .case-shot-plain {
+    display: grid;
+    place-items: center;
+    background-color: var(--pine-deep);
+    background-image:
+      linear-gradient(rgb(255 255 255 / 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(255 255 255 / 0.06) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .plain-icon {
+    display: grid;
+    place-items: center;
+    width: 5rem;
+    height: 5rem;
+    border-radius: var(--r-lg);
+    background: var(--marca);
+    color: #1d2a12;
+  }
+
+  .plain-icon :global(svg) {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .case-body {
+    display: grid;
+    align-content: start;
+    gap: var(--s-2);
+    padding: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+  }
+
+  .case-status {
+    font-size: var(--t-xs);
+    font-weight: 700;
+    color: var(--pine-ink);
+  }
+
+  .case-name {
+    font-family: var(--font-display);
+    font-size: var(--t-xl);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+  }
+
+  .case-summary {
+    font-size: var(--t-base);
+    font-weight: 600;
+  }
+
+  .case-problem {
+    color: var(--ink-2);
+    font-size: var(--t-sm);
+  }
+
+  .case-problem strong {
+    color: var(--ink);
+  }
+
+  .case-go {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: 2.75rem;
+    margin-top: var(--s-2);
+    color: var(--caneta);
+    font-weight: 700;
+  }
+
+  .case-go :global(svg) {
+    width: 1.05rem;
+    height: 1.05rem;
+    transition: transform var(--d-base) var(--ease-spring);
+  }
+
+  @media (hover: hover) {
+    .case-link:hover {
+      transform: translateY(-3px);
+      border-color: var(--line-2);
+      box-shadow: var(--shadow-2);
+    }
+
+    .case-link:hover img {
+      transform: scale(1.03);
+    }
+
+    .case-link:hover .case-go :global(svg) {
+      transform: translateX(3px);
+    }
+  }
+
+  .more-title {
+    margin-top: clamp(3rem, 2.5rem + 2vw, 4.5rem);
+    margin-bottom: var(--s-4);
+    font-size: var(--t-lg);
+  }
+
+  .more {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 clamp(2rem, 4vw, 4rem);
+    border-top: 1px solid var(--line-2);
+  }
+
+  .more li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "icon name tag"
+      "icon text text";
+    gap: var(--s-1) var(--s-4);
+    align-items: start;
+    padding-block: var(--s-5);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .more-icon {
+    grid-area: icon;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--r-sm);
+    background: var(--sunken);
+    color: var(--pine-ink);
+  }
+
+  .more-icon :global(svg) {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .more-name {
+    grid-area: name;
+    font-weight: 700;
+  }
+
+  .more-summary {
+    grid-area: text;
+    color: var(--ink-2);
+    font-size: var(--t-sm);
+  }
+
+  .more .tag {
+    grid-area: tag;
+  }
+
+  .work-note {
+    margin-top: var(--s-5);
+    font-size: var(--t-sm);
+    color: var(--ink-3);
+    max-width: 70ch;
+  }
+
+  @media (max-width: 63.99rem) {
+    .cases {
+      grid-template-columns: 1fr;
+    }
+
+    .case-link {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      grid-template-rows: none;
+    }
+
+    .case-shot {
+      aspect-ratio: auto;
+      min-height: 100%;
+      border-bottom: 0;
+      border-right: 1px solid var(--line);
+    }
+
+    .more {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 44rem) {
+    .case-link {
+      grid-template-columns: 1fr;
+    }
+
+    .case-shot {
+      aspect-ratio: 16 / 10;
+      min-height: 0;
+      border-right: 0;
+      border-bottom: 1px solid var(--line);
+    }
+  }
+
+  @media (max-width: 26rem) {
+    .more li {
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-areas:
+        "icon name"
+        "icon text"
+        "icon tag";
+    }
+
+    .more .tag {
+      justify-self: start;
+      margin-top: var(--s-2);
+    }
+  }
+</style>

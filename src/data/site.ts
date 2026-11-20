@@ -2,47 +2,56 @@
 
 const email = "daniel.harrisonlf@gmail.com";
 
-const diagnosisSubject = "Diagnóstico de 30 min com a Noxlabs";
+const talkSubject = "Conversa de 30 min com a Noxlabs";
 
 /** Roteiro que já vem no corpo do e-mail: o visitante só preenche. */
 export const mailScript = [
-  "Empresa:",
+  "Empresa e ramo:",
   "Meu cargo:",
-  "O problema, em poucas linhas:",
-  "O que já tentamos:",
-  "Prazo ou data que importa:",
+  "Quantas pessoas trabalham na rotina que quero melhorar:",
+  "A tarefa que mais toma tempo hoje:",
+  "Sistemas e planilhas que usamos:",
   "Horários bons para uma conversa de 30 min:",
 ] as const;
 
-function mailBody(context?: string) {
-  return ["Olá, Daniel.", "", ...(context ? [`Contexto: ${context}`, ""] : []), ...mailScript].join("\n");
+function mailBody(context?: string, extra: string[] = []) {
+  return ["Olá, Daniel.", "", ...(context ? [`Assunto: ${context}`, ""] : []), ...extra, ...(extra.length ? [""] : []), ...mailScript].join(
+    "\n",
+  );
 }
 
 /** mailto com assunto e roteiro preenchidos; `topic` entra no assunto e no corpo. */
-export function diagnosisMailto(topic?: string) {
-  const subject = topic ? `${diagnosisSubject}: ${topic}` : diagnosisSubject;
-  return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(mailBody(topic))}`;
+export function talkMailto(topic?: string, extra: string[] = []) {
+  const subject = topic ? `${talkSubject}: ${topic}` : talkSubject;
+  return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(mailBody(topic, extra))}`;
 }
 
 export const site = {
   name: "Noxlabs",
   url: "https://noxlabs.tech",
-  title: "Noxlabs — software e IA que saem do papel e ficam no ar",
+  title: "Noxlabs | Automação, sistemas sob medida e IA para empresas",
   description:
-    "Consultoria de software e IA de Daniel Harrison. Produtos sob medida, agentes de IA via MCP, integrações, arquitetura e redução de custo de nuvem. Comece por uma conversa de 30 minutos.",
+    "Automação de rotinas, atendimento no WhatsApp com IA e sistemas sob medida para escritórios de contabilidade e pequenas e médias empresas. Menos tarefa manual, menos erro, mais tempo para atender e crescer.",
   locale: "pt_BR",
   email,
   mailto: `mailto:${email}`,
-  diagnosisMailto: diagnosisMailto(),
+  talkMailto: talkMailto(),
+  talkSubject,
   /**
    * PENDENTE: link de agendamento (Cal.com ou similar) ainda não existe.
-   * Enquanto for null, o site não mostra botão de agenda e o diagnóstico
-   * é pedido por e-mail. Preencha com a URL real para ativar.
+   * Enquanto for null, o site não mostra botão de agenda e a conversa
+   * é pedida por e-mail. Preencha com a URL real para ativar.
    */
   scheduleUrl: null as string | null,
+  /**
+   * PENDENTE: número de WhatsApp comercial. Enquanto for null, nenhum botão
+   * de WhatsApp aparece. Formato esperado: só dígitos com DDI e DDD, por
+   * exemplo "5511999999999"; o site monta o link wa.me.
+   */
+  whatsapp: null as string | null,
   founder: {
     name: "Daniel Harrison",
-    role: "Engenheiro de software e fundador da Noxlabs",
+    role: "Fundador da Noxlabs",
   },
   links: {
     kairos: "https://kairos.noxlabs.tech",
@@ -53,11 +62,16 @@ export const site = {
   },
 } as const;
 
+/** Link de WhatsApp com mensagem pronta, ou null se o número não estiver configurado. */
+export function whatsappHref(text = "Olá, Daniel. Quero conversar sobre automatizar uma rotina da minha empresa.") {
+  return site.whatsapp ? `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(text)}` : null;
+}
+
 export const nav = [
-  { label: "Serviços", href: "/#servicos", id: "servicos" },
-  { label: "Kairos", href: "/#kairos", id: "kairos" },
+  { label: "Soluções", href: "/#solucoes", id: "solucoes" },
+  { label: "Contabilidade", href: "/contabilidade/", id: "contabilidade" },
+  { label: "Segmentos", href: "/#segmentos", id: "segmentos" },
   { label: "Casos", href: "/#casos", id: "casos" },
-  { label: "Processo", href: "/#processo", id: "processo" },
-  { label: "Sobre", href: "/#sobre", id: "sobre" },
+  { label: "Estimativa", href: "/#estimativa", id: "estimativa" },
   { label: "Perguntas", href: "/#perguntas", id: "perguntas" },
 ] as const;

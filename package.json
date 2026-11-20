@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Site institucional da Noxlabs (noxlabs.tech).",
+  "description": "Site da Noxlabs (noxlabs.tech): automação, sistemas sob medida e IA para escritórios de contabilidade e PMEs.",
   "packageManager": "pnpm@10.11.1",
   "engines": {
     "node": ">=22.12"
@@ -14,8 +14,6 @@
     "preview": "astro preview --port 4321",
     "og": "node scripts/og-image.mjs",
     "shots": "node scripts/screenshots.mjs",
-    "frames": "node scripts/frames.mjs",
-    "video": "node scripts/motion-video.mjs",
     "perf": "node scripts/perf.mjs",
     "check:a11y": "node scripts/check-page.mjs"
   },

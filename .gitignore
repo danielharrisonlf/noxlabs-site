@@ -8,3 +8,6 @@ playwright-report/
 .impeccable/review/
 .impeccable/mocks/
 *.log
+
+# Capturas locais de revisão: não vão para o repositório.
+docs/screenshots/local/

@@ -1,0 +1,88 @@
+---
+/**
+ * Bloco de dado de mercado: número grande, frase curta e a fonte com o ano.
+ * O número conta até o valor quando entra na tela (motion.ts); o HTML já traz
+ * o valor final, e o leitor de tela lê a frase completa, que não se mexe.
+ */
+import { type Stat, formatStat } from "../data/stats";
+
+interface Props {
+  stat: Stat;
+  index?: number;
+  size?: "lg" | "md";
+}
+
+const { stat, index = 0, size = "lg" } = Astro.props;
+const shown = formatStat(stat);
+---
+
+<figure class:list={["stat", `stat-${size}`]} data-reveal style={`--i:${index}`}>
+  <p class="stat-value tabular" aria-hidden="true">
+    {stat.prefix}<span
+      data-count={stat.value}
+      data-decimals={stat.decimals ?? 0}>{shown}</span
+    >{stat.suffix && <span class="stat-suffix">{stat.suffix}</span>}
+  </p>
+  <p class="stat-text">
+    <span class="visually-hidden">{stat.prefix}{shown}{stat.suffix}: </span>
+    {stat.text}
+  </p>
+  <figcaption class="fonte">
+    Fonte: <a href={stat.source.url}>{stat.source.org}, {stat.source.title}</a>, {stat.source.year}.{
+      stat.note && ` ${stat.note}`
+    }
+  </figcaption>
+</figure>
+
+<style>
+  .stat {
+    display: grid;
+    align-content: start;
+    gap: var(--s-3);
+    padding: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--surface);
+  }
+
+  .stat-value {
+    justify-self: start;
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    background: linear-gradient(transparent 62%, var(--marca) 62%, var(--marca) 90%, transparent 90%);
+    padding-inline: 0.05em;
+  }
+
+  :global(.band) .stat-value {
+    background: none;
+    color: var(--marca);
+  }
+
+  .stat-lg .stat-value {
+    font-size: clamp(2.75rem, 2rem + 3vw, 4.25rem);
+  }
+
+  .stat-md .stat-value {
+    font-size: clamp(2.25rem, 1.8rem + 2vw, 3.25rem);
+  }
+
+  .stat-suffix {
+    font-size: 0.55em;
+    letter-spacing: -0.01em;
+    margin-left: 0.12em;
+  }
+
+  .stat-text {
+    font-size: var(--t-base);
+    line-height: 1.45;
+    max-width: 34ch;
+  }
+
+  .stat .fonte {
+    margin-top: auto;
+    padding-top: var(--s-2);
+  }
+</style>

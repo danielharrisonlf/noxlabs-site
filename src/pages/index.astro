@@ -1,13 +1,16 @@
 ---
 import About from "../components/About.astro";
-import Cases from "../components/Cases.astro";
+import AccountingBlock from "../components/AccountingBlock.astro";
 import Contact from "../components/Contact.astro";
+import Estimator from "../components/Estimator.astro";
 import Faq from "../components/Faq.astro";
 import Hero from "../components/Hero.astro";
-import Kairos from "../components/Kairos.astro";
-import Process from "../components/Process.astro";
-import Services from "../components/Services.astro";
-import Thread from "../components/Thread.astro";
+import HowItWorks from "../components/HowItWorks.astro";
+import MarketData from "../components/MarketData.astro";
+import Security from "../components/Security.astro";
+import Segments from "../components/Segments.astro";
+import Solutions from "../components/Solutions.astro";
+import Work from "../components/Work.astro";
 import { faq } from "../data/content";
 import Base from "../layouts/Base.astro";
 
@@ -23,13 +26,20 @@ const faqSchema = {
 ---
 
 <Base path="/" schema={[faqSchema]}>
-  <Thread />
   <Hero />
-  <Services />
-  <Kairos />
-  <Cases />
-  <Process />
+  <MarketData
+    ids={["ms-sem-tempo", "mckinsey-potencial", "salesforce-imediato", "sebrae-whatsapp", "cetic-ia", "cetic-erp"]}
+    title="O trabalho manual custa mais do que parece."
+    lede="Pesquisas públicas sobre o tempo das equipes, a expectativa dos clientes e a tecnologia nas empresas brasileiras. São dados do mercado, não resultados da Noxlabs."
+  />
+  <Solutions />
+  <HowItWorks />
+  <AccountingBlock />
+  <Segments />
+  <Work />
+  <Estimator />
   <About />
-  <Faq />
+  <Security />
+  <Faq items={faq} />
   <Contact />
 </Base>

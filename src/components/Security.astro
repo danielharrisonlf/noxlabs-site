@@ -1,0 +1,114 @@
+---
+import { security } from "../data/content";
+import Icon from "./Icon.astro";
+---
+
+<section class="section sec" id="seguranca" aria-labelledby="seg-title">
+  <div class="wrap sec-grid">
+    <header class="sec-head" data-reveal>
+      <span class="sec-badge" aria-hidden="true"><Icon name="shield" /></span>
+      <h2 id="seg-title" class="section-title">Os dados dos seus clientes continuam protegidos.</h2>
+      <p class="section-lede">
+        Automação e IA mexem com informação sensível: documentos, valores, dados pessoais. A segurança entra no desenho
+        desde o primeiro dia, seguindo a LGPD, e é explicada em português, sem letra miúda.
+      </p>
+    </header>
+
+    <ul role="list" class="sec-list">
+      {
+        security.map((item, i) => (
+          <li data-reveal style={`--i:${i % 3}`}>
+            <span class="sec-icon">
+              <Icon name={item.icon} />
+            </span>
+            <div>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .sec-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: var(--s-7) clamp(2rem, 6vw, 6rem);
+    align-items: start;
+  }
+
+  .sec-head {
+    display: grid;
+    gap: var(--s-4);
+    position: sticky;
+    top: calc(var(--header-h) + 2rem);
+  }
+
+  .sec-badge {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: var(--r-md);
+    background: var(--pine);
+    color: #ffffff;
+  }
+
+  .sec-badge :global(svg) {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  .sec-list {
+    display: grid;
+    gap: var(--s-3);
+  }
+
+  .sec-list li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--s-4);
+    padding: var(--s-5);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--surface);
+  }
+
+  .sec-icon {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: var(--pine-soft);
+    color: var(--pine-ink);
+  }
+
+  .sec-icon :global(svg) {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+
+  .sec-list h3 {
+    font-size: var(--t-md);
+    line-height: 1.25;
+    margin-bottom: var(--s-1);
+  }
+
+  .sec-list p {
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 56rem) {
+    .sec-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .sec-head {
+      position: static;
+    }
+  }
+</style>

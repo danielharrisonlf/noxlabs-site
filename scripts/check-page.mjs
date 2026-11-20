@@ -1,14 +1,14 @@
 // Verificações no navegador contra um site no ar (padrão: dist/ servido
 // localmente; use BASE_URL=http://localhost:8088 para o contêiner).
-// - transbordo horizontal de 320 a 2560 px, em paisagem e em alturas baixas, nos dois temas
+// - transbordo horizontal de 320 a 2560 px, em paisagem e em alturas baixas
 // - erros de console e violações de CSP
 // - contraste WCAG de todo texto visível contra o fundo efetivo
-// - imagens sem alt, ordem de títulos, alvos de toque
+// - imagens sem alt, ordem de títulos, um H1, alvos de toque
 // - CTA principal visível na primeira tela do celular (390x844 e 360x740)
-// - tema (alternância e persistência), menu em tela cheia (foco, Esc), cópia de e-mail
-// - seletor de problemas (abas, teclado, assunto do e-mail) e o caminho do Kairos
-//   (próximo, teclado, gesto, reproduzir/pausar); CTA da base no celular
-// - movimento reduzido (tudo visível e parado) e página sem JavaScript
+// - todo dado de mercado com fonte (link) e ano; nenhum termo técnico fora do rodapé técnico
+// - menu em tela cheia (foco, inerte, Esc), CTA da base, seção atual na navegação
+// - calculadora (teclado, digitação, e-mail com os números), cópia de e-mail
+// - movimento reduzido (tudo visível e no estado final) e página sem JavaScript
 import { chromium } from "@playwright/test";
 import { serveDist } from "./serve-dist.mjs";
 
@@ -19,7 +19,14 @@ if (!base) {
   base = "http://127.0.0.1:4331";
 }
 
-const routes = ["/", "/casos/kairos/", "/casos/clinicflow/", "/casos/whatsapp-control-center/", "/nao-existe/"];
+const routes = [
+  "/",
+  "/contabilidade/",
+  "/casos/clinicflow/",
+  "/casos/whatsapp-control-center/",
+  "/casos/kairos/",
+  "/nao-existe/",
+];
 const viewports = [
   [320, 640],
   [360, 740],
@@ -38,42 +45,47 @@ const viewports = [
 ];
 // Larguras com a auditoria completa (contraste, títulos, alvos).
 const audited = new Set(["320x640", "390x844", "768x1024", "1440x900", "2560x1440"]);
+// Primeira tela: onde fica o CTA principal de cada rota.
+const heroCta = { "/": ".hero .btn-primary", "/contabilidade/": ".acc-hero .btn-primary" };
+// Termos técnicos que não podem aparecer no caminho principal (o rodapé técnico das páginas de caso é a exceção).
+const jargon =
+  /\b(arquitetura|banco de dados|API|MCP|microsservi\w*|deploy|PostgreSQL|Redis|NestJS|React|OAuth|stack|gateway|outbox|backend|frontend|servidor|webhooks?|JWT|Docker|Prisma)\b/i;
+
 const failures = [];
 const fail = (msg) => failures.push(msg);
 
 const browser = await chromium.launch();
 
-for (const theme of ["light", "dark"]) {
-  const context = await browser.newContext({ colorScheme: theme, reducedMotion: "reduce" });
+{
+  const context = await browser.newContext({ colorScheme: "light", reducedMotion: "reduce" });
   const page = await context.newPage();
   let current = "";
   page.on("console", (m) => {
     // A rota de 404 responde 404 de propósito.
     if (current === "/nao-existe/" && m.text().includes("404")) return;
-    if (m.type() === "error") fail(`[${theme}] console: ${m.text()}`);
+    if (m.type() === "error") fail(`console: ${m.text()}`);
   });
-  page.on("pageerror", (e) => fail(`[${theme}] pageerror: ${e.message}`));
+  page.on("pageerror", (e) => fail(`pageerror: ${e.message}`));
 
   for (const route of routes) {
     current = route;
     for (const [width, height] of viewports) {
       await page.setViewportSize({ width, height });
       await page.goto(base + route, { waitUntil: "networkidle" });
-      const tag = `[${theme} ${width}x${height} ${route}]`;
+      const tag = `[${width}x${height} ${route}]`;
 
       const sw = await page.evaluate(() => document.documentElement.scrollWidth);
       if (sw > width) fail(`${tag} transbordo: scrollWidth ${sw}`);
 
-      // CTA principal na primeira tela do celular.
-      if (route === "/" && ((width === 390 && height === 844) || (width === 360 && height === 740))) {
-        const box = await page.locator(".hero .btn-primary").boundingBox();
+      if (heroCta[route] && ((width === 390 && height === 844) || (width === 360 && height === 740))) {
+        const box = await page.locator(heroCta[route]).first().boundingBox();
         if (!box || box.y + box.height > height) fail(`${tag} CTA do topo fora da primeira tela (${box?.y}+${box?.height})`);
       }
 
       if (!audited.has(`${width}x${height}`)) continue;
 
-      const report = await page.evaluate(() => {
-        const out = { contrast: [], alt: [], headings: [], targets: [] };
+      const report = await page.evaluate((jargonSource) => {
+        const out = { contrast: [], alt: [], headings: [], targets: [], sources: [], jargon: [] };
         const parse = (c) => {
           const m = c.match(/rgba?\(([^)]+)\)/);
           if (!m) return null;
@@ -87,12 +99,21 @@ for (const theme of ["light", "dark"]) {
           };
           return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
         };
+        // Fundo efetivo: compõe as camadas semitransparentes até achar uma opaca.
         const bgOf = (el) => {
+          const layers = [];
           for (let n = el; n; n = n.parentElement) {
             const c = parse(getComputedStyle(n).backgroundColor);
-            if (c && c.a > 0.5) return c;
+            if (c && c.a > 0) {
+              layers.push(c);
+              if (c.a >= 0.99) break;
+            }
           }
-          return parse(getComputedStyle(document.body).backgroundColor);
+          let acc = parse(getComputedStyle(document.body).backgroundColor) ?? { r: 255, g: 255, b: 255, a: 1 };
+          for (const c of layers.reverse()) {
+            acc = { r: c.r * c.a + acc.r * (1 - c.a), g: c.g * c.a + acc.g * (1 - c.a), b: c.b * c.a + acc.b * (1 - c.a), a: 1 };
+          }
+          return acc;
         };
         const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
         const seen = new Set();
@@ -125,18 +146,40 @@ for (const theme of ["light", "dark"]) {
           last = lvl;
         }
         if (document.querySelectorAll("h1").length !== 1) out.headings.push("número de H1 diferente de 1");
-        for (const el of document.querySelectorAll('a.btn, button, summary, .icon-btn, [role="tab"]')) {
+        for (const el of document.querySelectorAll('a.btn, button, summary, input, [role="tab"], .nav-list a, .text-link')) {
           if (el.closest("[inert]")) continue;
           const r = el.getBoundingClientRect();
           if (r.width === 0 || getComputedStyle(el).visibility === "hidden") continue;
-          if (r.height < 44 || r.width < 44) out.targets.push(`${Math.round(r.width)}x${Math.round(r.height)} "${el.textContent.trim().slice(0, 30)}"`);
+          if (r.height < 44 || r.width < 44) out.targets.push(`${Math.round(r.width)}x${Math.round(r.height)} "${(el.textContent || el.id).trim().slice(0, 30)}"`);
+        }
+        // Todo dado de mercado: link para a fonte e um ano.
+        for (const stat of document.querySelectorAll(".stat")) {
+          const cap = stat.querySelector(".fonte");
+          const value = stat.querySelector(".stat-value")?.textContent.trim();
+          if (!cap || !cap.querySelector("a[href^='http']") || !/\b(19|20)\d{2}\b/.test(cap.textContent)) out.sources.push(value);
+        }
+        // Jargão técnico fora do rodapé técnico (details.tech).
+        const re = new RegExp(jargonSource, "i");
+        const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+        for (let t = tw.nextNode(); t; t = tw.nextNode()) {
+          const el = t.parentElement;
+          if (!el || el.closest("script, style, .tech")) continue;
+          const m = t.textContent.match(re);
+          if (m) out.jargon.push(`"${m[0]}" em "${t.textContent.trim().slice(0, 50)}"`);
+        }
+        for (const attr of document.querySelectorAll("[alt], [aria-label], meta[name='description'], title")) {
+          const text = attr.getAttribute("alt") ?? attr.getAttribute("aria-label") ?? attr.getAttribute("content") ?? attr.textContent;
+          const m = text?.match(re);
+          if (m) out.jargon.push(`"${m[0]}" em atributo "${text.slice(0, 50)}"`);
         }
         return out;
-      });
+      }, jargon.source);
       for (const c of report.contrast) fail(`${tag} contraste ${c}`);
       for (const a of report.alt) fail(`${tag} img sem alt ${a}`);
       for (const h of report.headings) fail(`${tag} títulos ${h}`);
       for (const t of report.targets) fail(`${tag} alvo pequeno ${t}`);
+      for (const s of report.sources) fail(`${tag} dado sem fonte ou ano: ${s}`);
+      for (const j of report.jargon) fail(`${tag} termo técnico ${j}`);
     }
   }
   await context.close();
@@ -144,11 +187,7 @@ for (const theme of ["light", "dark"]) {
 
 // Interações no celular (com movimento, como um visitante comum).
 {
-  const context = await browser.newContext({
-    colorScheme: "light",
-    viewport: { width: 390, height: 844 },
-    hasTouch: true,
-  });
+  const context = await browser.newContext({ colorScheme: "light", viewport: { width: 390, height: 844 }, hasTouch: true });
   await context.grantPermissions(["clipboard-read", "clipboard-write"], { origin: base });
   const page = await context.newPage();
   page.on("pageerror", (e) => fail(`interações: pageerror ${e.message}`));
@@ -156,23 +195,16 @@ for (const theme of ["light", "dark"]) {
 
   // Menu em tela cheia: abre, prende o foco, deixa a página inerte, fecha com Esc.
   await page.click("[data-menu-toggle]");
-  await page.waitForTimeout(600);
+  await page.waitForTimeout(500);
   if (!(await page.locator("#site-nav").isVisible())) fail("menu: não abriu");
   const inMenu = await page.evaluate(() => document.getElementById("site-nav")?.contains(document.activeElement));
   if (!inMenu) fail("menu: foco não entrou no menu");
   if (!(await page.evaluate(() => document.querySelector("main")?.inert))) fail("menu: página atrás não ficou inerte");
-
-  // Tema, pelo botão de dentro do menu.
-  await page.locator("#site-nav [data-theme-toggle]").click();
-  await page.waitForTimeout(800);
-  if ((await page.evaluate(() => document.documentElement.dataset.theme)) !== "dark") fail("tema: alternância não aplicou dark");
   await page.keyboard.press("Escape");
-  await page.waitForTimeout(600);
+  await page.waitForTimeout(500);
   if (await page.locator("#site-nav").isVisible()) fail("menu: Esc não fechou");
   const focused = await page.evaluate(() => document.activeElement?.hasAttribute("data-menu-toggle"));
   if (!focused) fail("menu: foco não voltou ao botão");
-  await page.reload({ waitUntil: "networkidle" });
-  if ((await page.evaluate(() => document.documentElement.dataset.theme)) !== "dark") fail("tema: escolha não persistiu");
 
   // CTA da base: escondido no topo, aparece no meio da página.
   if ((await page.locator("[data-dock]").getAttribute("data-visible")) !== "false") fail("cta da base: visível no topo");
@@ -180,59 +212,26 @@ for (const theme of ["light", "dark"]) {
   await page.waitForTimeout(800);
   if ((await page.locator("[data-dock]").getAttribute("data-visible")) !== "true") fail("cta da base: não apareceu ao rolar");
 
-  // Seletor de problemas: chips, setas e o problema no assunto do e-mail.
-  const svc = page.locator("[data-svc]");
-  await svc.scrollIntoViewIfNeeded();
-  const svcTabs = svc.locator('[role="tab"]');
-  if ((await svcTabs.count()) !== 6) fail(`serviços: ${await svcTabs.count()} abas, esperado 6`);
-  await svcTabs.nth(2).click();
-  if ((await svcTabs.nth(2).getAttribute("aria-selected")) !== "true") fail("serviços: toque não selecionou a aba");
-  const visiblePanels = await svc.locator('[role="tabpanel"]:visible').count();
-  if (visiblePanels !== 1) fail(`serviços: ${visiblePanels} painéis visíveis, esperado 1`);
-  await page.keyboard.press("ArrowRight");
-  if ((await svcTabs.nth(3).getAttribute("aria-selected")) !== "true") fail("serviços: seta não avançou");
-  const focusedTab = await page.evaluate(() => document.activeElement?.getAttribute("role"));
-  if (focusedTab !== "tab") fail("serviços: foco não acompanhou a aba");
-  const svcMail = await svc.locator('[role="tabpanel"]:visible a[href^="mailto:"]').getAttribute("href");
-  const problem = await svc.locator(".svc-panel:visible h3").textContent();
-  if (!svcMail || !decodeURIComponent(svcMail).includes("Contexto:")) fail(`serviços: e-mail sem o problema (${svcMail}, ${problem})`);
-
-  // Gesto de toque: deslizar para a esquerda num elemento avança.
-  const swipe = async (selector) => {
-    await page.evaluate((sel) => {
-      const el = document.querySelector(sel);
-      const r = el.getBoundingClientRect();
-      const y = r.top + Math.min(r.height / 2, 200);
-      const fire = (type, x) =>
-        el.dispatchEvent(new PointerEvent(type, { pointerType: "touch", pointerId: 7, clientX: x, clientY: y, bubbles: true }));
-      fire("pointerdown", r.left + r.width * 0.8);
-      fire("pointerup", r.left + r.width * 0.2);
-    }, selector);
-    await page.waitForTimeout(200);
-  };
-  await swipe(".svc-panels");
-  if ((await svcTabs.nth(4).getAttribute("aria-selected")) !== "true") fail("serviços: deslizar não avançou");
-
-  // Caminho do Kairos: próximo, gesto, teclado e reproduzir/pausar.
-  const flow = page.locator("[data-flow]").first();
-  await flow.scrollIntoViewIfNeeded();
-  await page.waitForTimeout(400);
-  const playBtn = flow.locator("[data-play]");
-  if ((await playBtn.getAttribute("data-state")) === "playing") await playBtn.click();
-  await flow.locator('[role="tab"]').first().click();
-  await flow.locator("[data-next]").click();
-  if ((await flow.getAttribute("data-step")) !== "2") fail("kairos: próximo não foi ao passo 2");
-  await swipe("[data-flow]");
-  if ((await flow.getAttribute("data-step")) !== "3") fail("kairos: deslizar não foi ao passo 3");
-  await flow.locator('[role="tab"][aria-selected="true"]').focus();
-  await page.keyboard.press("End");
-  if ((await flow.getAttribute("data-step")) !== "6") fail("kairos: End não levou ao último passo");
-  if ((await flow.locator('[role="tabpanel"]:visible').count()) !== 1) fail("kairos: mais de um passo visível");
-  await page.keyboard.press("Home");
-  await playBtn.click();
-  if ((await playBtn.getAttribute("data-state")) !== "playing") fail("kairos: reproduzir não iniciou");
-  await playBtn.click();
-  if ((await playBtn.getAttribute("data-state")) === "playing") fail("kairos: pausar não parou");
+  // Calculadora: teclado no controle deslizante, digitação no custo e o e-mail com os números.
+  await page.evaluate(() => document.getElementById("estimativa")?.scrollIntoView());
+  await page.waitForTimeout(500);
+  if ((await page.locator("[data-dock]").getAttribute("data-visible")) !== "false") fail("cta da base: cobre a calculadora");
+  const freed = () => page.locator('[data-res="freed"]').textContent();
+  const before = await freed();
+  await page.locator("#est-hours").focus();
+  for (let i = 0; i < 2; i++) await page.keyboard.press("ArrowRight");
+  await page.waitForTimeout(600);
+  const after = await freed();
+  // 5 pessoas × 10 h × 4 semanas × 30% = 60
+  if (after !== "60") fail(`calculadora: horas liberadas "${before}" → "${after}", esperado "60"`);
+  if ((await page.locator('[data-out="hours"]').textContent()) !== "10 h") fail("calculadora: valor das horas não atualizou");
+  await page.locator("#est-cost").fill("6600");
+  await page.waitForTimeout(600);
+  const month = (await page.locator('[data-res="month"]').textContent())?.replace(/\s/g, " ");
+  // 60 h × (6600 ÷ 220) = 1.800
+  if (month !== "R$ 1.800") fail(`calculadora: valor mensal "${month}", esperado "R$ 1.800"`);
+  const mail = decodeURIComponent((await page.locator("[data-est-mail]").getAttribute("href")) ?? "");
+  if (!mail.includes("10 h por semana") || !mail.includes("60 horas por mês")) fail(`calculadora: e-mail sem os números (${mail.slice(0, 120)})`);
 
   // Cópia de e-mail.
   await page.locator("[data-copy]").scrollIntoViewIfNeeded();
@@ -246,59 +245,44 @@ for (const theme of ["light", "dark"]) {
   await context.close();
 }
 
-// Desktop: indicador de seção no menu e fio condutor.
+// Desktop: seção atual na navegação e página de contabilidade marcada.
 {
-  const context = await browser.newContext({ colorScheme: "dark", viewport: { width: 1440, height: 900 } });
+  const context = await browser.newContext({ colorScheme: "light", viewport: { width: 1440, height: 900 } });
   const page = await context.newPage();
   await page.goto(`${base}/`, { waitUntil: "networkidle" });
-  await page.evaluate(() => document.getElementById("kairos")?.scrollIntoView());
+  await page.evaluate(() => document.getElementById("casos")?.scrollIntoView({ behavior: "instant" }));
   await page.waitForTimeout(700);
-  const current = await page.evaluate(() => document.querySelector('[aria-current="true"]')?.getAttribute("data-nav-link"));
-  if (current !== "kairos") fail(`menu: seção atual "${current}", esperado kairos`);
-  if ((await page.locator(".nav-ind").getAttribute("data-on")) !== "true") fail("menu: indicador de seção apagado");
-  if (!(await page.locator("[data-thread]").isVisible())) fail("fio condutor: não aparece em 1440");
-  const lit = await page.locator("[data-thread] circle.lit").count();
-  if (lit < 2) fail(`fio condutor: ${lit} pontos acesos ao chegar no Kairos`);
+  const current = await page.evaluate(() => document.querySelector('[data-nav-link][aria-current="true"]')?.getAttribute("data-nav-link"));
+  if (current !== "casos") fail(`menu: seção atual "${current}", esperado casos`);
+  await page.goto(`${base}/contabilidade/`, { waitUntil: "networkidle" });
+  if ((await page.locator('[data-nav-link="contabilidade"]').getAttribute("aria-current")) !== "page") fail("menu: Contabilidade sem aria-current na própria página");
   await context.close();
 }
 
-// Movimento reduzido: tudo visível e o Kairos parado no primeiro passo.
+// Movimento reduzido: tudo visível e a rotina do topo no estado final.
 {
   const context = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1440, height: 900 } });
   const page = await context.newPage();
   await page.goto(`${base}/`, { waitUntil: "networkidle" });
+  await page.waitForTimeout(300);
   const hidden = await page.evaluate(() =>
-    [...document.querySelectorAll("[data-reveal]")].filter((el) => Number(getComputedStyle(el).opacity) < 0.99).length,
+    [...document.querySelectorAll("[data-reveal], .st-done, .tag-final")].filter((el) => Number(getComputedStyle(el).opacity) < 0.99).length,
   );
-  if (hidden) fail(`movimento reduzido: ${hidden} blocos com opacidade < 1`);
-  await page.evaluate(() => document.getElementById("kairos")?.scrollIntoView());
-  await page.waitForTimeout(1500);
-  if ((await page.locator("[data-flow]").first().getAttribute("data-step")) !== "1") fail("movimento reduzido: Kairos avançou sozinho");
+  if (hidden) fail(`movimento reduzido: ${hidden} elementos com opacidade < 1`);
   await context.close();
 }
 
-// Sem JavaScript: todo o conteúdo aparece.
+// Sem JavaScript: todo o conteúdo aparece e a calculadora mostra a conta inicial.
 {
   const context = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
   await page.goto(`${base}/`, { waitUntil: "networkidle" });
-  const panels = await page.locator(".svc-panel:visible").count();
-  if (panels !== 6) fail(`sem JS: ${panels} respostas de serviço visíveis, esperado 6`);
-  const steps = await page.locator(".kf-panel:visible").count();
-  if (steps !== 6) fail(`sem JS: ${steps} passos do Kairos visíveis, esperado 6`);
-  // As entradas em CSS ainda correm sem script: espera o topo e percorre a página até o fim.
-  await page.waitForTimeout(4500);
-  for (let y = 0; y < (await page.evaluate(() => document.documentElement.scrollHeight)); y += 400) {
-    await page.mouse.wheel(0, 400);
-    await page.waitForTimeout(40);
-  }
-  await page.waitForTimeout(400);
+  await page.waitForTimeout(3500);
   const hidden = await page.evaluate(() =>
-    [...document.querySelectorAll("[data-reveal], .hero h1, .proofs li")].filter(
-      (el) => Number(getComputedStyle(el).opacity) < 0.99,
-    ).length,
+    [...document.querySelectorAll("[data-reveal]")].filter((el) => Number(getComputedStyle(el).opacity) < 0.99).length,
   );
   if (hidden) fail(`sem JS: ${hidden} blocos invisíveis`);
+  if ((await page.locator('[data-res="freed"]').textContent()) !== "48") fail("sem JS: calculadora sem a conta inicial");
   await context.close();
 }
 
@@ -310,6 +294,6 @@ if (failures.length) {
   process.exitCode = 1;
 } else {
   console.log(
-    `OK: ${routes.length} rotas, ${viewports.length} tamanhos de tela (320–2560, paisagem e baixos), 2 temas, contraste, títulos, alvos, CTA na primeira tela, menu, tema, abas, gesto, Kairos, cópia, CTA da base, fio condutor, movimento reduzido e sem JavaScript.`,
+    `OK: ${routes.length} rotas, ${viewports.length} tamanhos de tela (320–2560, paisagem e baixos), contraste, títulos, alvos, CTA na primeira tela, fontes dos dados, sem termo técnico, menu, CTA da base, seção atual, calculadora, cópia, movimento reduzido e sem JavaScript.`,
   );
 }

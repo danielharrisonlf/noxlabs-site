@@ -1,0 +1,131 @@
+---
+import { steps } from "../data/content";
+---
+
+<section class="section how" id="como-funciona" aria-labelledby="como-title">
+  <div class="wrap">
+    <header class="section-head" data-reveal>
+      <h2 id="como-title" class="section-title">Uma rotina de cada vez, sem parar a empresa.</h2>
+      <p class="section-lede">
+        Nada de projeto gigante que só aparece no fim. Você vê a primeira melhoria funcionando cedo e decide o próximo passo
+        com o resultado na mão.
+      </p>
+    </header>
+
+    <ol role="list" class="steps">
+      {
+        steps.map((step, i) => (
+          <li class="step" data-reveal style={`--i:${i}`}>
+            <span class="step-num tabular" aria-hidden="true">
+              {i + 1}
+            </span>
+            <h3>
+              <span class="visually-hidden">Passo {i + 1}: </span>
+              {step.title}
+            </h3>
+            <p>{step.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .how {
+    background: var(--surface);
+    border-block: 1px solid var(--line);
+  }
+
+  .steps {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--s-6) clamp(1.25rem, 2.5vw, 2.5rem);
+    counter-reset: step;
+  }
+
+  /* A linha que liga os passos. */
+  .steps::before {
+    content: "";
+    position: absolute;
+    left: 1.5rem;
+    right: 1.5rem;
+    top: 1.5rem;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, var(--line-2) 0 8px, transparent 8px 14px);
+  }
+
+  .step {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: var(--s-3);
+  }
+
+  .step-num {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: var(--s-2);
+    border-radius: 50%;
+    background: var(--pine);
+    color: #ffffff;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    box-shadow: 0 0 0 6px var(--surface);
+  }
+
+  .step:last-child .step-num {
+    background: var(--marca);
+    color: var(--marca-ink);
+  }
+
+  .step h3 {
+    font-size: var(--t-lg);
+  }
+
+  .step p {
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 60rem) {
+    .steps {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .steps::before {
+      display: none;
+    }
+  }
+
+  @media (max-width: 36rem) {
+    .steps {
+      grid-template-columns: 1fr;
+      gap: var(--s-5);
+    }
+
+    .step {
+      grid-template-columns: auto minmax(0, 1fr);
+      column-gap: var(--s-4);
+    }
+
+    .step-num {
+      grid-row: span 2;
+      margin-bottom: 0;
+    }
+
+    .steps::before {
+      display: block;
+      left: 1.5rem;
+      right: auto;
+      top: 1.5rem;
+      bottom: 1.5rem;
+      width: 2px;
+      height: auto;
+      background: repeating-linear-gradient(180deg, var(--line-2) 0 8px, transparent 8px 14px);
+    }
+  }
+</style>

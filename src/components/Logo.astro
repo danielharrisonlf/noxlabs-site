@@ -1,31 +1,22 @@
 ---
 /**
- * Marca Noxlabs: um "n" desenhado por um único rastro de luz, como numa foto
- * de longa exposição, com a fonte da luz acesa na ponta. Wordmark em
- * Funnel Display minúscula.
+ * Marca Noxlabs: um "n" cuja perna direita termina num visto. A rotina que
+ * se resolve: o traço da letra vira o sinal de "feito". Ladrilho verde-pinho,
+ * letra branca, visto em marca-texto. Wordmark em Bricolage Grotesque.
  */
 interface Props {
   wordmark?: boolean;
   class?: string;
-  /** Prefixo único do gradiente quando há mais de uma marca na página. */
-  id?: string;
 }
 
-const { wordmark = true, class: className, id = "lg" } = Astro.props;
-const grad = `${id}-trail`;
+const { wordmark = true, class: className } = Astro.props;
 ---
 
 <span class:list={["logo", className]}>
   <svg class="logo-mark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true" focusable="false">
-    <defs>
-      <linearGradient id={grad} x1="7" y1="26" x2="25" y2="8" gradientUnits="userSpaceOnUse">
-        <stop offset="0" class="logo-stop-a"></stop>
-        <stop offset="1" class="logo-stop-b"></stop>
-      </linearGradient>
-    </defs>
-    <path class="logo-glow" d="M8 26V15.5a8 8 0 0 1 16 0V24" stroke={`url(#${grad})`}></path>
-    <path class="logo-trail" d="M8 26V15.5a8 8 0 0 1 16 0V24" stroke={`url(#${grad})`}></path>
-    <circle class="logo-source" cx="24" cy="25" r="2.6"></circle>
+    <rect width="32" height="32" rx="9" class="logo-tile"></rect>
+    <path class="logo-n" d="M9.5 23V14.6a4.1 4.1 0 0 1 8.2 0v2"></path>
+    <path class="logo-tick" d="M17.7 16.6V22.6L23.8 13.2"></path>
   </svg>
   {wordmark && <span class="logo-word">noxlabs</span>}
 </span>
@@ -35,48 +26,45 @@ const grad = `${id}-trail`;
     display: inline-flex;
     align-items: center;
     gap: 0.55rem;
-    color: var(--fg);
+    color: var(--ink);
   }
 
   .logo-mark {
-    width: 1.875rem;
-    height: 1.875rem;
+    width: 2rem;
+    height: 2rem;
     flex: none;
-    overflow: visible;
   }
 
-  .logo-trail,
-  .logo-glow {
+  .logo-tile {
+    fill: var(--pine);
+  }
+
+  :global(.band) .logo-tile {
+    fill: #ffffff;
+    fill-opacity: 0.1;
+  }
+
+  .logo-n,
+  .logo-tick {
     fill: none;
+    stroke-width: 3.2;
     stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
-  .logo-trail {
-    stroke-width: 3.6;
+  .logo-n {
+    stroke: #ffffff;
   }
 
-  .logo-glow {
-    stroke-width: 8;
-    opacity: var(--trail-glow);
-  }
-
-  .logo-stop-a {
-    stop-color: var(--sodio);
-  }
-
-  .logo-stop-b {
-    stop-color: var(--freio);
-  }
-
-  .logo-source {
-    fill: var(--fg);
+  .logo-tick {
+    stroke: var(--marca);
   }
 
   .logo-word {
     font-family: var(--font-display);
-    font-size: 1.4rem;
-    font-weight: 600;
-    letter-spacing: -0.03em;
+    font-size: 1.45rem;
+    font-weight: 700;
+    letter-spacing: -0.035em;
     line-height: 1;
   }
 </style>

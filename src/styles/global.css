@@ -1,102 +1,103 @@
 /*
- * Noxlabs — "Longa exposição".
- * A fotografia noturna de longa exposição transforma movimento invisível em
- * linhas de luz. O site usa a mesma gramática: rastros bezier, pontos de luz,
- * céu de hora azul (tema escuro) e céu de manhã (tema claro), desenhados
- * como dois planos e não como inversão um do outro.
+ * Noxlabs — "Rotina em ordem".
+ * O mundo de quem compra: o escritório que confere, carimba e entrega no
+ * prazo. Papel limpo com um toque de sálvia, tinta verde-pinho (confiança,
+ * dinheiro em ordem), marca-texto amarelo para o que importa e caneta azul
+ * para anotações e links. Tema claro, desenhado para leitura de dia.
  */
 
 @font-face {
-  font-family: "Funnel Display";
+  font-family: "Bricolage Grotesque";
   font-style: normal;
-  font-weight: 300 800;
+  font-weight: 200 800;
   font-display: swap;
-  src: url("/fonts/funnel-display-latin-var.woff2") format("woff2");
+  src: url("/fonts/bricolage-grotesque-latin-var.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
     U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
-  font-family: "Atkinson Next";
+  font-family: "Figtree";
   font-style: normal;
-  font-weight: 200 800;
+  font-weight: 300 900;
   font-display: swap;
-  src: url("/fonts/atkinson-next-latin-var.woff2") format("woff2");
+  src: url("/fonts/figtree-latin-var.woff2") format("woff2");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
     U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 /* Fallbacks com métricas aproximadas: menos salto quando a fonte chega. */
 @font-face {
-  font-family: "Funnel Fallback";
+  font-family: "Bricolage Fallback";
   src: local("Arial");
-  size-adjust: 98%;
-  ascent-override: 98%;
-  descent-override: 26%;
-}
-
-@font-face {
-  font-family: "Atkinson Fallback";
-  src: local("Arial");
-  size-adjust: 103%;
+  size-adjust: 102%;
   ascent-override: 92%;
   descent-override: 24%;
 }
 
-/* ---------------------------------------------------------------------------
- * Manhã (tema claro): céu de alvorada, tinta índigo, rastros em tons fundos.
- * ------------------------------------------------------------------------- */
+@font-face {
+  font-family: "Figtree Fallback";
+  src: local("Arial");
+  size-adjust: 98%;
+  ascent-override: 96%;
+  descent-override: 25%;
+}
+
 :root {
   color-scheme: light;
 
-  --bg: #f5f6fc;
-  --bg-2: #ffffff;
-  --bg-3: #e8ebf8;
-  --line: #d6dbef;
-  --line-2: #aeb6d8;
-  --fg: #111a45;
-  --fg-2: #3e4777;
-  --fg-3: #565e8a;
-  --link: #2a43c6;
-  --accent: #111a45;
-  --accent-hover: #24307a;
-  --accent-fg: #ffffff;
-  --focus: #2a43c6;
-  --selection: #ffd9a8;
+  /* Papel */
+  --bg: #f6f8f4;
+  --surface: #ffffff;
+  --sunken: #ebf1ea;
+  --line: #d6e0d7;
+  --line-2: #aabdaf;
 
-  /* Luzes da cidade */
-  --sodio: #c46a00;
-  --freio: #d43c2a;
-  --mercurio: #1f6fd1;
-  --live: #d43c2a;
+  /* Tinta */
+  --ink: #0f2a22;
+  --ink-2: #3a5047;
+  --ink-3: #52665d;
 
-  /* Céu: de manhã é o próprio papel; só a origem dos rastros esquenta. */
-  --sky-top: #f5f6fc;
-  --sky-mid: #f5f6fc;
-  --sky-low: #f5f6fc;
-  --haze: rgb(255 168 112 / 0.16);
-  --haze-2: rgb(120 150 255 / 0);
-  --grain-opacity: 0.05;
-  --trail-glow: 0.16;
-  --packet-white: 0;
+  /* Pinho: a cor da marca e da ação principal */
+  --pine: #0d5c49;
+  --pine-hover: #094536;
+  --pine-deep: #0b3a2f;
+  --pine-soft: #d5ece2;
+  --pine-ink: #0a4a3a;
 
-  --shadow-1: 0 1px 2px rgb(17 26 69 / 0.06), 0 8px 24px -12px rgb(17 26 69 / 0.18);
-  --shadow-2: 0 2px 6px rgb(17 26 69 / 0.06), 0 30px 60px -28px rgb(17 26 69 / 0.35);
+  /* Marca-texto: destaca números e o que pede atenção */
+  --marca: #ffe15a;
+  --marca-soft: #fff4b8;
+  --marca-ink: #5c4a00;
+
+  /* Caneta: links e anotações */
+  --caneta: #2346c0;
+
+  /* Prazo: alerta, usado com parcimônia */
+  --prazo: #b23f28;
+  --prazo-soft: #fbe4dc;
+
+  --focus: #2346c0;
+  --selection: #fff0a3;
+
+  --shadow-1: 0 1px 2px rgb(15 42 34 / 0.06), 0 6px 18px -10px rgb(15 42 34 / 0.2);
+  --shadow-2: 0 2px 4px rgb(15 42 34 / 0.05), 0 28px 56px -26px rgb(15 42 34 / 0.32);
+  --shadow-3: 0 2px 6px rgb(15 42 34 / 0.06), 0 40px 80px -30px rgb(15 42 34 / 0.38);
 
   /* Tipografia */
-  --font-display: "Funnel Display", "Funnel Fallback", "Avenir Next", "Segoe UI", sans-serif;
-  --font-text: "Atkinson Next", "Atkinson Fallback", "Segoe UI", Arial, sans-serif;
+  --font-display: "Bricolage Grotesque", "Bricolage Fallback", "Segoe UI", sans-serif;
+  --font-text: "Figtree", "Figtree Fallback", "Segoe UI", Arial, sans-serif;
 
   --t-xs: 0.8125rem; /* 13 */
   --t-sm: 0.9375rem; /* 15 */
   --t-base: clamp(1.0625rem, 1rem + 0.2vw, 1.1875rem); /* 17–19 */
-  --t-md: clamp(1.1875rem, 1.08rem + 0.45vw, 1.4375rem); /* 19–23 */
-  --t-lg: clamp(1.375rem, 1.18rem + 0.8vw, 1.875rem); /* 22–30 */
-  --t-xl: clamp(1.75rem, 1.35rem + 1.7vw, 3rem); /* 28–48 */
-  --t-2xl: clamp(2.375rem, 1.6rem + 3.2vw, 4.5rem); /* 38–72 */
-  --t-display: clamp(2.75rem, 1.4rem + 5vw, 5.5rem); /* 44–88 */
+  --t-md: clamp(1.1875rem, 1.08rem + 0.4vw, 1.375rem); /* 19–22 */
+  --t-lg: clamp(1.375rem, 1.2rem + 0.7vw, 1.75rem); /* 22–28 */
+  --t-xl: clamp(1.75rem, 1.4rem + 1.4vw, 2.625rem); /* 28–42 */
+  --t-2xl: clamp(2.25rem, 1.6rem + 2.6vw, 3.75rem); /* 36–60 */
+  --t-display: clamp(2.5rem, 1.5rem + 4.2vw, 5rem); /* 40–80 */
 
-  /* Espaço */
+  /* Espaço (base 4) */
   --s-1: 0.25rem;
   --s-2: 0.5rem;
   --s-3: 0.75rem;
@@ -106,108 +107,47 @@
   --s-7: 3rem;
   --s-8: 4rem;
   --s-9: 6rem;
-  --s-10: 8rem;
-  --section-y: clamp(4rem, 2.5rem + 5vw, 7rem);
+  --section-y: clamp(4.5rem, 3rem + 5vw, 8rem);
 
-  --max: 80rem;
+  --max: 76rem;
   --gutter: clamp(1rem, 0.4rem + 2.6vw, 3rem);
 
+  /* Raio por hierarquia: etiqueta < controle < cartão < painel */
+  --r-xs: 6px;
   --r-sm: 10px;
-  --r-md: 18px;
-  --r-lg: 28px;
-  --r-xl: 40px;
+  --r-md: 14px;
+  --r-lg: 22px;
+  --r-xl: 32px;
   --r-pill: 999px;
 
-  --header-h: 5.25rem;
+  --header-h: 4.75rem;
 
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Movimento */
+  --d-fast: 160ms;
+  --d-base: 280ms;
+  --d-slow: 600ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --ease-spring: linear(0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.723 12.9%, 0.938 16.7%, 1.017 19.4%, 1.067, 1.077 24.6%,
       1.065 27.4%, 1.019 34.3%, 1.003 38.9%, 0.993 47.9%, 1);
 }
 
-/* ---------------------------------------------------------------------------
- * Noite (tema escuro e palco do Kairos): céu de hora azul, luz de sódio.
- * `.night` força o plano noturno num trecho, nos dois temas.
- * ------------------------------------------------------------------------- */
-:root[data-theme="dark"],
-.night {
-  color-scheme: dark;
-
-  --bg: #0d1438;
-  --bg-2: #141c4b;
-  --bg-3: #0a1030;
-  --line: #26306b;
-  --line-2: #3b478c;
-  --fg: #eef0ff;
-  --fg-2: #b8bfe8;
-  --fg-3: #98a2d4;
-  --link: #ffc56e;
-  --accent: #ffb547;
-  --accent-hover: #ffc976;
-  --accent-fg: #0a1030;
-  --focus: #ffc56e;
-  --selection: #4a3a7a;
-
-  --sodio: #ffb547;
-  --freio: #ff7a5c;
-  --mercurio: #8fd3ff;
-  --live: #ff7a5c;
-
-  --sky-top: #060b26;
-  --sky-mid: #0d1540;
-  --sky-low: #1d1d55;
-  --haze: rgb(255 150 70 / 0.2);
-  --haze-2: rgb(110 140 255 / 0.18);
-  --grain-opacity: 0.07;
-  --trail-glow: 0.22;
-  --packet-white: 1;
-
-  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.3), 0 10px 30px -12px rgb(0 0 0 / 0.55);
-  --shadow-2: 0 2px 6px rgb(0 0 0 / 0.3), 0 34px 70px -30px rgb(0 0 0 / 0.75);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-
-    --bg: #0d1438;
-    --bg-2: #141c4b;
-    --bg-3: #0a1030;
-    --line: #26306b;
-    --line-2: #3b478c;
-    --fg: #eef0ff;
-    --fg-2: #b8bfe8;
-    --fg-3: #98a2d4;
-    --link: #ffc56e;
-    --accent: #ffb547;
-    --accent-hover: #ffc976;
-    --accent-fg: #0a1030;
-    --focus: #ffc56e;
-    --selection: #4a3a7a;
-
-    --sodio: #ffb547;
-    --freio: #ff7a5c;
-    --mercurio: #8fd3ff;
-    --live: #ff7a5c;
-
-    --sky-top: #060b26;
-    --sky-mid: #0d1540;
-    --sky-low: #1d1d55;
-    --haze: rgb(255 150 70 / 0.2);
-    --haze-2: rgb(110 140 255 / 0.18);
-    --grain-opacity: 0.07;
-    --trail-glow: 0.22;
-    --packet-white: 1;
-
-    --shadow-1: 0 1px 2px rgb(0 0 0 / 0.3), 0 10px 30px -12px rgb(0 0 0 / 0.55);
-    --shadow-2: 0 2px 6px rgb(0 0 0 / 0.3), 0 34px 70px -30px rgb(0 0 0 / 0.75);
-  }
-}
-
-.night {
+/* Faixa verde-pinho (contabilidade, contato): tokens invertidos no trecho. */
+.band {
+  --bg: #0b3a2f;
+  --surface: #114737;
+  --sunken: #0a3329;
+  --line: #24584a;
+  --line-2: #3f7564;
+  --ink: #f2f7f3;
+  --ink-2: #c3d8cd;
+  --ink-3: #a9c4b7;
+  --caneta: #ffe15a;
+  --focus: #ffe15a;
+  --shadow-1: 0 1px 2px rgb(0 0 0 / 0.2), 0 8px 24px -12px rgb(0 0 0 / 0.45);
+  --shadow-2: 0 2px 6px rgb(0 0 0 / 0.2), 0 30px 60px -28px rgb(0 0 0 / 0.6);
   background-color: var(--bg);
-  color: var(--fg);
+  color: var(--ink);
 }
 
 /* ---------------------------------------------------------------------------
@@ -232,26 +172,23 @@ html {
   interpolate-size: allow-keywords;
 }
 
-/*
- * Telas muito largas: o sistema inteiro cresce um pouco, para 2560 px não
- * virar um site miúdo no meio. Media queries em rem não mudam com isso.
- */
+/* Telas muito largas: o sistema cresce um pouco para 2560 px não virar um site miúdo. */
 @media (min-width: 100rem) {
   html {
     font-size: calc(100% + 0.3vw - 4.8px);
   }
 }
 
-/* Celular: âncoras e foco não ficam sob o CTA da base. */
-@media (max-width: 39.99rem) {
-  html {
-    scroll-padding-bottom: 5.5rem;
+@media (min-width: 120rem) {
+  :root {
+    --max: 84rem;
   }
 }
 
-@media (min-width: 120rem) {
-  :root {
-    --max: 88rem;
+/* Celular: âncoras e foco não ficam sob o botão fixo da base. */
+@media (max-width: 39.99rem) {
+  html {
+    scroll-padding-bottom: 5.5rem;
   }
 }
 
@@ -264,28 +201,12 @@ html {
     navigation: auto;
   }
 
-  /* Navegação entre páginas: a página nova sobe um pouco enquanto aparece. */
   ::view-transition-old(root) {
-    animation: vt-out 220ms var(--ease-out) both;
+    animation: vt-out 200ms var(--ease-out) both;
   }
 
   ::view-transition-new(root) {
-    animation: vt-in 420ms var(--ease-out) both;
-  }
-
-  ::view-transition-group(*) {
-    animation-duration: 480ms;
-    animation-timing-function: var(--ease-out);
-  }
-
-  /* Troca de tema: o tema novo se abre num círculo a partir do botão. */
-  html.theme-vt::view-transition-group(*),
-  html.theme-vt::view-transition-old(*) {
-    animation: none;
-  }
-
-  html.theme-vt::view-transition-new(*) {
-    animation: theme-reveal 620ms var(--ease-in-out) both;
+    animation: vt-in 380ms var(--ease-out) both;
   }
 }
 
@@ -298,22 +219,13 @@ html {
 @keyframes vt-in {
   from {
     opacity: 0;
-    translate: 0 14px;
-  }
-}
-
-@keyframes theme-reveal {
-  from {
-    clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 0));
-  }
-  to {
-    clip-path: circle(var(--vt-r, 150vmax) at var(--vt-x, 50%) var(--vt-y, 0));
+    translate: 0 10px;
   }
 }
 
 body {
   background: var(--bg);
-  color: var(--fg);
+  color: var(--ink);
   font-family: var(--font-text);
   font-size: var(--t-base);
   line-height: 1.6;
@@ -322,7 +234,7 @@ body {
   text-rendering: optimizeLegibility;
   min-height: 100dvh;
   overflow-x: clip;
-  caret-color: var(--sodio);
+  caret-color: var(--pine);
 }
 
 main {
@@ -341,25 +253,26 @@ img {
 
 ::selection {
   background: var(--selection);
-  color: var(--fg);
+  color: #0f2a22;
 }
 
 a {
   color: inherit;
   text-decoration-thickness: 1px;
-  text-underline-offset: 0.24em;
+  text-underline-offset: 0.22em;
 }
 
 :focus-visible {
-  outline: 2px solid var(--focus);
+  outline: 2.5px solid var(--focus);
   outline-offset: 3px;
 }
 
 :where(h1, h2, h3, h4) {
   font-family: var(--font-display);
-  font-weight: 500;
-  line-height: 1.05;
-  letter-spacing: -0.025em;
+  font-weight: 650;
+  font-optical-sizing: auto;
+  line-height: 1.08;
+  letter-spacing: -0.022em;
   text-wrap: balance;
 }
 
@@ -374,19 +287,20 @@ dd {
   padding: 0;
 }
 
-/* Nenhum campo hoje; se entrar algum, o iOS não dá zoom ao focar. */
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+/* O iOS não dá zoom ao focar um campo com 16 px ou mais. */
 input,
 select,
 textarea {
   font-size: max(16px, 1em);
 }
 
-code {
-  font-family: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
-  font-size: 0.88em;
-}
-
-/* `hidden` vence qualquer display de componente. */
 [hidden] {
   display: none !important;
 }
@@ -409,9 +323,9 @@ code {
   top: -100px;
   z-index: 100;
   padding: var(--s-3) var(--s-5);
-  border-radius: var(--r-pill);
-  background: var(--fg);
-  color: var(--bg);
+  border-radius: var(--r-sm);
+  background: var(--ink);
+  color: var(--surface);
   font-weight: 700;
   text-decoration: none;
 }
@@ -438,72 +352,72 @@ code {
   padding-block: var(--section-y);
 }
 
+.section-head {
+  display: grid;
+  gap: var(--s-4);
+  max-width: 46rem;
+  margin-bottom: clamp(2.5rem, 2rem + 2vw, 4rem);
+}
+
 .section-title {
   font-size: var(--t-2xl);
-  max-width: 18ch;
 }
 
 .section-lede {
-  margin-top: var(--s-5);
   font-size: var(--t-md);
   line-height: 1.5;
-  color: var(--fg-2);
-  max-width: 48ch;
+  color: var(--ink-2);
+  max-width: 52ch;
 }
 
-/* Granulação de filme: dá matéria aos céus sem pesar (um SVG de 1 KB). */
-.grain {
-  position: relative;
-  isolation: isolate;
+/* Contexto curto acima de um título, em frase comum (sem caixa-alta). */
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: var(--t-sm);
+  font-weight: 650;
+  color: var(--pine-ink);
 }
 
-.grain::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  opacity: var(--grain-opacity);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1.4 -.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  mix-blend-mode: overlay;
+.band .kicker {
+  color: var(--marca);
 }
 
 /* ---------------------------------------------------------------------------
- * Botões: cápsulas. Primário é a luz mais forte da tela.
+ * Botões
  * ------------------------------------------------------------------------- */
 .btn {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.6rem;
+  gap: 0.55rem;
   min-height: 3.25rem;
-  padding: 0.8rem 1.5rem;
+  padding: 0.8rem 1.4rem;
   border: 1.5px solid transparent;
-  border-radius: var(--r-pill);
+  border-radius: var(--r-md);
   font-family: var(--font-text);
   font-size: var(--t-sm);
   font-weight: 700;
   line-height: 1.2;
-  letter-spacing: 0.005em;
+  text-align: center;
   text-decoration: none;
   cursor: pointer;
   user-select: none;
-  overflow: hidden;
-  -webkit-tap-highlight-color: transparent;
   transition:
-    background-color 200ms var(--ease-out),
-    color 200ms var(--ease-out),
-    border-color 200ms var(--ease-out),
-    box-shadow 300ms var(--ease-out),
-    transform 300ms var(--ease-spring);
+    background-color var(--d-fast) var(--ease-out),
+    color var(--d-fast) var(--ease-out),
+    border-color var(--d-fast) var(--ease-out),
+    box-shadow var(--d-base) var(--ease-out),
+    transform var(--d-base) var(--ease-spring);
 }
 
 .btn svg {
   flex: none;
-  width: 1.125rem;
-  height: 1.125rem;
-  transition: transform 300ms var(--ease-spring);
+  width: 1.15rem;
+  height: 1.15rem;
+  transition: transform var(--d-base) var(--ease-spring);
 }
 
 .btn:active {
@@ -511,37 +425,42 @@ code {
 }
 
 .btn-primary {
-  background: var(--accent);
-  color: var(--accent-fg);
-  box-shadow: 0 6px 18px -8px color-mix(in srgb, var(--sodio) 60%, transparent);
+  background: var(--pine);
+  color: #ffffff;
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.12) inset, 0 8px 20px -10px rgb(13 92 73 / 0.7);
 }
 
-/* Reflexo que atravessa o botão: um farol passando. */
-.btn-primary::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(100deg, transparent 30%, rgb(255 255 255 / 0.35) 50%, transparent 70%);
-  transform: translateX(-120%);
-  pointer-events: none;
+.btn-secondary {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line-2);
 }
 
-.btn-ghost {
-  background: color-mix(in srgb, var(--bg-2) 40%, transparent);
-  color: var(--fg);
+/* Na faixa verde, o primário vira marca-texto. */
+.band .btn-primary {
+  background: var(--marca);
+  color: #1d2a12;
+  box-shadow: 0 10px 24px -12px rgb(0 0 0 / 0.6);
+}
+
+.band .btn-secondary {
+  background: transparent;
+  color: var(--ink);
   border-color: var(--line-2);
 }
 
 @media (hover: hover) {
   .btn-primary:hover {
-    background: var(--accent-hover);
-    box-shadow: 0 12px 28px -10px color-mix(in srgb, var(--sodio) 75%, transparent);
+    background: var(--pine-hover);
     transform: translateY(-1px);
   }
 
-  .btn-ghost:hover {
-    border-color: var(--fg);
-    background: var(--bg-2);
+  .band .btn-primary:hover {
+    background: #ffeb8a;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--ink);
     transform: translateY(-1px);
   }
 
@@ -554,96 +473,93 @@ code {
   }
 }
 
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .btn-primary:hover::after {
-    transform: translateX(120%);
-    transition: transform 700ms var(--ease-out);
-  }
-}
-
-.btn:focus-visible {
-  outline-offset: 4px;
-}
-
 .btn-sm {
   min-height: 2.75rem;
-  padding: 0.55rem 1.1rem;
+  padding: 0.5rem 1rem;
 }
 
-/* Link de texto com seta desenhada */
-/*
- * Sublinhado em duas camadas: um traço fraco sempre e a luz que corre por cima
- * no hover. Todo .text-link termina numa seta (1,45em com o espaço), que fica de fora.
- */
+.btn-block {
+  width: 100%;
+}
+
+/* Link de texto */
 .text-link {
-  --line-w: calc(100% - 1.45em);
   display: inline-flex;
   width: fit-content;
   align-items: center;
-  gap: 0.4em;
+  gap: 0.35em;
   min-height: 2.75rem;
-  color: var(--link);
+  color: var(--caneta);
   font-weight: 700;
-  text-decoration: none;
-  background:
-    linear-gradient(currentColor, currentColor) 0 calc(50% + 0.75em) / 0 1.5px no-repeat,
-    linear-gradient(color-mix(in srgb, currentColor 35%, transparent), color-mix(in srgb, currentColor 35%, transparent))
-      0 calc(50% + 0.75em) / var(--line-w) 1px no-repeat;
-  transition: background-size 420ms var(--ease-out);
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+  text-underline-offset: 0.25em;
+  transition: text-decoration-color var(--d-fast) var(--ease-out);
 }
 
 .text-link svg {
   width: 1.05em;
   height: 1.05em;
-  transition: transform 300ms var(--ease-spring);
+  transition: transform var(--d-base) var(--ease-spring);
 }
 
 @media (hover: hover) {
   .text-link:hover {
-    background-size:
-      var(--line-w) 1.5px,
-      var(--line-w) 1px;
+    text-decoration-color: currentColor;
   }
 
   .text-link:hover svg {
-    transform: translate(3px, 0);
+    transform: translateX(3px);
   }
 }
 
-/* Sinal "no ar": ponto de lanterna que respira três vezes e fica aceso. */
-.live {
+/* ---------------------------------------------------------------------------
+ * Peças do sistema
+ * ------------------------------------------------------------------------- */
+
+/* Marca-texto: sublinha números e trechos que pedem atenção. */
+.hl {
+  background: linear-gradient(transparent 58%, var(--marca) 58%, var(--marca) 92%, transparent 92%);
+  padding-inline: 0.06em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Etiquetas de estado */
+.tag {
   display: inline-flex;
   align-items: center;
-  gap: 0.55em;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--r-xs);
+  font-size: var(--t-xs);
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
 }
 
-.live::before {
-  content: "";
-  flex: none;
-  width: 0.6em;
-  height: 0.6em;
-  border-radius: 50%;
-  background: var(--live);
-  box-shadow: 0 0 0 0 color-mix(in srgb, var(--live) 55%, transparent);
+.tag-done {
+  background: var(--pine-soft);
+  color: var(--pine-ink);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .live::before {
-    animation: live-pulse 2.4s var(--ease-out) 3;
-  }
+.tag-review {
+  background: var(--marca-soft);
+  color: var(--marca-ink);
 }
 
-@keyframes live-pulse {
-  0% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--live) 55%, transparent);
-  }
-  70%,
-  100% {
-    box-shadow: 0 0 0 0.6em transparent;
-  }
+.tag-late {
+  background: var(--prazo-soft);
+  color: var(--prazo);
 }
 
-/* Chips de tecnologia */
+.tag-neutral {
+  background: var(--sunken);
+  color: var(--ink-2);
+}
+
+/* Chips de exemplo (não interativos) */
 .chips {
   display: flex;
   flex-wrap: wrap;
@@ -651,89 +567,91 @@ code {
 }
 
 .chips li {
-  padding: 0.3rem 0.8rem;
-  border: 1px solid var(--line-2);
-  border-radius: var(--r-pill);
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
   font-size: var(--t-sm);
-  color: var(--fg-2);
+  color: var(--ink-2);
 }
 
-/* Lista com pontos de luz */
-.dots li {
+/* Lista com visto */
+.checks li {
   position: relative;
-  padding-left: 1.5rem;
-  color: var(--fg-2);
+  padding-left: 1.9rem;
+  color: var(--ink-2);
 }
 
-.dots li + li {
+.checks li + li {
   margin-top: var(--s-3);
 }
 
-.dots li::before {
+.checks li::before {
   content: "";
   position: absolute;
-  left: 0.2rem;
-  top: 0.62em;
-  width: 0.5rem;
-  height: 0.5rem;
+  left: 0;
+  top: 0.18em;
+  width: 1.25rem;
+  height: 1.25rem;
   border-radius: 50%;
-  background: var(--sodio);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--sodio) 18%, transparent);
+  background: var(--pine-soft)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='m6 10.5 2.6 2.6L14.2 7.4' fill='none' stroke='%230a4a3a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / 100% no-repeat;
+}
+
+.band .checks li::before {
+  background-color: rgb(255 225 90 / 0.18);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='m6 10.5 2.6 2.6L14.2 7.4' fill='none' stroke='%23ffe15a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* Linha de fonte de um dado */
+.fonte {
+  font-size: var(--t-xs);
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+.fonte a {
+  color: inherit;
+  text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+}
+
+@media (hover: hover) {
+  .fonte a:hover {
+    color: var(--caneta);
+    text-decoration-color: currentColor;
+  }
+}
+
+/* Cartão base: superfície branca com borda e sombra leve. */
+.card {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
 }
 
 /* ---------------------------------------------------------------------------
- * Entradas por rolagem. Cada seção escolhe a sua coreografia com data-reveal;
- * todas usam só transform e opacity. Com animation-timeline o progresso segue a
- * rolagem; sem ele, um IntersectionObserver marca .is-in (html.reveal-io, posto
- * no <head>) e há uma trava que mostra tudo após 4 s se o script não rodar.
- * Sem preferência de movimento, nada disso existe: o conteúdo nasce visível.
+ * Entradas por rolagem: só transform e opacity, uma vez, curtas.
+ * Com JS, um IntersectionObserver marca .is-in (html.reveal-on, posto no <head>).
+ * Sem JS ou com movimento reduzido, tudo nasce visível.
+ * Uma trava mostra tudo após 3 s se o script não rodar.
  * ------------------------------------------------------------------------- */
-@keyframes rv-head {
-  from {
+@media (prefers-reduced-motion: no-preference) {
+  html.reveal-on [data-reveal]:not(.is-in) {
     opacity: 0;
-    translate: 0 0.45em;
+    translate: 0 24px;
   }
-}
 
-@keyframes rv-rise {
-  from {
-    opacity: 0;
-    translate: 0 36px;
+  html.reveal-on:not(.reveal-ready) [data-reveal]:not(.is-in) {
+    animation: rv-failsafe 1ms 3s forwards;
   }
-}
 
-@keyframes rv-left {
-  from {
-    opacity: 0;
-    translate: -44px 0;
-  }
-}
-
-@keyframes rv-right {
-  from {
-    opacity: 0;
-    translate: 44px 0;
-  }
-}
-
-@keyframes rv-tilt {
-  from {
-    opacity: 0;
-    transform: perspective(1000px) rotateX(14deg) translateY(70px) scale(0.96);
-  }
-}
-
-@keyframes rv-stage {
-  from {
-    opacity: 0.15;
-    transform: translateY(56px) scale(0.94);
-  }
-}
-
-@keyframes rv-iris {
-  from {
-    opacity: 0;
-    transform: scale(0.82) rotate(-5deg);
+  html.reveal-on [data-reveal] {
+    transition:
+      opacity 600ms var(--ease-out),
+      translate 700ms var(--ease-out);
+    transition-delay: calc(var(--i, 0) * 70ms);
   }
 }
 
@@ -741,67 +659,7 @@ code {
   to {
     opacity: 1;
     translate: none;
-    transform: none;
   }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: view()) {
-    [data-reveal] {
-      animation: var(--rv, rv-rise) both;
-      animation-timing-function: var(--ease-out);
-      animation-timeline: view();
-      animation-range: entry calc(4% + var(--i, 0) * 5%) cover calc(26% + var(--i, 0) * 5%);
-    }
-  }
-
-  html.reveal-io [data-reveal]:not(.is-in) {
-    opacity: 0;
-    translate: var(--rv-x, 0) var(--rv-y, 36px);
-  }
-
-  /* Trava: se o script do fallback não rodar em 4 s, tudo aparece. */
-  html.reveal-io:not(.reveal-ready) [data-reveal]:not(.is-in) {
-    animation: rv-failsafe 1ms 4s forwards;
-  }
-
-  html.reveal-io [data-reveal] {
-    transition:
-      opacity 700ms var(--ease-out),
-      translate 900ms var(--ease-out);
-    transition-delay: calc(var(--i, 0) * 80ms);
-  }
-}
-
-[data-reveal="head"] {
-  --rv: rv-head;
-}
-
-[data-reveal="left"] {
-  --rv: rv-left;
-  --rv-x: -44px;
-  --rv-y: 0;
-}
-
-[data-reveal="right"] {
-  --rv: rv-right;
-  --rv-x: 44px;
-  --rv-y: 0;
-}
-
-[data-reveal="tilt"] {
-  --rv: rv-tilt;
-  --rv-y: 70px;
-}
-
-[data-reveal="stage"] {
-  --rv: rv-stage;
-  --rv-y: 56px;
-}
-
-[data-reveal="iris"] {
-  --rv: rv-iris;
-  --rv-y: 24px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -810,6 +668,8 @@ code {
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
   }
 }
