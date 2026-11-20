@@ -1,13 +1,16 @@
 # noxlabs.tech
 
-Site institucional da Noxlabs, consultoria de software e IA de Daniel Harrison. Página única com serviços, casos,
-processo, sobre e perguntas frequentes, mais três páginas de caso (Kairos, ClinicFlow e WhatsApp Control Center).
+Site da Noxlabs, de Daniel Harrison: automação de rotinas, atendimento e WhatsApp com IA e sistemas sob medida para
+escritórios de contabilidade e pequenas e médias empresas. Página inicial, página `/contabilidade/` e três páginas de
+caso (ClinicFlow, WhatsApp Control Center e Kairos).
 
-Astro com saída estática, CSS próprio, fontes hospedadas no próprio site e JavaScript pequeno, sem biblioteca, carregado
-como módulo: tema, menu, seção atual na navegação, seletor de problemas, o caminho de um pedido no Kairos e cópia de
-e-mail. Todo o conteúdo aparece sem script. Sem rastreadores, sem cookies e sem integrações de terceiros.
+Astro com saída estática, CSS próprio, fontes hospedadas no próprio site e JavaScript pequeno, sem biblioteca: menu,
+seção atual, contadores, calculadora de horas e cópia de e-mail. Todo o conteúdo aparece sem script. Sem rastreadores,
+sem cookies e sem integrações de terceiros; a calculadora roda no navegador.
 
-Direção visual em `DESIGN.md` ("Longa exposição"); referências em `docs/references.md`.
+- Marca, voz e exemplos de texto: `BRAND.md`.
+- Sistema visual ("Rotina em ordem"): `DESIGN.md`; referências em `docs/references.md`.
+- Público, ofertas, provas e a fonte de cada número (URL e citação literal): `PRODUCT.md`.
 
 ## Rodar
 
@@ -25,15 +28,16 @@ pnpm preview        # serve o dist/
 ```bash
 pnpm exec playwright install chromium   # uma vez
 pnpm build
-pnpm shots          # primeira tela e página inteira em 14 tamanhos (320–2560, paisagem, alturas baixas), 2 temas
-pnpm frames         # quadros do movimento (topo, caminho do Kairos, onda do processo) em docs/screenshots/frames/
-pnpm video          # vídeos do movimento (rolagem, topo, seletor, Kairos, menu, tema) e quadros em docs/screenshots/video/
-pnpm perf           # quadros, tarefas longas, pior evento e CLS com a CPU 4x mais lenta
-node scripts/check-page.mjs             # 14 tamanhos x 2 temas: transbordo, contraste, alvos, CTA na dobra, menu, gesto, sem JS
+node scripts/check-page.mjs             # 6 rotas x 14 tamanhos: transbordo, contraste, títulos, alvos, CTA na dobra,
+                                        # fonte e ano em todo dado, sem termo técnico, menu, calculadora, sem JS
 BASE_URL=http://localhost:8088 node scripts/check-page.mjs   # o mesmo contra o contêiner
+pnpm shots          # capturas em docs/screenshots/local/ (fora do git); SIZES=390x844,1440x900 limita os tamanhos
+pnpm perf           # quadros, tarefas longas, pior evento e CLS com a CPU 4x mais lenta
 ```
 
-`pnpm og` regenera `public/og.png`, os ícones PNG e o `favicon.ico` (este último via ffmpeg).
+`pnpm og` regenera `public/og.png`, os ícones PNG, o `favicon.svg` e o `favicon.ico` (este via ffmpeg).
+
+Capturas não vão para o repositório: ficam em `docs/screenshots/local/`, que está no `.gitignore`.
 
 ## Docker
 
@@ -44,45 +48,34 @@ curl -s localhost:8088/healthz
 ```
 
 Build em `node:24-alpine` com pnpm; runtime em `nginx:alpine` na porta 80. O nginx (`deploy/nginx.conf`) faz gzip,
-cache de um ano para `/_astro/` (nomes com hash), `no-cache` para HTML, `try_files` para as rotas, 404 próprio,
-`/healthz` para o healthcheck e cabeçalhos de segurança. A CSP lista o hash SHA-256 de cada script inline,
-gerado no build por `scripts/csp.mjs`, então não usa `'unsafe-inline'` para scripts. TLS termina no proxy à frente
-(Traefik do Dokploy, por exemplo).
+cache de um ano para `/_astro/`, `no-cache` para HTML, `try_files` para as rotas, 404 próprio, `/healthz` e cabeçalhos de
+segurança. A CSP lista o hash SHA-256 de cada script inline, gerado no build por `scripts/csp.mjs`, sem
+`'unsafe-inline'` para scripts. TLS termina no proxy à frente (Traefik do Dokploy).
 
 ## Estrutura
 
 ```text
 src/
-  data/          conteúdo: contato e links, serviços, casos, processo e FAQ
-  components/    seções da home, palco do Kairos (KairosFlow), marca e ícones
-  scripts/       abas acessíveis compartilhadas (tabs.ts)
+  data/          conteúdo: contato, soluções, segmentos e contabilidade, casos, dados de mercado, calculadora, FAQ, ícones
+  components/    seções (Hero, MarketData/Stat, Solutions, HowItWorks, AccountingBlock, Segments, Work, Estimator,
+                 About, Security, Faq, Contact), cabeçalho, rodapé, marca e ícones
+  scripts/       motion.ts (entradas por rolagem e contadores)
   layouts/       Base.astro: head, SEO, JSON-LD, cabeçalho e rodapé
-  pages/         index, casos/[slug] e 404
+  pages/         index, contabilidade, casos/[slug] e 404
   styles/        tokens e base (global.css)
-public/          fontes Funnel Display e Atkinson Hyperlegible Next (OFL), imagens dos casos, ícones, og.png, robots.txt
-scripts/         capturas, verificações, CSP e geração de imagens
+public/          fontes Bricolage Grotesque e Figtree (OFL), imagens dos casos, ícones, og.png, robots.txt
+scripts/         verificações, capturas, CSP e geração de imagens
 deploy/          nginx.conf
-docs/screenshots capturas de referência
 ```
 
-O conteúdo mora em `src/data/`. Trocar e-mail, links ou textos de serviço não exige mexer em componentes.
+O conteúdo mora em `src/data/`. Trocar e-mail, WhatsApp, agenda, textos ou dados não exige mexer em componentes. Um dado
+de mercado novo entra em `src/data/stats.ts` com fonte, ano e link, e na tabela de `PRODUCT.md` com a citação literal.
 
 ## Pendências antes de publicar
 
-- `src/data/site.ts` → `scheduleUrl`: link de agenda (Cal.com ou similar). Enquanto for `null`, o diagnóstico é
-  pedido por e-mail e o botão de agenda não aparece.
-- Captura atual do Kairos (as do repositório ainda mostram a marca antiga, e o produto pede login). Hoje o caso usa o
-  diagrama do caminho de um pedido.
-- Confirmar se a conversa inicial de 30 min é gratuita. O site hoje diz só "conversa inicial de 30 minutos";
-  formato e preço de contratação aparecem como "sob proposta".
-- Confirmar o resumo semanal por escrito (vem do brief, não do portfólio).
-
-## Fontes do conteúdo
-
-A origem de cada afirmação e de cada imagem está em `PRODUCT.md` (Evidence on Hand).
-
-Bio, experiência e projetos vêm do portfólio do Daniel e dos READMEs dos repositórios em
-[github.com/danielharrisonlf](https://github.com/danielharrisonlf). Só repositórios públicos têm link. A medição citada
-no caso Kairos (p50 de 1,9 s para 27 ms com keep-alive no gateway) está em `docs/performance/relatorio-desempenho.md`
-do repositório `axial`. As capturas do ClinicFlow e do WhatsApp Control Center são interfaces reais com dados de
-demonstração, reaproveitadas do portfólio.
+- `src/data/site.ts` → `whatsapp`: número comercial (só dígitos, com DDI e DDD). Enquanto for `null`, não há botão de
+  WhatsApp.
+- `src/data/site.ts` → `scheduleUrl`: link de agenda. Enquanto for `null`, a conversa é pedida por e-mail.
+- E-mail no domínio (hoje o Gmail do Daniel).
+- Confirmar se a conversa inicial de 30 min é gratuita. O site hoje não promete.
+- Captura atual do Kairos: o caso usa o ícone do sistema no lugar da tela.

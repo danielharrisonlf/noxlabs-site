@@ -163,19 +163,6 @@ export const stats: Stat[] = [
     },
   },
   {
-    id: "opinionbox-whatsapp",
-    value: 77,
-    suffix: "%",
-    text: "dos usuários de WhatsApp no Brasil já conversam com empresas pelo aplicativo.",
-    source: {
-      org: "Opinion Box",
-      title: "Pesquisa WhatsApp no Brasil",
-      year: "2026",
-      url: "https://blog.opinionbox.com/pesquisa-whatsapp/",
-    },
-    note: "1.000 entrevistados.",
-  },
-  {
     id: "cetic-ia",
     value: 17,
     suffix: "%",

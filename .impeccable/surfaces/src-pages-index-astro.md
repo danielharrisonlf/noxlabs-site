@@ -1,26 +1,28 @@
 ---
-version: 1
+version: 2
 slug: "src-pages-index-astro"
 primary_target: "src/pages/index.astro"
-related_targets: ["src/pages/casos"]
+related_targets: ["src/pages/contabilidade.astro", "src/pages/casos"]
 ---
 
-# Surface brief: noxlabs.tech (home + páginas de caso)
+# Surface brief: noxlabs.tech (home, contabilidade e páginas de caso)
 
-Mode: Persuade. Visitante: founder, CTO ou líder de operação/produto no Brasil avaliando se contrata a Noxlabs. Ação: pedir o diagnóstico de 30 min por e-mail. Prova: Kairos no ar, repositórios públicos, medição do A/B do gateway. Restrições: sem logos, depoimentos, métricas de negócio ou preços inventados; sem nomes de ex-empregadores.
+Mode: Persuade. Visitante: dono ou gestor de pequena ou média empresa no Brasil, primeiro escritórios de contabilidade.
+Ação: escrever o e-mail e marcar a conversa de 30 min. Prova: dados de mercado com fonte e ano; sistemas que o Daniel
+construiu, contados em linguagem de negócio. Restrições: sem tecnês fora do rodapé técnico dos casos; sem clientes,
+depoimentos, métricas ou preços inventados; sem prometer gratuidade.
 
-Redesign de 2026-11: o dono rejeitou o pôster concreto ("engessado"). Sessão de subagente sem ferramenta de pergunta; a página de decisão não foi servida e a direção foi fixada pelo próprio brief ("um conceito forte seu"). Seed a8f9b6ea atribuiu o candidato 7 (laboratório noturno); o material vidro conflita com o veto do brief a glassmorphism, então foi traduzido em luz e fundido ao candidato 1.
+Rebranding de 2026-11: o dono pediu um site para donos de empresa, não para desenvolvedores, com dados e sem falar de
+arquitetura ou banco de dados. A versão "Longa exposição" (céu noturno, rastros de luz, Kairos como palco técnico) saiu.
 
 ## Direction contract
 
-THESIS: longa exposição na hora azul. A fotografia noturna transforma movimento invisível em linhas de luz; a Noxlabs torna visível o caminho de um pedido, de um evento, de um agente. Recusa o pôster rígido e o SaaS escuro com cards de vidro.
+THESIS: rotina em ordem. O escritório que confere, marca e entrega no prazo; o visto como gesto da marca.
 
-OWN-WORLD: céu índigo profundo (noite) e céu de alvorada (manhã) como dois planos desenhados; luzes de cidade como paleta: sódio âmbar, lanterna coral, mercúrio azul-gelo. Rastros bezier em três camadas de brilho, nós como pontos de luz, cantos arredondados, cápsulas. Funnel Display no display, Atkinson Hyperlegible Next no texto.
+OWN-WORLD: papel claro com toque de sálvia, papel quadriculado nos pontos certos, tinta verde-pinho, marca-texto amarelo,
+caneta azul. Bricolage Grotesque nos títulos e números, Figtree no texto. Faixa verde-pinho para contabilidade e contato.
 
-STORY: entende a oferta numa linha, acha o próprio problema, segue um pedido de agente pelo Kairos passo a passo, abre os casos e escreve.
+STORY: entende a promessa numa linha, vê a rotina se resolver, confere os números do mercado, acha a própria rotina nas
+soluções e nos segmentos (contabilidade primeiro), vê o que já foi construído, estima as horas e escreve.
 
-FIRST VIEWPORT: título grande à esquerda (Funnel 500), lede e dois botões em cápsula; rastros de luz sobem da borda de baixo, à direita do texto e sem cruzá-lo, e terminam em três provas (Kairos no ar, 49 ferramentas MCP, 1,9 s para 27 ms). Navegação em cápsula flutuante com progresso e CTA fixo.
-
-FORM: candidato 7 (laboratório noturno, vidro traduzido em luz) fundido ao 1 (hora azul); seed a8f9b6ea. Raises: ukiyo-e (linha-chave antes da cor no diagrama), minihompy (o problema escolhido segue para o e-mail), cidade adormecida (noite e manhã como dois planos), teletexto (todo movimento automático tem pausa), passaporte (cada número traz a fonte), Versalhes (serviços acendem em sequência).
-
-FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+Detalhes em `BRAND.md` e `DESIGN.md`.
