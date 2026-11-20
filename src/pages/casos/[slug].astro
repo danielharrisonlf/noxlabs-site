@@ -59,7 +59,7 @@ const breadcrumb = {
         </nav>
         <div class="case-intro">
           <div class="case-intro-copy">
-            <span class="tag tag-done">{study.status}</span>
+            <span class="tag tag-ok">{study.status}</span>
             <h1 id="case-title">{study.name}</h1>
             <p class="case-summary">{study.summary}</p>
           </div>
@@ -172,7 +172,7 @@ const breadcrumb = {
 
   .case-head:has(+ .case-visual) {
     padding-bottom: clamp(6rem, 10vw, 10rem);
-    background: var(--sunken);
+    background: var(--tint);
     border-bottom: 1px solid var(--line);
   }
 
@@ -190,7 +190,7 @@ const breadcrumb = {
     align-items: center;
     min-width: 2.75rem;
     min-height: 2.75rem;
-    color: var(--caneta);
+    color: var(--goiaba-ink);
     font-weight: 700;
   }
 
@@ -297,8 +297,8 @@ const breadcrumb = {
   .gains {
     padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
     border-radius: var(--r-xl);
-    background: var(--pine-deep);
-    color: #f2f7f3;
+    background: var(--goiaba-soft);
+    color: var(--jabu);
   }
 
   .gain-list {
@@ -323,13 +323,13 @@ const breadcrumb = {
     width: 0.4rem;
     height: 1em;
     border-radius: 2px;
-    background: var(--marca);
+    background: var(--goiaba-ink);
   }
 
   .gain-note {
     margin-top: var(--s-5);
     font-size: var(--t-xs);
-    color: #c3d8cd;
+    color: var(--ink-2);
   }
 
   .tech {
@@ -405,8 +405,8 @@ const breadcrumb = {
     width: 2.5rem;
     height: 2.5rem;
     border-radius: var(--r-sm);
-    background: var(--pine-soft);
-    color: var(--pine-ink);
+    background: var(--goiaba-soft);
+    color: var(--goiaba-ink);
   }
 
   .next-icon :global(svg) {
@@ -437,7 +437,7 @@ const breadcrumb = {
     width: 2.75rem;
     height: 2.75rem;
     border-radius: 50%;
-    background: var(--sunken);
+    background: var(--tint);
     transition:
       background-color var(--d-base) var(--ease-out),
       transform var(--d-base) var(--ease-spring);
@@ -454,7 +454,7 @@ const breadcrumb = {
       box-shadow: var(--shadow-2);
     }
     .next:hover .next-go {
-      background: var(--marca);
+      background: var(--goiaba-soft);
       transform: translateX(3px);
     }
   }

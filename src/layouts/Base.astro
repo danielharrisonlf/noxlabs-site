@@ -35,9 +35,13 @@ const org = {
   areaServed: { "@type": "Country", name: "Brasil" },
   founder: { "@id": `${site.url}/#daniel` },
   sameAs: [site.links.linkedin],
+  audience: {
+    "@type": "BusinessAudience",
+    name: "Pequenas e médias empresas brasileiras de qualquer ramo",
+  },
   knowsAbout: [
-    "Automação de processos para escritórios de contabilidade",
-    "Automação de rotinas administrativas",
+    "Automação de rotinas administrativas para pequenas e médias empresas",
+    "Automação para clínicas, lojas, escritórios, indústrias, distribuidoras, imobiliárias e escolas",
     "Atendimento por WhatsApp com inteligência artificial",
     "Sistemas sob medida para empresas",
     "Integração entre sistemas de gestão, planilhas e bancos",
@@ -90,7 +94,7 @@ const graph = [org, person, website, ...schema];
     <link rel="canonical" href={canonical} />
     <meta name="author" content={site.founder.name} />
     <meta name="color-scheme" content="light" />
-    <meta name="theme-color" content="#f6f8f4" />
+    <meta name="theme-color" content="#fff8f6" />
 
     <meta property="og:type" content={type} />
     <meta property="og:site_name" content={site.name} />
@@ -103,7 +107,7 @@ const graph = [org, person, website, ...schema];
     <meta property="og:image:height" content="630" />
     <meta
       property="og:image:alt"
-      content="Noxlabs: sua equipe não foi contratada para copiar e colar. Ao lado, uma lista de exemplo com rotinas de escritório marcadas como feitas."
+      content="Noxlabs: tire o trabalho repetitivo da rotina da sua empresa. Ao lado, azulejos ilustrados de vários ramos: clínica, loja, escritório, indústria, imobiliária e agro."
     />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
@@ -116,8 +120,8 @@ const graph = [org, person, website, ...schema];
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="sitemap" href="/sitemap-index.xml" />
 
-    <link rel="preload" href="/fonts/bricolage-grotesque-latin-var.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/figtree-latin-var.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/parkinsans-latin-var.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/onest-latin-var.woff2" as="font" type="font/woff2" crossorigin />
 
     <script is:inline>
       document.documentElement.classList.add("js");
@@ -138,9 +142,11 @@ const graph = [org, person, website, ...schema];
     <Footer />
     <MobileCta mailto={mailto} />
     <script>
+      import { initCopy } from "../scripts/copy";
       import { initMotion } from "../scripts/motion";
 
       initMotion();
+      initCopy();
     </script>
   </body>
 </html>

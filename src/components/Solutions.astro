@@ -1,39 +1,126 @@
 ---
+/**
+ * O que a Noxlabs faz: seis ofertas em azulejos, cada uma com uma tela de
+ * exemplo pequena que mostra a rotina, não a tecnologia. Abaixo, o que muda
+ * na empresa, em uma linha cada.
+ */
+import { outcomes } from "../data/content";
 import { site, talkMailto } from "../data/site";
 import { solutions } from "../data/solutions";
 import Icon from "./Icon.astro";
+
+const byId = Object.fromEntries(solutions.map((s) => [s.id, s]));
+const order = ["atendimento", "rotinas", "sistemas", "paineis", "integracoes", "diagnostico"] as const;
 ---
 
 <section class="section solutions" id="solucoes" aria-labelledby="solucoes-title">
   <div class="wrap">
-    <header class="section-head" data-reveal>
-      <h2 id="solucoes-title" class="section-title">Menos tarefa manual. Mais tempo para o que dá resultado.</h2>
+    <header class="section-head split" data-reveal>
+      <h2 id="solucoes-title" class="section-title">O que eu faço pela sua empresa</h2>
       <p class="section-lede">
-        Cada solução começa por uma rotina que já existe na sua empresa e termina com ela acontecendo com menos esforço,
-        menos espera e menos erro.
+        Cada trabalho começa por uma rotina que já existe e termina com ela acontecendo com menos esforço, menos espera e
+        menos erro.
       </p>
     </header>
 
-    <ul role="list" class="sol-grid">
+    <ul role="list" class="bento">
       {
-        solutions.map((s, i) => (
-          <li class="sol" data-reveal style={`--i:${i % 2}`}>
-            <span class="sol-icon">
-              <Icon name={s.icon} />
-            </span>
-            <div class="sol-body">
-              <h3>{s.title}</h3>
-              <p>{s.promise}</p>
-              <ul role="list" class="chips" aria-label={`Exemplos de ${s.title.toLowerCase()}`}>
-                {s.examples.map((e) => (
-                  <li>{e}</li>
-                ))}
-              </ul>
-            </div>
-          </li>
-        ))
+        order.map((id, i) => {
+          const s = byId[id];
+          return (
+            <li class:list={["tile", "tile-white", "sol", `sol-${id}`]} data-reveal style={`--i:${i % 3}`}>
+              <div class="vig" aria-hidden="true">
+                {id === "atendimento" && (
+                  <div class="v-chat">
+                    <p class="bubble in">Vocês abrem sábado? Preciso de um orçamento.</p>
+                    <p class="bubble out">
+                      Abrimos das 8h às 12h. Me diga o que precisa que eu já monto o orçamento.<small>Assistente</small>
+                    </p>
+                    <p class="handoff">Orçamento pronto, enviado ao vendedor</p>
+                  </div>
+                )}
+                {id === "rotinas" && (
+                  <ul class="v-list">
+                    <li><span class="v-ok" />Pedidos lançados<b>38</b></li>
+                    <li><span class="v-ok" />Boletos enviados<b>12</b></li>
+                    <li><span class="v-ok warm" />Para conferir<b>2</b></li>
+                  </ul>
+                )}
+                {id === "sistemas" && (
+                  <div class="v-app">
+                    <p class="v-app-h">Ordens de serviço</p>
+                    <p class="v-row"><span>OS 1182, troca de peça</span><i class="v-pill done">Concluída</i></p>
+                    <p class="v-row"><span>OS 1183, visita técnica</span><i class="v-pill">Hoje, 14h</i></p>
+                    <p class="v-row"><span>OS 1184, orçamento</span><i class="v-pill wait">Aguardando</i></p>
+                  </div>
+                )}
+                {id === "paineis" && (
+                  <div class="v-dash">
+                    <div class="v-kpis">
+                      <p><span>Recebido no mês</span><b class="tabular">R$ 84,3 mil</b></p>
+                      <p><span>Em atraso</span><b class="tabular">7 clientes</b></p>
+                      <p><span>Pedidos na semana</span><b class="tabular">212</b></p>
+                    </div>
+                    <span class="v-bars">
+                      <i style="--h:40%" /><i style="--h:55%" /><i style="--h:48%" /><i style="--h:63%" /><i style="--h:58%" /><i style="--h:74%" /><i class="on" style="--h:90%" />
+                    </span>
+                  </div>
+                )}
+                {id === "integracoes" && (
+                  <div class="v-flow">
+                    <span>Loja virtual</span>
+                    <i />
+                    <span>Sistema de gestão</span>
+                    <i />
+                    <span>Planilha do financeiro</span>
+                  </div>
+                )}
+                {id === "diagnostico" && (
+                  <div class="v-map">
+                    <p class="v-app-h">Onde vai o tempo, por semana</p>
+                    <p><span>Digitar pedidos</span><i style="--w:92%" /><b>9 h</b></p>
+                    <p><span>Cobrar clientes</span><i style="--w:62%" /><b>6 h</b></p>
+                    <p><span>Responder dúvidas</span><i style="--w:52%" /><b>5 h</b></p>
+                  </div>
+                )}
+              </div>
+              <div class="sol-body">
+                <h3>
+                  <Icon name={s.icon} class="no-nudge" />
+                  {s.title}
+                </h3>
+                <p>{s.promise}</p>
+                <ul role="list" class="chips" aria-label={`Exemplos de ${s.title.toLowerCase()}`}>
+                  {s.examples.map((e) => (
+                    <li>{e}</li>
+                  ))}
+                </ul>
+              </div>
+            </li>
+          );
+        })
       }
     </ul>
+    <p class="example-note sol-note">Telas, nomes e números de exemplo, para mostrar a rotina. Não são dados de clientes.</p>
+
+    <div class="outcomes" data-reveal>
+      <h3 class="outcomes-title">O que muda na empresa</h3>
+      <ul role="list" class="outcomes-list">
+        {
+          outcomes.map((o) => (
+            <li>
+              <span class="o-ico">
+                <Icon name={o.icon} class="no-nudge" />
+              </span>
+              <span>
+                <strong>{o.title}</strong>
+                {o.text}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
 
     <p class="sol-foot" data-reveal>
       Não achou a sua rotina aqui?
@@ -47,52 +134,319 @@ import Icon from "./Icon.astro";
 </section>
 
 <style>
-  .sol-grid {
+  .bento {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0 clamp(2rem, 4vw, 4rem);
-    border-top: 1px solid var(--line-2);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-3);
   }
 
   .sol {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: var(--s-5);
-    padding-block: clamp(1.5rem, 1.2rem + 1vw, 2.25rem);
-    border-bottom: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+    padding: var(--s-3);
   }
 
-  .sol-icon {
+  .sol-atendimento,
+  .sol-paineis,
+  .sol-diagnostico {
+    grid-column: span 2;
+  }
+
+  .vig {
+    flex: 1;
     display: grid;
-    place-items: center;
-    width: 3.25rem;
-    height: 3.25rem;
+    align-content: center;
+    min-height: 11.5rem;
+    padding: var(--s-4);
     border-radius: var(--r-md);
-    background: var(--pine-soft);
-    color: var(--pine-ink);
+    background: var(--tint);
+    overflow: hidden;
   }
 
-  .sol-icon :global(svg) {
-    width: 1.6rem;
-    height: 1.6rem;
+  .sol-atendimento .vig {
+    background: #f6eef6;
+  }
+
+  .sol-integracoes .vig {
+    background: var(--goiaba-soft);
+  }
+
+  .sol-rotinas .vig,
+  .sol-diagnostico .vig {
+    background: var(--caju-soft);
   }
 
   .sol-body {
     display: grid;
     gap: var(--s-3);
+    padding: 0 var(--s-3) var(--s-3);
   }
 
-  .sol h3 {
+  .sol-body h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
     font-size: var(--t-lg);
   }
 
-  .sol p {
-    color: var(--ink-2);
-    max-width: 46ch;
+  .sol-body h3 svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--goiaba-ink);
   }
 
-  .sol .chips {
-    margin-top: var(--s-1);
+  .sol-body p {
+    color: var(--ink-2);
+  }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .chips li {
+    padding: 0.25rem 0.7rem;
+    border-radius: 999px;
+    background: var(--tint);
+    color: var(--ink-2);
+    font-size: var(--t-xs);
+    font-weight: 600;
+  }
+
+  /* ---- Telas de exemplo ---- */
+  .v-chat {
+    display: grid;
+    gap: 0.45rem;
+    max-width: 30rem;
+    width: 100%;
+    margin-inline: auto;
+  }
+
+  .v-list,
+  .v-app,
+  .v-map {
+    display: grid;
+    gap: 0.4rem;
+    padding: 0.85rem;
+    border-radius: var(--r-sm);
+    background: #fff;
+    box-shadow: var(--shadow-1);
+    font-size: 0.8125rem;
+  }
+
+  .v-list li {
+    display: grid;
+    grid-template-columns: 1.1rem minmax(0, 1fr) auto;
+    gap: 0.55rem;
+    align-items: center;
+    padding: 0.25rem 0;
+  }
+
+  .v-list b {
+    font-family: var(--font-display);
+    font-size: 1rem;
+  }
+
+  .v-ok {
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+    background: var(--goiaba);
+  }
+
+  .v-ok.warm {
+    background: var(--caju);
+  }
+
+  .v-app-h {
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+
+  .v-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.3rem 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .v-row span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .v-pill {
+    flex: none;
+    padding: 0.05rem 0.5rem;
+    border-radius: 999px;
+    background: var(--lila);
+    color: var(--lila-ink);
+    font-style: normal;
+    font-size: 0.75rem;
+    font-weight: 650;
+  }
+
+  .v-pill.done {
+    background: var(--goiaba-soft);
+    color: var(--goiaba-ink);
+  }
+
+  .v-pill.wait {
+    background: var(--caju-soft);
+    color: var(--caju-ink);
+  }
+
+  .v-dash {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: var(--s-4);
+    align-items: end;
+    padding: 1rem;
+    border-radius: var(--r-sm);
+    background: #fff;
+    box-shadow: var(--shadow-1);
+  }
+
+  .v-kpis {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-3);
+  }
+
+  .v-kpis p {
+    display: grid;
+    gap: 0.2rem;
+    font-size: 0.75rem;
+    color: var(--ink-3);
+  }
+
+  .v-kpis b {
+    font-family: var(--font-display);
+    font-size: clamp(1rem, 0.85rem + 0.5vw, 1.35rem);
+    color: var(--ink);
+    line-height: 1.1;
+  }
+
+  .v-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    height: 5.5rem;
+  }
+
+  .v-bars i {
+    flex: 1;
+    height: var(--h);
+    border-radius: 5px 5px 2px 2px;
+    background: var(--lila);
+  }
+
+  .v-bars i.on {
+    background: var(--goiaba);
+  }
+
+  .v-flow {
+    display: grid;
+    justify-items: center;
+    gap: 0.3rem;
+    font-size: 0.8125rem;
+    font-weight: 650;
+  }
+
+  .v-flow span {
+    padding: 0.45rem 0.9rem;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: var(--shadow-1);
+  }
+
+  .v-flow i {
+    width: 2px;
+    height: 0.9rem;
+    background: var(--goiaba-ink);
+    border-radius: 2px;
+  }
+
+  .v-map {
+    width: 100%;
+    max-width: 30rem;
+    margin-inline: auto;
+  }
+
+  .v-map p:not(.v-app-h) {
+    display: grid;
+    grid-template-columns: 7.5rem minmax(0, 1fr) 2.2rem;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .v-map i {
+    height: 0.55rem;
+    width: var(--w);
+    border-radius: 999px;
+    background: var(--goiaba);
+  }
+
+  .v-map b {
+    text-align: right;
+  }
+
+  .sol-note {
+    margin-top: var(--s-3);
+  }
+
+  /* ---- O que muda ---- */
+  .outcomes {
+    margin-top: clamp(2.5rem, 2rem + 2vw, 4rem);
+  }
+
+  .outcomes-title {
+    font-size: var(--t-xl);
+    margin-bottom: var(--s-5);
+  }
+
+  .outcomes-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s-5) var(--s-6);
+  }
+
+  .outcomes-list li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--s-3);
+    align-items: start;
+    color: var(--ink-2);
+  }
+
+  .outcomes-list strong {
+    display: block;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: var(--t-md);
+    line-height: 1.2;
+    margin-bottom: 0.15rem;
+  }
+
+  .o-ico {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 14px;
+    background: var(--goiaba-soft);
+    color: var(--goiaba-ink);
+  }
+
+  .o-ico svg {
+    width: 1.4rem;
+    height: 1.4rem;
   }
 
   .sol-foot {
@@ -104,16 +458,53 @@ import Icon from "./Icon.astro";
     color: var(--ink-2);
   }
 
-  @media (max-width: 52rem) {
-    .sol-grid {
-      grid-template-columns: 1fr;
+  @media (max-width: 63.99rem) {
+    .bento {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .sol-atendimento,
+    .sol-paineis,
+    .sol-diagnostico {
+      grid-column: span 2;
+    }
+
+    .outcomes-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  @media (max-width: 30rem) {
-    .sol {
+  @media (max-width: 39.99rem) {
+    .bento {
       grid-template-columns: 1fr;
-      gap: var(--s-3);
+    }
+
+    .sol-atendimento,
+    .sol-paineis,
+    .sol-diagnostico {
+      grid-column: auto;
+    }
+
+    .vig {
+      min-height: 0;
+      padding: var(--s-3);
+    }
+
+    .v-dash {
+      grid-template-columns: 1fr;
+    }
+
+    .v-bars {
+      height: 3.5rem;
+    }
+
+    .v-map p:not(.v-app-h) {
+      grid-template-columns: 6.8rem minmax(0, 1fr) 2rem;
+    }
+
+    .outcomes-list {
+      grid-template-columns: 1fr;
+      gap: var(--s-4);
     }
   }
 </style>

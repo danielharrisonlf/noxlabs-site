@@ -88,7 +88,7 @@ export const whatsapp: CaseStudy = {
   summary: "Um painel para a empresa cuidar do WhatsApp Business oficial, o usado para avisos e atendimento em volume.",
   status: "Produto próprio",
   icon: "chat",
-  fits: ["Empresas que atendem e vendem pelo WhatsApp", "Escritórios que enviam avisos e guias em volume"],
+  fits: ["Empresas que atendem e vendem pelo WhatsApp", "Quem envia avisos e lembretes em volume"],
   problem:
     "Quem atende ou avisa clientes pelo WhatsApp Business oficial, o que permite mandar mensagens em volume, trabalha espalhado: números, perfil da empresa, mensagens prontas e configurações ficam em telas diferentes, e quando um envio falha a mensagem de erro raramente diz o que fazer.",
   hook: "Números, mensagens prontas e configurações do WhatsApp da empresa espalhados, e envios que falham sem dizer por quê.",
@@ -196,5 +196,5 @@ export const moreCases: CaseEntry[] = [
 /** Todas as páginas de caso. */
 export const detailCases = [whatsapp, clinicflow, kairos];
 
-/** Os que abrem a seção de casos na página inicial: os mais próximos da rotina de um escritório. */
+/** Os que abrem a seção de projetos na página inicial: atendimento e agenda, comuns a quase todo ramo. */
 export const featuredCases = [whatsapp, clinicflow];

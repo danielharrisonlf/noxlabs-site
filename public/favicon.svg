@@ -1,5 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-    <rect width="32" height="32" rx="9" fill="#0d5c49"/>
-    <path d="M9.5 23V14.6a4.1 4.1 0 0 1 8.2 0v2" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M17.7 16.6V22.6L23.8 13.2" fill="none" stroke="#ffe15a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <style>@media (prefers-color-scheme: dark) { .a { fill: #fbf3fb; } }</style>
+    <rect class="a" width="15" height="15" rx="4" fill="#2a1430"/>
+    <path d="M17 15V8.5a7.5 7.5 0 0 1 15 0V15Z" fill="#ee5a6f"/>
+    <path d="M0 17h15v15H7.5A7.5 7.5 0 0 1 0 24.5Z" fill="#ffb23e"/>
+    <rect class="a" x="17" y="17" width="15" height="15" rx="4" fill="#2a1430"/>
   </svg>

@@ -1,0 +1,107 @@
+---
+/** "Para empresas de todo ramo": doze ramos com o mesmo peso. No celular, uma faixa que rola de lado. */
+import { sectors } from "../data/sectors";
+import Ill from "./Ill.astro";
+---
+
+<section class="strip" aria-labelledby="strip-title">
+  <div class="wrap">
+    <div class="strip-head">
+      <h2 id="strip-title">Para empresas de todo ramo</h2>
+      <p>O que muda de um negócio para outro é a rotina. É por ela que o trabalho começa.</p>
+    </div>
+    <ul role="list" class="strip-list">
+      {
+        sectors.map((s) => (
+          <li>
+            <span class:list={["tile", `tile-${s.tone}`, "strip-ill"]}>
+              <Ill name={s.ill} />
+            </span>
+            <span>{s.name}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .strip {
+    padding-block: clamp(2rem, 1.4rem + 2vw, 3.5rem);
+    border-block: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .strip-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s-2) var(--s-6);
+    margin-bottom: var(--s-5);
+  }
+
+  h2 {
+    font-size: var(--t-lg);
+  }
+
+  .strip-head p {
+    max-width: 34rem;
+    color: var(--ink-2);
+    font-size: var(--t-sm);
+  }
+
+  .strip-list {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: var(--s-3);
+  }
+
+  .strip-list li {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    min-height: 3.5rem;
+    font-size: var(--t-sm);
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  .strip-ill {
+    flex: none;
+    width: 3.25rem;
+    height: 3.25rem;
+    padding: 0.4rem;
+    border-radius: 14px;
+  }
+
+  @media (max-width: 75rem) {
+    .strip-list {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 47.99rem) {
+    /* Duas linhas que rolam juntas, com o próximo ramo cortado na borda. */
+    .strip-list {
+      grid-template-columns: none;
+      grid-template-rows: repeat(2, auto);
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(10.5rem, 46vw);
+      margin-inline: calc(-1 * max(var(--gutter), env(safe-area-inset-left)));
+      padding-inline: max(var(--gutter), env(safe-area-inset-left));
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: max(var(--gutter), env(safe-area-inset-left));
+      scrollbar-width: none;
+    }
+
+    .strip-list::-webkit-scrollbar {
+      display: none;
+    }
+
+    .strip-list li {
+      scroll-snap-align: start;
+    }
+  }
+</style>

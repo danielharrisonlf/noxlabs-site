@@ -1,0 +1,13 @@
+---
+/** Ilustração de ramo (ver src/data/illustrations.ts). Decorativa: o texto ao lado dá o nome. */
+import { type IllustrationName, illustrations } from "../data/illustrations";
+
+interface Props {
+  name: IllustrationName;
+  class?: string;
+}
+
+const { name, class: className } = Astro.props;
+---
+
+<svg class:list={["ill", className]} viewBox="0 0 64 64" aria-hidden="true" focusable="false" set:html={illustrations[name]} />

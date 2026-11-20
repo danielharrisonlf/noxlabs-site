@@ -4,7 +4,7 @@
  * some quando o contato, o rodapé ou a calculadora entram. Respeita a barra
  * inferior do aparelho (safe-area). Fora do celular, o cabeçalho já carrega o CTA.
  */
-import { site } from "../data/site";
+import { site, whatsappHref } from "../data/site";
 import Icon from "./Icon.astro";
 
 interface Props {
@@ -12,13 +12,23 @@ interface Props {
 }
 
 const { mailto = site.talkMailto } = Astro.props;
+const whats = whatsappHref();
 ---
 
 <div class="dock" data-dock data-visible="false" inert>
-  <a class="btn btn-primary dock-cta" href={mailto}>
-    Pedir uma conversa de 30 min
-    <Icon name="mail" class="no-nudge" />
-  </a>
+  <div class="dock-bar">
+    <a class="btn btn-primary dock-cta" href={mailto}>
+      <Icon name="mail" class="no-nudge" />
+      Pedir uma conversa de 30 min
+    </a>
+    {
+      whats && (
+        <a class="btn btn-secondary dock-whats" href={whats} aria-label="Chamar no WhatsApp">
+          <Icon name="phone" class="no-nudge" />
+        </a>
+      )
+    }
+  </div>
 </div>
 
 <script>
@@ -27,11 +37,11 @@ const { mailto = site.talkMailto } = Astro.props;
 
   if (dock && "IntersectionObserver" in window) {
     const anchors = [...document.querySelectorAll<HTMLElement>("[data-cta-anchor]")];
-    // Some também sobre a calculadora, para não cobrir os campos.
+    // Some também sobre a calculadora e o seletor de ramos, para não cobrir campos e controles.
     const blockers = [
       document.getElementById("contato"),
       document.querySelector("footer"),
-      ...document.querySelectorAll("[data-estimator]"),
+      ...document.querySelectorAll("[data-estimator], [data-scenarios]"),
     ].filter((el): el is HTMLElement => el !== null);
     const seen = new Map<Element, boolean>();
 
@@ -72,10 +82,10 @@ const { mailto = site.talkMailto } = Astro.props;
     }
   }
 
-  .dock-cta {
-    width: 100%;
+  .dock-bar {
+    display: flex;
+    gap: var(--s-2);
     pointer-events: auto;
-    box-shadow: 0 14px 30px -10px rgb(11 58 47 / 0.6);
     transform: translateY(calc(100% + 1.5rem));
     opacity: 0;
     transition:
@@ -83,8 +93,23 @@ const { mailto = site.talkMailto } = Astro.props;
       opacity 280ms var(--ease-out);
   }
 
-  .dock[data-visible="true"] .dock-cta {
+  .dock-cta {
+    flex: 1;
+    box-shadow: 0 14px 30px -10px rgb(42 20 48 / 0.6);
+  }
+
+  .dock-whats {
+    flex: none;
+    width: 3.375rem;
+    padding: 0;
+  }
+
+  .dock[data-visible="true"] .dock-bar {
     transform: none;
     opacity: 1;
+  }
+
+  :global(html.menu-open) .dock {
+    visibility: hidden;
   }
 </style>

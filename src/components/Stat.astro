@@ -10,14 +10,15 @@ import { type Stat, formatStat } from "../data/stats";
 interface Props {
   stat: Stat;
   index?: number;
-  size?: "lg" | "md";
+  /** Fundo do azulejo; a cor não carrega significado, só ritmo. */
+  tone?: "lila" | "goiaba" | "caju" | "white";
 }
 
-const { stat, index = 0, size = "lg" } = Astro.props;
+const { stat, index = 0, tone = "white" } = Astro.props;
 const shown = formatStat(stat);
 ---
 
-<figure class:list={["stat", `stat-${size}`]} data-reveal style={`--i:${index}`}>
+<figure class:list={["stat", "tile", `tile-${tone}`]} data-reveal style={`--i:${index}`}>
   <!-- Tudo numa linha: espaço entre os elementos apareceria entre o número e o "%". -->
   <p class="stat-value tabular" aria-hidden="true">{stat.prefix}{stat.prefix ? <span>{shown}</span> : <span data-count={stat.value} data-decimals={stat.decimals ?? 0}>{shown}</span>}{stat.suffix && <span class="stat-suffix">{stat.suffix}</span>}</p>
   <p class="stat-text">
@@ -36,50 +37,35 @@ const shown = formatStat(stat);
     display: grid;
     align-content: start;
     gap: var(--s-3);
-    padding: clamp(1.25rem, 1rem + 1vw, 1.75rem);
-    border: 1px solid var(--line);
-    border-radius: var(--r-lg);
-    background: var(--surface);
+    padding: clamp(1.35rem, 1rem + 1vw, 2rem);
   }
 
   .stat-value {
-    justify-self: start;
     font-family: var(--font-display);
+    font-size: clamp(2.5rem, 1.9rem + 1.8vw, 3.5rem);
+    white-space: nowrap;
     font-weight: 700;
     line-height: 1;
-    letter-spacing: -0.03em;
-    color: var(--ink);
-    background: linear-gradient(transparent 62%, var(--marca) 62%, var(--marca) 90%, transparent 90%);
-    padding-inline: 0.05em;
-  }
-
-  :global(.band) .stat-value {
-    background: none;
-    color: var(--marca);
-  }
-
-  .stat-lg .stat-value {
-    font-size: clamp(2.75rem, 2rem + 3vw, 4.25rem);
-  }
-
-  .stat-md .stat-value {
-    font-size: clamp(2.25rem, 1.8rem + 2vw, 3.25rem);
+    letter-spacing: -0.035em;
+    color: var(--jabu);
   }
 
   .stat-suffix {
-    font-size: 0.55em;
+    font-size: 0.5em;
     letter-spacing: -0.01em;
-    margin-left: 0.12em;
+    margin-left: 0.1em;
   }
 
   .stat-text {
     font-size: var(--t-base);
     line-height: 1.45;
-    max-width: 34ch;
+    max-width: 32ch;
   }
 
   .stat .fonte {
     margin-top: auto;
-    padding-top: var(--s-2);
+    padding-top: var(--s-3);
+    border-top: 1px solid rgb(42 20 48 / 0.12);
+    color: var(--ink-2);
   }
 </style>

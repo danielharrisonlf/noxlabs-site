@@ -31,7 +31,7 @@ export const site = {
   url: "https://noxlabs.tech",
   title: "Noxlabs | Automação, sistemas sob medida e IA para empresas",
   description:
-    "Automação de rotinas, atendimento no WhatsApp com IA e sistemas sob medida para escritórios de contabilidade e pequenas e médias empresas. Menos tarefa manual, menos erro, mais tempo para atender e crescer.",
+    "Automações, atendimento pelo WhatsApp com IA e sistemas sob medida para pequenas e médias empresas de qualquer ramo. Menos trabalho repetitivo, menos erro e uma visão clara do negócio.",
   locale: "pt_BR",
   email,
   mailto: `mailto:${email}`,
@@ -68,10 +68,10 @@ export function whatsappHref(text = "Olá, Daniel. Quero conversar sobre automat
 }
 
 export const nav = [
-  { label: "Soluções", href: "/#solucoes", id: "solucoes" },
-  { label: "Contabilidade", href: "/contabilidade/", id: "contabilidade" },
-  { label: "Segmentos", href: "/#segmentos", id: "segmentos" },
-  { label: "Casos", href: "/#casos", id: "casos" },
+  { label: "O que eu faço", href: "/#solucoes", id: "solucoes" },
+  { label: "Na sua empresa", href: "/#na-sua-empresa", id: "na-sua-empresa" },
+  { label: "Projetos", href: "/#casos", id: "casos" },
   { label: "Estimativa", href: "/#estimativa", id: "estimativa" },
+  { label: "Quem faz", href: "/#sobre", id: "sobre" },
   { label: "Perguntas", href: "/#perguntas", id: "perguntas" },
 ] as const;

@@ -3,7 +3,7 @@ import { mailScript, site, talkMailto, whatsappHref } from "../data/site";
 import Icon from "./Icon.astro";
 
 interface Props {
-  /** Assunto do e-mail, quando a página pede um contexto (ex.: contabilidade). */
+  /** Assunto do e-mail, quando a página pede um contexto (ex.: uma página de caso). */
   topic?: string;
   title?: string;
 }
@@ -14,7 +14,7 @@ const whats = whatsappHref();
 const subject = topic ? `${site.talkSubject}: ${topic}` : site.talkSubject;
 ---
 
-<section class="contact band" id="contato" aria-labelledby="contato-title">
+<section class="contact dark" id="contato" aria-labelledby="contato-title" data-copy-scope>
   <div class="wrap contact-grid">
     <div class="contact-copy">
       <h2 id="contato-title" data-reveal>{title}</h2>
@@ -44,7 +44,7 @@ const subject = topic ? `${site.talkSubject}: ${topic}` : site.talkSubject;
             </a>
           )
         }
-        <button class="btn btn-secondary" type="button" data-copy={site.email}>
+        <button class="btn btn-secondary" type="button" data-copy={site.email} data-copy-done="E-mail copiado">
           <span class="copy-icon"><Icon name="copy" class="no-nudge" /></span>
           <span class="check-icon"><Icon name="check" class="no-nudge" /></span>
           <span data-copy-label>Copiar e-mail</span>
@@ -71,30 +71,6 @@ const subject = topic ? `${site.talkSubject}: ${topic}` : site.talkSubject;
   </div>
 </section>
 
-<script>
-  const button = document.querySelector<HTMLButtonElement>("[data-copy]");
-  const label = button?.querySelector<HTMLElement>("[data-copy-label]");
-  const status = document.querySelector<HTMLElement>("[data-copy-status]");
-  let timer: number | undefined;
-
-  button?.addEventListener("click", async () => {
-    const value = button.dataset.copy ?? "";
-    window.clearTimeout(timer);
-    try {
-      await navigator.clipboard.writeText(value);
-      button.dataset.copied = "true";
-      if (label) label.textContent = "E-mail copiado";
-      if (status) status.textContent = "";
-    } catch {
-      button.dataset.copied = "false";
-      if (status) status.textContent = "O navegador não permitiu copiar. Selecione o endereço acima e copie manualmente.";
-    }
-    timer = window.setTimeout(() => {
-      delete button.dataset.copied;
-      if (label) label.textContent = "Copiar e-mail";
-    }, 2400);
-  });
-</script>
 
 <style>
   .contact {
@@ -103,16 +79,20 @@ const subject = topic ? `${site.talkSubject}: ${topic}` : site.talkSubject;
     padding-block: clamp(4.5rem, 3rem + 6vw, 8rem);
   }
 
-  /* Papel quadriculado claro no canto, a mesma folha do topo da página. */
+  /* Quatro azulejos da marca no canto, grandes e quase apagados. */
   .contact::before {
     content: "";
     position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgb(255 255 255 / 0.05) 1px, transparent 1px);
-    background-size: 32px 32px;
-    mask-image: radial-gradient(60% 80% at 90% 20%, #000, transparent 70%);
+    right: -6rem;
+    top: -6rem;
+    width: 26rem;
+    height: 26rem;
+    background:
+      radial-gradient(circle at 50% 100%, rgb(238 90 111 / 0.16) 0 70%, transparent 71%) right top / 48% 48% no-repeat,
+      linear-gradient(rgb(255 255 255 / 0.05), rgb(255 255 255 / 0.05)) left top / 48% 48% no-repeat,
+      linear-gradient(rgb(255 178 62 / 0.12), rgb(255 178 62 / 0.12)) left bottom / 48% 48% no-repeat,
+      linear-gradient(rgb(255 255 255 / 0.05), rgb(255 255 255 / 0.05)) right bottom / 48% 48% no-repeat;
+    border-radius: 3rem;
     pointer-events: none;
   }
 
@@ -163,7 +143,7 @@ const subject = topic ? `${site.talkSubject}: ${topic}` : site.talkSubject;
 
   [data-copied="true"] .check-icon {
     display: inline-flex;
-    color: var(--marca);
+    color: var(--caju);
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -201,7 +181,7 @@ const subject = topic ? `${site.talkSubject}: ${topic}` : site.talkSubject;
     font-size: var(--t-md);
     font-weight: 700;
     color: var(--ink);
-    text-decoration-color: var(--marca);
+    text-decoration-color: var(--goiaba);
     text-decoration-thickness: 2px;
     overflow-wrap: anywhere;
   }
@@ -216,7 +196,7 @@ const subject = topic ? `${site.talkSubject}: ${topic}` : site.talkSubject;
     padding: clamp(1.5rem, 1rem + 2vw, 2.25rem);
     border-radius: var(--r-lg);
     background: #ffffff;
-    color: #0f2a22;
+    color: var(--jabu);
     box-shadow: 0 30px 60px -28px rgb(0 0 0 / 0.6);
     rotate: -1.2deg;
   }
@@ -230,26 +210,26 @@ const subject = topic ? `${site.talkSubject}: ${topic}` : site.talkSubject;
     display: grid;
     padding-bottom: var(--s-3);
     margin-bottom: var(--s-3);
-    border-bottom: 1px solid #d6e0d7;
+    border-bottom: 1px solid #efdfe2;
     font-weight: 700;
   }
 
   .letter-subject span {
     font-size: var(--t-xs);
     font-weight: 500;
-    color: #52665d;
+    color: #6c5a71;
   }
 
   .letter-lines li {
     padding-block: 0.45rem;
-    border-bottom: 1px dashed #d6e0d7;
-    color: #3a5047;
+    border-bottom: 1px dashed #e2cdd3;
+    color: #57435d;
   }
 
   .letter-note {
     margin-top: var(--s-4);
     font-size: var(--t-sm);
-    color: #52665d;
+    color: #6c5a71;
   }
 
   @media (max-width: 63.99rem) {

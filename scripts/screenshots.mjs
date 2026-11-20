@@ -33,11 +33,11 @@ const sizes = [
 ];
 const sections = [
   ["01-topo", ".hero"],
-  ["02-numeros", "#numeros"],
-  ["03-solucoes", "#solucoes"],
-  ["04-como-funciona", "#como-funciona"],
-  ["05-contabilidade", "#contabilidade"],
-  ["06-segmentos", "#segmentos"],
+  ["02-ramos", ".strip"],
+  ["03-numeros", "#numeros"],
+  ["04-solucoes", "#solucoes"],
+  ["05-na-sua-empresa", "#na-sua-empresa"],
+  ["06-como-funciona", "#como-funciona"],
   ["07-casos", "#casos"],
   ["08-estimativa", "#estimativa"],
   ["09-sobre", "#sobre"],
@@ -47,7 +47,6 @@ const sections = [
   ["13-rodape", "footer"],
 ];
 const pages = [
-  ["contabilidade", "/contabilidade/"],
   ["caso-clinicflow", "/casos/clinicflow/"],
   ["caso-whatsapp", "/casos/whatsapp-control-center/"],
   ["caso-kairos", "/casos/kairos/"],
@@ -95,7 +94,7 @@ for (const [width, height] of sizes) {
   await page.screenshot({ path: `${out}/full/home-${tag}.jpg`, fullPage: true, type: "jpeg", quality: 72 });
 
   if ((width === 390 && height === 844) || (width === 1440 && height === 900)) {
-    await page.addStyleTag({ content: ".header,.dock{visibility:hidden!important}" });
+    await page.addStyleTag({ content: ".header,.dock,.skip-link{visibility:hidden!important}" });
     for (const [name, selector] of sections) {
       const el = page.locator(selector).first();
       await el.scrollIntoViewIfNeeded();

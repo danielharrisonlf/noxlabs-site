@@ -1,13 +1,21 @@
 {
   "name": "Noxlabs",
   "short_name": "Noxlabs",
-  "description": "Automação, sistemas sob medida e IA para escritórios de contabilidade e pequenas e médias empresas.",
+  "description": "Automações, atendimento pelo WhatsApp com IA e sistemas sob medida para pequenas e médias empresas de qualquer ramo.",
   "start_url": "/",
   "display": "browser",
-  "background_color": "#f6f8f4",
-  "theme_color": "#0d5c49",
+  "background_color": "#fff8f6",
+  "theme_color": "#2a1430",
   "icons": [
-    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }

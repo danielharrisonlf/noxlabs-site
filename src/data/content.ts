@@ -34,7 +34,7 @@ export const security: { icon: IconName; title: string; text: string }[] = [
   {
     icon: "person",
     title: "Decisão importante passa por uma pessoa",
-    text: "O assistente prepara, a equipe aprova. Envio de guia, cobrança e resposta sensível não saem sem conferência, se for assim que você quiser.",
+    text: "O assistente prepara, a equipe aprova. Cobrança, envio de documento e resposta sensível não saem sem conferência, se for assim que você quiser.",
   },
   {
     icon: "shield",
@@ -46,6 +46,16 @@ export const security: { icon: IconName; title: string; text: string }[] = [
     title: "Os dados e o sistema são seus",
     text: "Contas, acessos e documentação ficam no nome da sua empresa, para que nada dependa da Noxlabs.",
   },
+];
+
+/** O que muda na empresa, em uma linha cada. */
+export const outcomes: { icon: IconName; title: string; text: string }[] = [
+  { icon: "clock", title: "Horas de volta", text: "O repetitivo sai da mesa da equipe." },
+  { icon: "check", title: "Menos erro e retrabalho", text: "O que é digitado uma vez não é digitado de novo." },
+  { icon: "chat", title: "Atendimento mais rápido", text: "Resposta na hora para as perguntas de sempre." },
+  { icon: "chart", title: "Visão clara do negócio", text: "Atrasos, vendas e pendências numa tela." },
+  { icon: "users", title: "Crescer sem inchar a equipe", text: "Mais clientes sem contratar na mesma proporção." },
+  { icon: "shield", title: "Dados protegidos", text: "Acesso por pessoa, registro de tudo, LGPD desde o começo." },
 ];
 
 export const faq = [
@@ -65,7 +75,7 @@ export const faq = [
   {
     q: "Preciso trocar os sistemas que já uso?",
     a: [
-      "Na maioria das vezes, não. O ponto de partida é o que a sua empresa já usa: sistema de gestão, sistema contábil, planilhas, e-mail, WhatsApp.",
+      "Na maioria das vezes, não. O ponto de partida é o que a sua empresa já usa: sistema de gestão, agenda, loja virtual, planilhas, e-mail, WhatsApp.",
       "Se um sistema não permite nenhum tipo de integração, isso aparece no diagnóstico, com as alternativas e o custo de cada uma, antes de qualquer contrato.",
     ],
   },
@@ -94,6 +104,13 @@ export const faq = [
     q: "E depois da entrega, quem cuida?",
     a: [
       "Você escolhe: eu sigo cuidando de ajustes, atualizações e novas rotinas no formato que combinarmos, ou a sua equipe de TI assume com documentação e uma passagem acompanhada.",
+    ],
+  },
+  {
+    q: "Serve para o meu ramo?",
+    a: [
+      "Se a sua empresa tem tarefa que se repete toda semana, mensagem que se responde igual e informação digitada duas vezes, serve. Isso existe em clínica, loja, escritório, indústria, distribuidora, imobiliária, escola e em quase todo negócio.",
+      "O que muda de um ramo para outro é a rotina, e é por ela que o trabalho começa.",
     ],
   },
   {

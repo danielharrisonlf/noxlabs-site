@@ -6,7 +6,9 @@
 // - imagens sem alt, ordem de títulos, um H1, alvos de toque
 // - CTA principal visível na primeira tela do celular (390x844 e 360x740)
 // - todo dado de mercado com fonte (link) e ano; nenhum termo técnico fora do rodapé técnico
-// - menu em tela cheia (foco, inerte, Esc), CTA da base, seção atual na navegação
+// - menu do celular: foco preso, página inerte, rolagem travada, Esc, toque fora,
+//   gesto de voltar, fechar ao navegar sem a seção ficar sob o cabeçalho, alvos de 48 px
+// - seletor de ramos (abas e teclado), CTA da base, seção atual na navegação
 // - calculadora (teclado, digitação, e-mail com os números), cópia de e-mail
 // - movimento reduzido (tudo visível e no estado final) e página sem JavaScript
 import { chromium } from "@playwright/test";
@@ -21,7 +23,6 @@ if (!base) {
 
 const routes = [
   "/",
-  "/contabilidade/",
   "/casos/clinicflow/",
   "/casos/whatsapp-control-center/",
   "/casos/kairos/",
@@ -46,7 +47,7 @@ const viewports = [
 // Larguras com a auditoria completa (contraste, títulos, alvos).
 const audited = new Set(["320x640", "390x844", "768x1024", "1440x900", "2560x1440"]);
 // Primeira tela: onde fica o CTA principal de cada rota.
-const heroCta = { "/": ".hero .btn-primary", "/contabilidade/": ".acc-hero .btn-primary" };
+const heroCta = { "/": ".hero .btn-primary" };
 // Termos técnicos que não podem aparecer no caminho principal (o rodapé técnico das páginas de caso é a exceção).
 const jargon =
   /\b(arquitetura|banco de dados|API|MCP|microsservi\w*|deploy|PostgreSQL|Redis|NestJS|React|OAuth|stack|gateway|outbox|backend|frontend|servidor|webhooks?|JWT|Docker|Prisma|produção|VPS|monorepo|S3|Vercel|GitHub|código-fonte|CRM)\b/i;
@@ -146,7 +147,7 @@ const browser = await chromium.launch();
           last = lvl;
         }
         if (document.querySelectorAll("h1").length !== 1) out.headings.push("número de H1 diferente de 1");
-        const targets = 'a.btn, button, summary, input, [role="tab"], .nav-list a, .text-link, .contact-email a, .crumbs a, .footer-group a, .more-link, a.seg-proof, .menu-mail';
+        const targets = 'a.btn, button, summary, input, [role="tab"], .nav-list a, .text-link, .contact-email a, .crumbs a, .footer-group a, .more-link';
         for (const el of document.querySelectorAll(targets)) {
           if (el.closest("[inert]")) continue;
           const r = el.getBoundingClientRect();
@@ -207,18 +208,90 @@ const browser = await chromium.launch();
   page.on("pageerror", (e) => fail(`interações: pageerror ${e.message}`));
   await page.goto(`${base}/`, { waitUntil: "networkidle" });
 
-  // Menu em tela cheia: abre, prende o foco, deixa a página inerte, fecha com Esc.
-  await page.click("[data-menu-toggle]");
-  await page.waitForTimeout(500);
+  // Menu do celular: abre, prende o foco, deixa a página inerte e trava a rolagem do fundo.
+  const menuOpen = () => page.evaluate(() => document.querySelector("[data-menu-toggle]")?.getAttribute("aria-expanded") === "true");
+  const openMenu = async () => {
+    await page.click("[data-menu-toggle]");
+    await page.waitForTimeout(500);
+  };
+  await openMenu();
   if (!(await page.locator("#site-nav").isVisible())) fail("menu: não abriu");
-  const inMenu = await page.evaluate(() => document.getElementById("site-nav")?.contains(document.activeElement));
-  if (!inMenu) fail("menu: foco não entrou no menu");
+  if (!(await page.evaluate(() => document.getElementById("site-nav")?.contains(document.activeElement)))) fail("menu: foco não entrou no menu");
   if (!(await page.evaluate(() => document.querySelector("main")?.inert))) fail("menu: página atrás não ficou inerte");
+  if ((await page.evaluate(() => getComputedStyle(document.documentElement).overflow)) !== "hidden") fail("menu: rolagem do fundo não travou");
+  const y0 = await page.evaluate(() => window.scrollY);
+  await page.mouse.wheel(0, 600);
+  await page.waitForTimeout(300);
+  if ((await page.evaluate(() => window.scrollY)) !== y0) fail("menu: o fundo rolou com o menu aberto");
+  // Foco preso: Tab dá a volta sem sair do menu.
+  for (let i = 0; i < 14; i++) await page.keyboard.press("Tab");
+  const trapped = await page.evaluate(
+    () => document.getElementById("site-nav")?.contains(document.activeElement) || document.activeElement?.hasAttribute("data-menu-toggle"),
+  );
+  if (!trapped) fail("menu: o foco escapou com Tab");
+  // Alvos de 48 px dentro do menu.
+  const small = await page.evaluate(() =>
+    [...document.querySelectorAll("#site-nav a, #site-nav button")]
+      .map((el) => el.getBoundingClientRect())
+      .filter((r) => r.width > 0 && (r.height < 47.5 || r.width < 47.5)).length,
+  );
+  if (small) fail(`menu: ${small} alvo(s) menores que 48 px`);
+  // Indicação da seção atual no menu (há uma seção marcada depois de rolar).
+  // Esc fecha e devolve o foco ao botão.
   await page.keyboard.press("Escape");
   await page.waitForTimeout(500);
   if (await page.locator("#site-nav").isVisible()) fail("menu: Esc não fechou");
-  const focused = await page.evaluate(() => document.activeElement?.hasAttribute("data-menu-toggle"));
-  if (!focused) fail("menu: foco não voltou ao botão");
+  if (!(await page.evaluate(() => document.activeElement?.hasAttribute("data-menu-toggle")))) fail("menu: foco não voltou ao botão");
+  // Toque fora (no fundo escurecido) fecha.
+  await openMenu();
+  await page.mouse.click(195, 90);
+  await page.waitForTimeout(500);
+  if (await menuOpen()) fail("menu: tocar fora não fechou");
+  // Gesto de voltar fecha o menu sem sair da página.
+  await openMenu();
+  await page.goBack();
+  await page.waitForTimeout(500);
+  if (await menuOpen()) fail("menu: voltar não fechou");
+  if (!page.url().startsWith(`${base}/`)) fail(`menu: voltar saiu da página (${page.url()})`);
+  // Tocar num link fecha o menu e leva à seção, sem ela ficar escondida sob o cabeçalho.
+  await openMenu();
+  await page.click('#site-nav a[href="/#estimativa"]');
+  await page.waitForTimeout(1500);
+  if (await menuOpen()) fail("menu: tocar num link não fechou");
+  const landing = await page.evaluate(() => {
+    const top = document.getElementById("estimativa")?.getBoundingClientRect().top ?? -1;
+    const header = document.querySelector("[data-header]");
+    const hb = header && header.dataset.hidden !== "true" ? header.getBoundingClientRect().bottom : 0;
+    return { top, hb, hash: location.hash, overflow: getComputedStyle(document.documentElement).overflow };
+  });
+  if (landing.top < landing.hb - 1 || landing.top > 160) fail(`menu: seção fora do lugar depois do link (topo ${landing.top}, cabeçalho ${landing.hb})`);
+  if (landing.hash !== "#estimativa") fail(`menu: endereço sem a seção (${landing.hash})`);
+  if (landing.overflow === "hidden") fail("menu: rolagem continuou travada depois de fechar");
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  await page.waitForTimeout(300);
+
+  // Cabeçalho do celular: some ao descer e volta ao subir.
+  await page.evaluate(() => window.scrollTo({ top: 1400, behavior: "instant" }));
+  await page.waitForTimeout(150);
+  await page.evaluate(() => window.scrollTo({ top: 1800, behavior: "instant" }));
+  await page.waitForTimeout(500);
+  if ((await page.locator("[data-header]").getAttribute("data-hidden")) !== "true") fail("cabeçalho: não sumiu ao rolar para baixo");
+  await page.evaluate(() => window.scrollTo({ top: 1500, behavior: "instant" }));
+  await page.waitForTimeout(500);
+  if ((await page.locator("[data-header]").getAttribute("data-hidden")) === "true") fail("cabeçalho: não voltou ao rolar para cima");
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  await page.waitForTimeout(300);
+
+  // Seletor de ramos: tocar num chip troca o cenário; setas do teclado andam entre os chips.
+  await page.locator("#tab-clinica").scrollIntoViewIfNeeded();
+  await page.click("#tab-clinica");
+  await page.waitForTimeout(500);
+  if (!(await page.locator("#panel-clinica").isVisible()) || (await page.locator("#panel-loja").isVisible())) fail("ramos: o chip não trocou o cenário");
+  await page.keyboard.press("ArrowRight");
+  await page.waitForTimeout(500);
+  if ((await page.locator("#tab-loja").getAttribute("aria-selected")) !== "true") fail("ramos: seta para a direita não andou");
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  await page.waitForTimeout(300);
 
   // CTA da base: escondido no topo, aparece no meio da página.
   if ((await page.locator("[data-dock]").getAttribute("data-visible")) !== "false") fail("cta da base: visível no topo");
@@ -259,10 +332,10 @@ const browser = await chromium.launch();
   if (!mail.includes("10 h por semana") || !mail.includes("60 horas por mês")) fail(`calculadora: e-mail sem os números (${mail.slice(0, 120)})`);
 
   // Cópia de e-mail.
-  await page.locator("[data-copy]").scrollIntoViewIfNeeded();
-  await page.click("[data-copy]");
+  await page.locator("#contato [data-copy]").scrollIntoViewIfNeeded();
+  await page.click("#contato [data-copy]");
   await page.waitForTimeout(300);
-  const label = await page.locator("[data-copy-label]").textContent();
+  const label = await page.locator("#contato [data-copy-label]").textContent();
   const status = await page.locator("[data-copy-status]").textContent();
   if (label !== "E-mail copiado") fail(`cópia: rótulo "${label}", status "${status}"`);
   const clip = await page.evaluate(() => navigator.clipboard.readText());
@@ -270,28 +343,26 @@ const browser = await chromium.launch();
   await context.close();
 }
 
-// Desktop: seção atual na navegação e página de contabilidade marcada.
+// Desktop: seção atual na navegação.
 {
   const context = await browser.newContext({ colorScheme: "light", viewport: { width: 1440, height: 900 } });
   const page = await context.newPage();
   await page.goto(`${base}/`, { waitUntil: "networkidle" });
   await page.evaluate(() => document.getElementById("casos")?.scrollIntoView({ behavior: "instant" }));
   await page.waitForTimeout(700);
-  const current = await page.evaluate(() => document.querySelector('[data-nav-link][aria-current="true"]')?.getAttribute("data-nav-link"));
+  const current = await page.evaluate(() => document.querySelector('.nav-list [data-nav-link][aria-current="true"]')?.getAttribute("data-nav-link"));
   if (current !== "casos") fail(`menu: seção atual "${current}", esperado casos`);
-  await page.goto(`${base}/contabilidade/`, { waitUntil: "networkidle" });
-  if ((await page.locator('[data-nav-link="contabilidade"]').getAttribute("aria-current")) !== "page") fail("menu: Contabilidade sem aria-current na própria página");
   await context.close();
 }
 
-// Movimento reduzido: tudo visível e a rotina do topo no estado final.
+// Movimento reduzido: tudo visível e o mosaico do topo no estado final.
 {
   const context = await browser.newContext({ reducedMotion: "reduce", viewport: { width: 1440, height: 900 } });
   const page = await context.newPage();
   await page.goto(`${base}/`, { waitUntil: "networkidle" });
   await page.waitForTimeout(300);
   const hidden = await page.evaluate(() =>
-    [...document.querySelectorAll("[data-reveal], .st-done, .tag-final")].filter((el) => Number(getComputedStyle(el).opacity) < 0.99).length,
+      [...document.querySelectorAll("[data-reveal], .mosaic-grid > .tile, .m-reply, .m-rows li")].filter((el) => Number(getComputedStyle(el).opacity) < 0.99).length,
   );
   if (hidden) fail(`movimento reduzido: ${hidden} elementos com opacidade < 1`);
   await context.close();
@@ -308,6 +379,8 @@ const browser = await chromium.launch();
   );
   if (hidden) fail(`sem JS: ${hidden} blocos invisíveis`);
   if ((await page.locator('[data-res="freed"]').textContent()) !== "48") fail("sem JS: calculadora sem a conta inicial");
+  const panels = await page.locator("[data-scen-panel]").evaluateAll((els) => els.filter((el) => el.getBoundingClientRect().height > 0).length);
+  if (panels !== 6) fail(`sem JS: ${panels} de 6 cenários de ramo visíveis`);
   await context.close();
 }
 
@@ -319,6 +392,6 @@ if (failures.length) {
   process.exitCode = 1;
 } else {
   console.log(
-    `OK: ${routes.length} rotas, ${viewports.length} tamanhos de tela (320–2560, paisagem e baixos), contraste, títulos, alvos, CTA na primeira tela, fontes dos dados, sem termo técnico, menu, CTA da base, seção atual, calculadora, cópia, movimento reduzido e sem JavaScript.`,
+    `OK: ${routes.length} rotas, ${viewports.length} tamanhos de tela (320–2560, paisagem e baixos), contraste, títulos, alvos, CTA na primeira tela, fontes dos dados, sem termo técnico, menu do celular (foco, trava, Esc, toque fora, voltar, link, 48 px), cabeçalho que some, seletor de ramos, CTA da base, seção atual, calculadora, cópia, movimento reduzido e sem JavaScript.`,
   );
 }

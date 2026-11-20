@@ -2,6 +2,7 @@
  * Dados de mercado usados no site. Regra: todo número aparece com a fonte e o
  * ano ao lado, e está registrado em PRODUCT.md com a URL e a citação literal.
  * São dados de terceiros sobre o mercado, nunca resultados da Noxlabs.
+ * Escolhidos para valer para qualquer ramo: nenhum é de um setor só.
  */
 export type Stat = {
   id: string;
@@ -17,86 +18,6 @@ export type Stat = {
 };
 
 export const stats: Stat[] = [
-  /* ---- Contabilidade no Brasil ---- */
-  {
-    id: "cfc-escritorios",
-    value: 101880,
-    text: "escritórios e empresas de contabilidade com registro ativo no Brasil no fim de 2025.",
-    note: "Registro no CFC; o número não indica quantos estão em atividade.",
-    source: {
-      org: "CFC",
-      title: "Relato Integrado 2025",
-      year: "2026",
-      url: "https://cfc.org.br/wp-content/uploads/2026/05/RI_2025.pdf",
-    },
-  },
-  {
-    id: "cfc-profissionais",
-    value: 539,
-    suffix: " mil",
-    text: "contadores e técnicos em contabilidade com registro ativo no país no fim de 2025.",
-    source: {
-      org: "CFC",
-      title: "Relato Integrado 2025",
-      year: "2026",
-      url: "https://cfc.org.br/wp-content/uploads/2026/05/RI_2025.pdf",
-    },
-  },
-  {
-    id: "contabil-retrabalho",
-    value: 34,
-    suffix: "%",
-    text: "dos profissionais de contabilidade citam o excesso de retrabalho manual como desafio da rotina, o mais citado entre os desafios divulgados.",
-    source: {
-      org: "IOB, CFC e Fenacon",
-      title: "pesquisa sobre IA na rotina contábil",
-      year: "2026",
-      url: "https://cfc.org.br/noticias/pesquisa-mostra-avanco-da-inteligencia-artificial-na-rotina-dos-profissionais-da-contabilidade/",
-    },
-    note: "393 profissionais ouvidos.",
-  },
-  {
-    id: "contabil-ia-semanal",
-    value: 78,
-    suffix: "%",
-    text: "dos profissionais de contabilidade já usam ferramentas de IA no trabalho pelo menos uma vez por semana.",
-    source: {
-      org: "IOB, CFC e Fenacon",
-      title: "pesquisa sobre IA na rotina contábil",
-      year: "2026",
-      url: "https://cfc.org.br/noticias/pesquisa-mostra-avanco-da-inteligencia-artificial-na-rotina-dos-profissionais-da-contabilidade/",
-    },
-    note: "393 profissionais ouvidos.",
-  },
-
-  {
-    id: "ibpt-normas",
-    value: 569469,
-    text: "normas sobre impostos foram editadas no Brasil de outubro de 1988 a setembro de 2026, mais de 40 por dia.",
-    source: {
-      org: "IBPT",
-      title: "estudo sobre normas editadas desde 1988",
-      year: "2026",
-      url: "https://ibpt.org.br/brasil-editou-862-milhoes-de-normas-desde-1988-quase-7-sao-tributarias/",
-    },
-    note: "Federais, estaduais e municipais.",
-  },
-
-  {
-    id: "tr-5h",
-    value: 5,
-    suffix: " h",
-    text: "por semana. Em 2025, profissionais de contabilidade, tributos e direito previam que quem usa IA economizaria isso em até um ano.",
-    source: {
-      org: "Thomson Reuters",
-      title: "Future of Professionals Report",
-      year: "2025",
-      url: "https://thomsonreuters.com/en/press-releases/2025/june/the-ai-adoption-reality-check-firms-with-ai-strategies-are-twice-as-likely-to-see-ai-driven-revenue-growth-those-without-risk-falling-behind",
-    },
-    note: "Previsão de 2.275 profissionais de vários países.",
-  },
-
-  /* ---- Trabalho e atendimento ---- */
   {
     id: "ms-sem-tempo",
     value: 80,
@@ -124,9 +45,6 @@ export const stats: Stat[] = [
     },
     note: "Potencial técnico, não previsão de corte de vagas.",
   },
-
-
-  /* ---- Empresas brasileiras ---- */
   {
     id: "sebrae-whatsapp",
     value: 8,
@@ -138,9 +56,21 @@ export const stats: Stat[] = [
       year: "2026",
       url: "https://agenciasebrae.com.br/dados/whatsapp-se-consolida-nas-vendas-on-line-enquanto-facebook-e-lojas-proprias-perdem-folego/",
     },
+    note: "Mais de 8,2 mil empreendedores, fevereiro e março de 2026.",
   },
-
-
+  {
+    id: "sebrae-ia",
+    value: 52,
+    suffix: "%",
+    text: "dos donos de pequenos negócios no Brasil usaram IA no trabalho nas duas semanas antes da entrevista.",
+    source: {
+      org: "Sebrae",
+      title: "Transformação Digital nos Pequenos Negócios",
+      year: "2026",
+      url: "https://agenciasebrae.com.br/dados/pequenos-negocios-do-brasil-usam-mais-ia-que-os-norte-americanos-aponta-sebrae/",
+    },
+    note: "7.182 entrevistas, de março a maio de 2026. Usar não é o mesmo que ter IA na rotina.",
+  },
 ];
 
 export function statById(id: string) {

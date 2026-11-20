@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Site da Noxlabs (noxlabs.tech): automação, sistemas sob medida e IA para escritórios de contabilidade e PMEs.",
+  "description": "Site da Noxlabs (noxlabs.tech): automações, atendimento pelo WhatsApp com IA e sistemas sob medida para pequenas e médias empresas de qualquer ramo.",
   "packageManager": "pnpm@10.11.1",
   "engines": {
     "node": ">=22.12"

@@ -1,34 +1,53 @@
 ---
 import Icon from "../components/Icon.astro";
+import Ill from "../components/Ill.astro";
+import type { IllustrationName } from "../data/illustrations";
 import Base from "../layouts/Base.astro";
+
+/** O mosaico do topo com uma peça faltando: esta página. */
+const tiles: ({ ill: IllustrationName; tone: string } | null)[] = [
+  { ill: "clinica", tone: "lila" },
+  { ill: "loja", tone: "goiaba" },
+  { ill: "industria", tone: "caju" },
+  { ill: "imobiliaria", tone: "goiaba" },
+  null,
+  { ill: "escola", tone: "lila" },
+  { ill: "agro", tone: "white" },
+  { ill: "distribuidora", tone: "white" },
+  { ill: "escritorio", tone: "lila" },
+];
 ---
 
 <Base title="Página não encontrada | Noxlabs" description="Este endereço não existe no site da Noxlabs." path="/404/">
   <section class="nf" aria-labelledby="nf-title">
     <div class="wrap nf-grid">
       <div class="nf-copy">
-        <p class="nf-code" aria-hidden="true">Página não encontrada</p>
-        <h1 id="nf-title">Este documento não está na pasta.</h1>
+        <p class="nf-code">Página não encontrada</p>
+        <h1 id="nf-title">Esta peça não está no mosaico.</h1>
         <p>
-          O link pode estar errado ou a página mudou de lugar. As soluções, os casos e o contato estão na página inicial.
+          O link pode estar errado ou a página mudou de lugar. O que eu faço, os projetos e o contato estão na página inicial.
         </p>
         <div class="nf-actions">
           <a class="btn btn-primary" href="/">
             Ir para a página inicial
             <Icon name="arrow-right" />
           </a>
-          <a class="btn btn-secondary" href="/contabilidade/">Automação para contabilidade</a>
+          <a class="btn btn-secondary" href="/#na-sua-empresa">Ver como seria no seu ramo</a>
         </div>
       </div>
 
-      <div class="nf-folder card" aria-hidden="true">
-        <p class="nf-folder-title">Pasta: site da Noxlabs</p>
-        <ul role="list">
-          <li><span class="tag tag-done">Encontrado</span> Página inicial</li>
-          <li><span class="tag tag-done">Encontrado</span> Contabilidade</li>
-          <li><span class="tag tag-done">Encontrado</span> Casos</li>
-          <li><span class="tag tag-late">Não encontrado</span> <span class="nf-missing">Esta página</span></li>
-        </ul>
+      <div class="nf-mosaic" aria-hidden="true">
+        {
+          tiles.map((t) =>
+            t ? (
+              <span class:list={["tile", `tile-${t.tone}`]}>
+                <Ill name={t.ill} />
+              </span>
+            ) : (
+              <span class="nf-gap" />
+            ),
+          )
+        }
       </div>
     </div>
   </section>
@@ -36,15 +55,15 @@ import Base from "../layouts/Base.astro";
 
 <style>
   .nf {
-    min-height: min(92svh, 48rem);
+    min-height: min(92svh, 50rem);
     display: grid;
     align-items: center;
-    padding-block: calc(var(--header-h) + 3rem) 5rem;
+    padding-block: calc(var(--header-h) + 2.5rem) 4rem;
   }
 
   .nf-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
     gap: var(--s-7) clamp(2rem, 5vw, 5rem);
     align-items: center;
   }
@@ -56,20 +75,18 @@ import Base from "../layouts/Base.astro";
   }
 
   .nf-code {
-    font-family: var(--font-display);
-    font-size: var(--t-lg);
+    padding: 0.2rem 0.75rem;
+    border-radius: 999px;
+    background: var(--goiaba-soft);
+    color: var(--goiaba-ink);
+    font-size: var(--t-sm);
     font-weight: 700;
-    padding: 0.1rem 0.6rem;
-    border-radius: var(--r-xs);
-    background: var(--marca);
-    color: var(--marca-ink);
   }
 
   .nf h1 {
     font-size: var(--t-display);
-    font-weight: 700;
     line-height: 1.02;
-    letter-spacing: -0.025em;
+    letter-spacing: -0.03em;
     max-width: 13ch;
   }
 
@@ -85,32 +102,38 @@ import Base from "../layouts/Base.astro";
     gap: var(--s-3);
   }
 
-  .nf-folder {
-    padding: var(--s-6);
-    border-radius: var(--r-xl);
-    rotate: 1.5deg;
+  .nf-mosaic {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.6rem;
+    max-width: 26rem;
+    width: 100%;
+    justify-self: center;
   }
 
-  .nf-folder-title {
-    font-weight: 700;
-    margin-bottom: var(--s-3);
+  .nf-mosaic > * {
+    aspect-ratio: 1;
+    border-radius: 22px;
   }
 
-  .nf-folder li {
-    display: flex;
-    align-items: center;
-    gap: var(--s-3);
-    padding-block: 0.65rem;
-    border-bottom: 1px dashed var(--line);
+  .nf-mosaic .tile {
+    padding: 14%;
   }
 
-  .nf-folder li:last-child {
-    border-bottom: 0;
+  .nf-gap {
+    border: 2px dashed var(--line-2);
   }
 
-  .nf-missing {
-    color: var(--ink-3);
-    text-decoration: line-through;
+  @media (prefers-reduced-motion: no-preference) {
+    .nf-mosaic .tile:nth-child(4) {
+      animation: nf-nudge 2.4s var(--ease-in-out) 0.6s infinite alternate;
+    }
+  }
+
+  @keyframes nf-nudge {
+    to {
+      transform: translateX(6px);
+    }
   }
 
   @media (max-width: 52rem) {
@@ -118,9 +141,9 @@ import Base from "../layouts/Base.astro";
       grid-template-columns: 1fr;
     }
 
-    .nf-folder {
-      max-width: 24rem;
-      rotate: none;
+    .nf-mosaic {
+      max-width: 18rem;
+      justify-self: start;
     }
   }
 
