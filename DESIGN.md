@@ -113,11 +113,46 @@ pontas arredondadas. Pontos de luz: núcleo cheio com anel da cor do fundo e hal
 
 ## Movimento
 
-Um momento orquestrado no carregamento: a exposição do topo se forma (rastros em 2,2s, um pacote de luz por prova,
-provas acendendo), uma vez, sem laço. Depois disso, movimento só responde à pessoa ou à rolagem: passos do Kairos,
-rastro do seletor, onda do processo, hover. Curva padrão `--ease-out`; mola leve (`--ease-spring`) só em transições de
-hover e seta. Troca de tema e navegação entre páginas usam transição de visão. `prefers-reduced-motion` desliga
-desenhos, pacotes, autoplay e transições; tudo começa visível.
+Gramática: a luz se desenha, corre e acende. Só `transform`, `opacity` e `stroke-dashoffset` animam; curva padrão
+`--ease-out`, mola leve (`--ease-spring`) só em hover e seta.
+
+- **Topo:** a exposição se forma uma vez (rastros em 2,2 s, um pacote por prova, provas acendendo, "49" contando).
+  Depois, vida lenta: uma luz percorre um rastro de cada vez a cada 9 s e os pontos respiram; tudo pausa fora da
+  tela. No desktop as camadas seguem o ponteiro em profundidades diferentes e o ponto mais próximo cresce. Rolando,
+  o céu se afasta e o texto sobe.
+- **Fio condutor (>= 72rem):** um rastro na margem esquerda se desenha com a rolagem (`animation-timeline: scroll()`,
+  com a faixa calculada para a ponta ficar a 60% da tela); um ponto por seção acende quando a luz passa.
+- **Entradas por seção** (`data-reveal`, `animation-timeline: view()`): título sobe (`head`), lista desliza da
+  esquerda (`left`), texto vem da direita (`right`), casos inclinam para a frente (`tilt`), palco do Kairos e
+  resultado sobem com escala (`stage`), retrato abre girando (`iris`), o resto sobe (`rise`). Sem
+  `animation-timeline`, um IntersectionObserver aplica as mesmas entradas, com trava que mostra tudo em 4 s.
+- **Menu:** o indicador desliza até a seção atual e se enche com o progresso dentro dela. No celular, o menu em
+  tela cheia abre por cortina, os links sobem em sequência e dois rastros se desenham.
+- **Seletor:** as seis respostas dividem a mesma célula (sem salto de altura); o conteúdo entra na direção da
+  escolha; uma barra de luz desliza até o problema; o rastro até o painel se redesenha.
+- **Kairos:** a luz percorre trecho a trecho; o nó ativo pulsa e solta um anel uma vez; o texto do passo entra pela
+  direção; gesto lateral e toque no nó mudam o passo; reprodução automática uma vez, com pausa.
+- **Microinterações:** sublinhado que corre, seta que anda, botão que afunda; molduras de caso inclinam com reflexo;
+  FAQ com altura animada; cópia com visto desenhado e anel; troca de tema num círculo a partir do botão; transições
+  de visão com imagem, título e palco do Kairos compartilhados entre páginas.
+- **Movimento reduzido:** versão estática completa, tudo visível; nenhum laço, desenho, autoplay ou inclinação.
+
+Medido com CPU 4x mais lenta (`pnpm perf`): quadros a 16,7 ms (p95) na rolagem e nas interações, nenhuma tarefa longa
+durante o uso.
+
+## Faixas de tela
+
+| Faixa | Desenho |
+| --- | --- |
+| 320–639 | cápsula com marca e menu; CTA na primeira tela; provas em coluna com pontos à esquerda; seletor em chips roláveis; CTA de polegar na base |
+| 640–767 | uma coluna; tema e CTA voltam à cápsula |
+| 768–1023 | topo em duas colunas com provas compactas; lista de projetos em duas colunas |
+| 1024–1599 | composição larga; menu completo a partir de 1120 px; fio condutor a partir de 1152 px |
+| 1600–2560 | o sistema cresce com a tela (fonte raiz até ~19 px, largura útil 88rem a partir de 1920) |
+| paisagem e alturas baixas | título acompanha a altura da tela; em desktop baixo os botões sobem antes da frase de posse |
+
+`viewport-fit=cover` com `safe-area-inset` no cabeçalho, nas margens e na base; `dvh` no menu; imagens de caso com
+`srcset` (720, 1080, 1440).
 
 ## Não canonizado
 

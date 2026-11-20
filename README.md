@@ -25,9 +25,11 @@ pnpm preview        # serve o dist/
 ```bash
 pnpm exec playwright install chromium   # uma vez
 pnpm build
-pnpm shots          # capturas de cada seção em 390 e 1440 px, claro e escuro, em docs/screenshots/
+pnpm shots          # primeira tela e página inteira em 14 tamanhos (320–2560, paisagem, alturas baixas), 2 temas
 pnpm frames         # quadros do movimento (topo, caminho do Kairos, onda do processo) em docs/screenshots/frames/
-node scripts/check-page.mjs             # transbordo 360–1920, contraste, títulos, alvos, tema, menu, abas, Kairos, cópia
+pnpm video          # vídeos do movimento (rolagem, topo, seletor, Kairos, menu, tema) e quadros em docs/screenshots/video/
+pnpm perf           # quadros, tarefas longas, pior evento e CLS com a CPU 4x mais lenta
+node scripts/check-page.mjs             # 14 tamanhos x 2 temas: transbordo, contraste, alvos, CTA na dobra, menu, gesto, sem JS
 BASE_URL=http://localhost:8088 node scripts/check-page.mjs   # o mesmo contra o contêiner
 ```
 
