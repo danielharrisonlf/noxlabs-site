@@ -30,11 +30,12 @@ céu com profundidade, o texto parado a peças que se movem quando a pessoa age.
 | `--freio` | `#d43c2a` | `#ff7a5c` | lanterna; também o sinal "no ar" (`--live`) |
 | `--mercurio` | `#1f6fd1` | `#8fd3ff` | luz fria: trechos já percorridos, código público |
 
-Céus (`--sky-top`, `--sky-mid`, `--sky-low`, `--haze`, `--haze-2`) desenham o topo, o contato, a abertura dos casos e o
-404: manhã vai de azul-claro a pêssego; noite vai de índigo profundo a um horizonte violeta com névoa âmbar.
+Céus (`--sky-top`, `--sky-mid`, `--sky-low`, `--haze`, `--haze-2`) desenham o topo, a abertura dos casos e o 404. De
+manhã o céu é o próprio papel, sem gradiente, com uma névoa âmbar fraca só na origem dos rastros; à noite vai de índigo
+profundo a um horizonte violeta e se dissolve no fundo da página.
 
-`.night` força o plano noturno num trecho, nos dois temas. É o caso do palco do Kairos: uma ilha de noite dentro da
-página de manhã.
+`.night` força o plano noturno num trecho, nos dois temas: o palco do Kairos e a faixa de contato são ilhas de noite
+dentro da página de manhã, e o fechamento da página é sempre noturno.
 
 Regras: nenhum preto puro, nenhum gradiente em texto. A cor forte é luz (traço, ponto, botão), não fundo de seção.
 Texto sobre âmbar é sempre `#0a1030`.
@@ -64,11 +65,12 @@ Títulos com `text-wrap: balance`; corpo entre 40 e 62ch. Sem caixa-alta, sem r�
 
 - Cantos: `--r-sm` 10, `--r-md` 18, `--r-lg` 28, `--r-xl` 40, cápsula 999. Céus e o palco usam 40; painéis 28;
   itens de lista e FAQ 18; botões e chips são cápsulas.
-- Céus são objetos: o topo, o contato e a abertura dos casos ficam a 8px da borda da janela (6px no celular), com
-  cantos de 40px, e a navegação flutua por cima.
-- Largura máxima 80rem, calha de 16 a 48px, seções de 80 a 160px. Composições variam por seção: título e lede
-  empilhados (serviços, casos, processo), título e texto lado a lado (Kairos), retrato e texto (sobre), cabeçalho fixo
-  e lista (perguntas), texto e carta (contato).
+- Céus sangram até a borda da janela, sem moldura; a navegação flutua por cima. O que tem canto é o que se pega: palco
+  do Kairos (40px), painel de serviço, molduras de caso e carta (28px).
+- Largura máxima 80rem, calha de 16 a 48px, seções de 64 a 112px. Composições variam por seção: título e lede
+  empilhados (serviços), título e texto lado a lado (Kairos), título no vão acima do segundo caso desencontrado
+  (casos), abertura centralizada sobre a onda (processo), retrato e texto (sobre), cabeçalho fixo e lista (perguntas),
+  texto e carta numa faixa noturna (contato).
 - Profundidade com sombra de deslocamento e desfoque (`--shadow-1`, `--shadow-2`), névoa radial nos céus e
   granulação de filme (`.grain`, SVG de 1 KB em `overlay`).
 
@@ -77,12 +79,15 @@ Títulos com `text-wrap: balance`; corpo entre 40 e 62ch. Sem caixa-alta, sem r�
 O único ornamento, sempre em três camadas: brilho largo (16px, opacidade baixa), brilho (6–10px) e núcleo (1,75–2,25px),
 pontas arredondadas. Pontos de luz: núcleo cheio com anel da cor do fundo e halo de 20%.
 
-- Topo: seis rastros sobem da borda de baixo à direita do texto e terminam nas três provas. Nunca cruzam texto.
+- Topo: seis rastros sobem da borda de baixo à direita do texto e terminam nas três provas (Kairos no ar, agentes com
+  as permissões de cada usuário, código aberto). Nunca cruzam texto. No celular, "Kairos no ar" sobe para a primeira
+  tela numa faixa curta de rastros.
 - Seletor de serviços: um rastro liga o problema escolhido ao painel da resposta.
 - Kairos: linha-chave tracejada do caminho inteiro; o trecho atual acende em âmbar; os já percorridos ficam em
   mercúrio, como numa exposição acumulada.
 - Processo: onda que passa pelas quatro etapas e se desenha com a rolagem.
-- Contato: faixa de rastros ao pé do bloco. 404: um rastro que se apaga no meio.
+- Contato: faixa de rastros ao pé do bloco. 404: um rastro abaixo do botão que se apaga no caminho.
+- Sobre: um rastro contínuo passando por trás do retrato.
 - Marca: um "n" desenhado por um único rastro (âmbar para coral) com a fonte da luz acesa na ponta.
 
 ## Componentes
@@ -96,9 +101,13 @@ pontas arredondadas. Pontos de luz: núcleo cheio com anel da cor do fundo e hal
 - **Palco do Kairos**: dois desenhos (largo a partir de 64rem, zigue-zague abaixo), trilho de seis passos em abas,
   painel de altura fixa, anterior, próximo e reproduzir/pausar/repetir. Reproduz sozinho uma vez ao aparecer; parado
   com movimento reduzido.
-- **Casos**: molduras com céu atrás da captura, deslocadas em altura; no hover a moldura sobe e uma faixa de luz passa.
-  A captura usa `view-transition-name` e continua na página do caso.
-- **FAQ**: `<details>` em cartões, sinal de mais que gira para xis, altura animada onde o navegador sabe.
+- **Casos**: molduras neutras com a captura inteira, deslocadas em altura; no hover a moldura sobe e uma faixa de luz
+  passa. A captura usa `view-transition-name` e continua na página do caso. "Também construí" mostra quatro e dobra o
+  resto num `<details>`.
+- **Kairos, fatos**: "Em produção" em corpo de display; a medição do gateway e o limite assumido em notas menores ao lado.
+- **Princípios**: texto corrido em duas colunas, o título abre a frase.
+- **FAQ**: `<details>` em lista com fios, ponto de luz na pergunta aberta, mais que gira para xis, altura animada onde
+  o navegador sabe.
 - **Contato**: mailto com assunto e roteiro preenchidos, copiar e-mail com confirmação no botão, carta que mostra o
   roteiro. Botão de agenda aparece só se `scheduleUrl` existir.
 
