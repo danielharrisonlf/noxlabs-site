@@ -15,9 +15,19 @@ interface Props {
   schema?: Record<string, unknown>[];
   /** Assunto do e-mail dos botões fixos desta página. */
   mailto?: string;
+  /** Página fora dos buscadores (404): sem canônico e com noindex. */
+  noindex?: boolean;
 }
 
-const { title = site.title, description = site.description, path, type = "website", schema = [], mailto = site.talkMailto } = Astro.props;
+const {
+  title = site.title,
+  description = site.description,
+  path,
+  type = "website",
+  schema = [],
+  mailto = site.talkMailto,
+  noindex = false,
+} = Astro.props;
 
 const canonical = new URL(path, site.url).href;
 const ogImage = new URL("/og.png", site.url).href;
@@ -91,7 +101,7 @@ const graph = [org, person, website, ...schema];
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
     <meta name="author" content={site.founder.name} />
     <meta name="color-scheme" content="light" />
     <meta name="theme-color" content="#fff8f6" />
