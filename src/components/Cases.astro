@@ -3,22 +3,25 @@ import { clinicflow, moreCases, whatsapp } from "../data/cases";
 import Icon from "./Icon.astro";
 
 const pair = [clinicflow, whatsapp];
+/* Os quatro primeiros ficam à vista; os outros, a um clique. */
+const shown = moreCases.slice(0, 4);
+const folded = moreCases.slice(4);
 ---
 
 <section class="section cases" id="casos" aria-labelledby="casos-title">
   <div class="wrap">
-    <header class="cases-head">
-      <h2 id="casos-title" class="section-title">Mais trabalho para abrir e conferir.</h2>
-      <p class="section-lede">
-        Sem logo de cliente nem depoimento inventado. São sistemas que construí, com código aberto sempre que possível e
-        resultado descrito como ele é.
-      </p>
-    </header>
-
     <div class="pair">
+      <header class="cases-head">
+        <h2 id="casos-title" class="section-title">Casos que você pode abrir.</h2>
+        <p class="section-lede">
+          Sem logo de cliente nem depoimento inventado. São sistemas que construí, com código aberto sempre que possível e
+          resultado descrito como ele é.
+        </p>
+      </header>
+
       {
-        pair.map((c) => (
-          <article class="case" aria-labelledby={`${c.slug}-title`}>
+        pair.map((c, i) => (
+          <article class:list={["case", `case-${i + 1}`]} aria-labelledby={`${c.slug}-title`}>
             {c.image && (
               <a class="case-frame" href={`/casos/${c.slug}/`} tabindex="-1" aria-hidden="true">
                 <img
@@ -52,7 +55,7 @@ const pair = [clinicflow, whatsapp];
       <h3 class="more-title">Também construí</h3>
       <ul class="more-list" role="list">
         {
-          moreCases.map((c) => (
+          shown.map((c) => (
             <li class="more-item">
               <div class="more-top">
                 <p class="more-name">{c.name}</p>
@@ -74,24 +77,70 @@ const pair = [clinicflow, whatsapp];
           ))
         }
       </ul>
+      {
+        folded.length > 0 && (
+          <details class="more-fold">
+            <summary>
+              <span class="fold-open">Ver os outros {folded.length}</span>
+              <span class="fold-close">Mostrar menos</span>
+              <Icon name="plus" class="fold-icon" />
+            </summary>
+            <ul class="more-list" role="list">
+              {folded.map((c) => (
+                <li class="more-item">
+                  <div class="more-top">
+                    <p class="more-name">{c.name}</p>
+                    <p class:list={["more-vis", c.visibility === "público" ? "is-public" : "is-private"]}>
+                      {c.visibility === "público" ? "Código público" : "Código privado"}
+                    </p>
+                  </div>
+                  <p class="more-summary">{c.summary}</p>
+                  <div class="more-foot">
+                    <p class="more-stack">{c.stack}</p>
+                    {c.link && (
+                      <a class="text-link" href={c.link.href} aria-label={`${c.link.label} de ${c.name}`}>
+                        {c.link.label}
+                        <Icon name="arrow-up-right" />
+                      </a>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </details>
+        )
+      }
     </div>
   </div>
 </section>
 
 <style>
-  .cases-head {
-    margin-bottom: clamp(2.5rem, 2rem + 3vw, 5rem);
-  }
-
+  /*
+   * Duas colunas desencontradas: o primeiro caso sobe até o topo da seção à
+   * esquerda; o título ocupa o vão acima do segundo, à direita.
+   */
   .pair {
     display: grid;
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    gap: clamp(2.5rem, 5vw, 5rem) clamp(1.5rem, 4vw, 4rem);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      "one head"
+      "one two";
+    grid-template-rows: auto 1fr;
+    gap: clamp(2.5rem, 4vw, 4rem) clamp(1.5rem, 4vw, 4rem);
     align-items: start;
   }
 
-  .case:nth-child(2) {
-    margin-top: clamp(4rem, 12vw, 10rem);
+  .cases-head {
+    grid-area: head;
+    align-self: end;
+  }
+
+  .case-1 {
+    grid-area: one;
+  }
+
+  .case-2 {
+    grid-area: two;
   }
 
   .case-frame {
@@ -102,8 +151,9 @@ const pair = [clinicflow, whatsapp];
     border-radius: var(--r-lg);
     overflow: hidden;
     background:
-      radial-gradient(90% 80% at 0% 100%, var(--haze), transparent 60%),
-      linear-gradient(160deg, var(--sky-top), var(--sky-low));
+      radial-gradient(90% 80% at 0% 100%, color-mix(in srgb, var(--sodio) 22%, transparent), transparent 60%),
+      radial-gradient(70% 70% at 100% 0%, color-mix(in srgb, var(--mercurio) 22%, transparent), transparent 60%),
+      var(--bg-3);
     box-shadow: var(--shadow-2);
     transition:
       transform 500ms var(--ease-spring),
@@ -112,7 +162,7 @@ const pair = [clinicflow, whatsapp];
 
   .case-frame img {
     width: 100%;
-    aspect-ratio: 16 / 11;
+    aspect-ratio: 4 / 3.6;
     object-fit: cover;
     object-position: top left;
     border-radius: var(--r-sm) var(--r-sm) 0 0;
@@ -120,8 +170,8 @@ const pair = [clinicflow, whatsapp];
     transition: transform 700ms var(--ease-out);
   }
 
-  .case:nth-child(2) .case-frame img {
-    aspect-ratio: 4 / 3.4;
+  .case-1 .case-frame img {
+    aspect-ratio: 4 / 4.4;
   }
 
   /* Faixa de luz que atravessa a moldura no hover. */
@@ -183,15 +233,17 @@ const pair = [clinicflow, whatsapp];
   }
 
   .more {
-    margin-top: clamp(5rem, 10vw, 9rem);
+    margin-top: clamp(4rem, 8vw, 7rem);
   }
 
   .more-title {
     font-size: var(--t-xl);
-    margin-bottom: var(--s-6);
+    margin-bottom: var(--s-5);
   }
 
   .more-list {
+    list-style: none;
+    padding: 0;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: clamp(1.5rem, 4vw, 4rem);
@@ -261,14 +313,71 @@ const pair = [clinicflow, whatsapp];
     color: var(--fg-3);
   }
 
+  .more-fold summary {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-3);
+    min-height: 3rem;
+    margin-top: var(--s-3);
+    padding: 0.5rem 1.1rem;
+    border: 1.5px solid var(--line-2);
+    border-radius: var(--r-pill);
+    font-size: var(--t-sm);
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+    transition:
+      border-color 200ms var(--ease-out),
+      background-color 200ms var(--ease-out);
+  }
+
+  .more-fold summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .more-fold :global(.fold-icon) {
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--sodio);
+    transition: transform 400ms var(--ease-spring);
+  }
+
+  .fold-close,
+  .more-fold[open] .fold-open {
+    display: none;
+  }
+
+  .more-fold[open] .fold-close {
+    display: inline;
+  }
+
+  .more-fold[open] :global(.fold-icon) {
+    transform: rotate(45deg);
+  }
+
+  .more-fold[open] summary {
+    margin-bottom: var(--s-4);
+  }
+
+  @media (hover: hover) {
+    .more-fold summary:hover {
+      border-color: var(--fg);
+      background: var(--bg-2);
+    }
+  }
+
   @media (max-width: 63.99rem) {
-    .pair,
-    .more-list {
+    .pair {
       grid-template-columns: 1fr;
+      grid-template-areas:
+        "head"
+        "one"
+        "two";
+      grid-template-rows: auto;
     }
 
-    .case:nth-child(2) {
-      margin-top: 0;
+    .more-list {
+      grid-template-columns: 1fr;
     }
   }
 </style>

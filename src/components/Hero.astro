@@ -7,7 +7,7 @@ import Icon from "./Icon.astro";
  * três provas que se pode conferir. As coordenadas valem para a coluna de
  * provas (520 x 620); o SVG transborda para a esquerda e passa sob o texto.
  */
-type Trail = { d: string; tone: "sodio" | "freio" | "mercurio"; lead?: boolean };
+type Trail = { d: string; tone: "sodio" | "freio" | "mercurio"; lead?: boolean; p1?: boolean };
 
 const nodes = [
   { x: 150, y: 120, tone: "freio" },
@@ -20,8 +20,8 @@ const nodes = [
  * pela avenida: nunca cruzam o título, o texto ou os botões.
  */
 const trails: Trail[] = [
-  { d: "M -260 900 C -120 640, -40 260, 150 120", tone: "sodio", lead: true },
-  { d: "M -200 900 C -90 640, -10 280, 150 120", tone: "freio" },
+  { d: "M -260 900 C -120 640, -40 260, 150 120", tone: "sodio", lead: true, p1: true },
+  { d: "M -200 900 C -90 640, -10 280, 150 120", tone: "freio", p1: true },
   { d: "M -300 900 C -150 700, -60 420, 80 310", tone: "mercurio", lead: true },
   { d: "M -230 900 C -110 700, -30 430, 80 310", tone: "sodio" },
   { d: "M -160 900 C -60 760, 40 560, 170 500", tone: "freio", lead: true },
@@ -34,10 +34,17 @@ const ambient: Trail[] = [
   { d: "M -200 900 C 0 780, 300 720, 720 700", tone: "sodio" },
 ];
 
+/* No celular, a primeira prova sobe para a dobra numa faixa curta de rastros. */
+const band = [
+  { d: "M -220 74 C -90 72, 80 44, 196 28", tone: "sodio" },
+  { d: "M -220 60 C -100 58, 90 38, 196 28", tone: "freio" },
+  { d: "M -220 86 C -60 84, 110 50, 196 28", tone: "mercurio" },
+] as const;
+
 const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
 ---
 
-<section class="hero night-sky grain" aria-labelledby="hero-title">
+<section class="hero grain" aria-labelledby="hero-title">
   <div class="wrap hero-grid">
     <div class="hero-copy">
       <h1 id="hero-title">Software e IA que saem do papel e ficam no ar.</h1>
@@ -45,6 +52,26 @@ const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
         A Noxlabs é a consultoria de Daniel Harrison. Desenho, construo e opero produtos, integrações e agentes de IA para
         empresas que precisam de sistema funcionando, não de apresentação.
       </p>
+      <div class="hero-band">
+        <svg class="band-trails" viewBox="0 0 210 56" preserveAspectRatio="xMaxYMid meet" aria-hidden="true" focusable="false">
+          {
+            band.map((t, i) => (
+              <g class={`trail tone-${t.tone}`} style={`--i:${i}`}>
+                <path class="glow" d={t.d} pathLength="1000" />
+                <path class="core" d={t.d} pathLength="1000" />
+              </g>
+            ))
+          }
+          <g class="node tone-freio" style="--i:0">
+            <circle class="node-halo" cx="196" cy="28" r="16"></circle>
+            <circle class="node-core" cx="196" cy="28" r="5.5"></circle>
+          </g>
+        </svg>
+        <div class="band-label">
+          <p class="proof-title">Kairos no ar</p>
+          <a class="proof-link" href={site.links.kairos}>kairos.noxlabs.tech</a>
+        </div>
+      </div>
       <p class="hero-own">Você fala direto com quem escreve o código. E o código é seu.</p>
       <div class="hero-actions">
         <a class="btn btn-primary" href={site.diagnosisMailto}>
@@ -63,7 +90,7 @@ const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
         </g>
         {
           trails.map((t, i) => (
-            <g class={`trail tone-${t.tone}`} style={`--i:${i}`}>
+            <g class:list={["trail", `tone-${t.tone}`, { p1: t.p1 }]} style={`--i:${i}`}>
               <path class="glow-wide" d={t.d} pathLength="1000" />
               <path class="glow" d={t.d} pathLength="1000" />
               <path class="core" d={t.d} pathLength="1000" />
@@ -73,7 +100,7 @@ const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
         }
         {
           nodes.map((n, i) => (
-            <g class={`node tone-${n.tone}`} style={`--i:${i}`}>
+            <g class:list={["node", `tone-${n.tone}`, { p1: i === 0 }]} style={`--i:${i}`}>
               <circle class="node-halo" cx={n.x} cy={n.y} r="20" />
               <circle class="node-core" cx={n.x} cy={n.y} r="6.5" />
             </g>
@@ -82,7 +109,7 @@ const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
       </svg>
 
       <ul class="proofs" role="list" aria-label="Provas que você pode conferir">
-        <li style={`--x:${pct(nodes[0].x + 38, 520)};--y:${pct(nodes[0].y, 620)};--i:0`}>
+        <li class="p1" style={`--x:${pct(nodes[0].x + 38, 520)};--y:${pct(nodes[0].y, 620)};--i:0`}>
           <p class="proof-title live">Kairos no ar</p>
           <p class="proof-text">Produto próprio em produção, com cadastro aberto de empresas.</p>
           <a class="proof-link" href={site.links.kairos}>kairos.noxlabs.tech</a>
@@ -92,10 +119,9 @@ const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
           <p class="proof-text">Agentes de IA entram com o login e o escopo de cada usuário.</p>
         </li>
         <li style={`--x:${pct(nodes[2].x + 38, 520)};--y:${pct(nodes[2].y, 620)};--i:2`}>
-          <p class="proof-title tabular">
-            1,9 s <Icon name="arrow-right" class="proof-arrow" /><span class="visually-hidden">para</span> 27 ms
-          </p>
-          <p class="proof-text">p50 de uma rota do Kairos num A/B local, ao ligar o keep-alive do gateway.</p>
+          <p class="proof-title">Código aberto</p>
+          <p class="proof-text">Repositórios públicos para você ler antes de contratar.</p>
+          <a class="proof-link" href={site.links.github}>github.com/danielharrisonlf</a>
         </li>
       </ul>
     </div>
@@ -104,15 +130,13 @@ const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
 
 <style>
   .hero {
-    margin: 0.5rem;
-    border-radius: var(--r-xl);
     overflow: hidden;
     padding-top: calc(var(--header-h) + clamp(1.5rem, 4vw, 4rem));
     padding-bottom: clamp(2.5rem, 5vw, 5rem);
     background:
       radial-gradient(120% 75% at 0% 110%, var(--haze), transparent 62%),
       radial-gradient(70% 60% at 100% 0%, var(--haze-2), transparent 60%),
-      linear-gradient(180deg, var(--sky-top), var(--sky-mid) 55%, var(--sky-low));
+      linear-gradient(180deg, var(--sky-top), var(--sky-mid) 50%, var(--sky-low) 88%, var(--bg));
   }
 
   .hero-grid {
@@ -185,7 +209,8 @@ const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
     z-index: -1;
   }
 
-  .trails path {
+  .trails path,
+  .band-trails path {
     fill: none;
     stroke-linecap: round;
   }
@@ -260,12 +285,6 @@ const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
     font-weight: 600;
     line-height: 1.1;
     letter-spacing: -0.02em;
-  }
-
-  .proof-title :global(.proof-arrow) {
-    width: 0.8em;
-    height: 0.8em;
-    color: var(--sodio);
   }
 
   .proof-text {
@@ -370,10 +389,47 @@ const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
     }
   }
 
+  .hero-band {
+    display: none;
+  }
+
   @media (max-width: 40rem) {
-    .hero {
-      margin: 0.375rem;
-      border-radius: var(--r-lg);
+    .hero-band {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: var(--s-3);
+      margin-top: var(--s-5);
+    }
+
+    .band-trails {
+      width: 100%;
+      height: 3.5rem;
+      overflow: visible;
+    }
+
+    .band-label .proof-title {
+      font-size: 1.25rem;
+    }
+
+    .band-label .proof-link {
+      min-height: 2.75rem;
+      margin-top: -0.35rem;
+    }
+
+    /* A primeira prova já está na faixa; a coluna mostra as outras duas e
+       sobe sobre o espaço vazio que a primeira deixaria. */
+    .exposure .p1 {
+      display: none;
+    }
+
+    .exposure {
+      margin-top: -22%;
+      pointer-events: none;
+    }
+
+    .exposure a {
+      pointer-events: auto;
     }
 
     .hero h1 {

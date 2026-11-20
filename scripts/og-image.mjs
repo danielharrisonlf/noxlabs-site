@@ -76,7 +76,7 @@ const og = `<!doctype html><html><head><meta charset="utf-8"><style>
   </div>
   <div class="p" style="left:1040px;top:130px">Kairos<small>no ar</small></div>
   <div class="p" style="left:980px;top:280px">MCP<small>49 ferramentas</small></div>
-  <div class="p" style="left:1060px;top:430px">27 ms<small>p50, A/B local</small></div>
+  <div class="p" style="left:1060px;top:430px">GitHub<small>código aberto</small></div>
 </body></html>`;
 
 const icon = (size, pad) => `<!doctype html><html><head><style>

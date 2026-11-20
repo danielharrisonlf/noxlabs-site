@@ -3,11 +3,7 @@ import { kairos } from "../data/cases";
 import Icon from "./Icon.astro";
 import KairosFlow from "./KairosFlow.astro";
 
-const facts = [
-  {
-    title: "Medido",
-    text: "Num A/B local com o mesmo código, ligar o keep-alive no gateway levou o p50 de GET /projects de 1,9 s para 27 ms e zerou os erros do teste.",
-  },
+const notes = [
   {
     title: "Em produção",
     text: "Sete serviços, PostgreSQL e Redis numa única VPS com Dokploy, com cadastro aberto de empresas e convites.",
@@ -44,16 +40,25 @@ const facts = [
 
     <KairosFlow id="kf-home" />
 
-    <ul class="k-facts" role="list">
-      {
-        facts.map((f) => (
-          <li>
-            <h3>{f.title}</h3>
-            <p>{f.text}</p>
-          </li>
-        ))
-      }
-    </ul>
+    <div class="k-proof">
+      <div class="k-measure">
+        <p class="k-kind">Medido</p>
+        <p class="k-measure-text">
+          Num A/B local com o mesmo código, ligar o keep-alive no gateway levou o p50 de <code>GET /projects</code> de
+          <strong class="tabular">1,9 s para 27 ms</strong> e zerou os erros do teste.
+        </p>
+      </div>
+      <dl class="k-notes">
+        {
+          notes.map((n) => (
+            <div>
+              <dt>{n.title}</dt>
+              <dd>{n.text}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
     <p class="k-code">
       O código é aberto:
       <a class="text-link" href={kairos.links[1].href}>
@@ -93,46 +98,68 @@ const facts = [
     margin-top: var(--s-5);
   }
 
-  .k-facts {
+  .k-proof {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--s-6) clamp(1.5rem, 3vw, 3rem);
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: var(--s-6) clamp(2rem, 5vw, 5rem);
+    align-items: start;
     margin-top: clamp(2.5rem, 2rem + 2vw, 4rem);
   }
 
-  .k-facts li {
-    position: relative;
-    padding-top: var(--s-5);
+  .k-kind {
+    display: inline-flex;
+    padding: 0.2rem 0.75rem;
+    border-radius: var(--r-pill);
+    background: var(--accent);
+    color: var(--accent-fg);
+    font-size: var(--t-xs);
+    font-weight: 700;
   }
 
-  /* Cada fato abre com um rastro curto que esmaece. */
-  .k-facts li::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4.5rem;
-    height: 2px;
-    border-radius: 2px;
-    background: linear-gradient(90deg, var(--sodio), transparent);
-  }
-
-  .k-facts li:nth-child(2)::before {
-    background: linear-gradient(90deg, var(--mercurio), transparent);
-  }
-
-  .k-facts li:nth-child(3)::before {
-    background: linear-gradient(90deg, var(--freio), transparent);
-  }
-
-  .k-facts h3 {
+  .k-measure-text {
+    margin-top: var(--s-4);
+    font-family: var(--font-display);
     font-size: var(--t-lg);
-    margin-bottom: var(--s-2);
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+    max-width: 30ch;
   }
 
-  .k-facts p {
+  .k-measure-text strong {
+    font-weight: 600;
+    color: var(--sodio);
+  }
+
+  :global(:root:not([data-theme="dark"])) .k-measure-text strong {
+    color: var(--fg);
+    background: linear-gradient(transparent 62%, color-mix(in srgb, var(--sodio) 28%, transparent) 62%);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme="light"])) .k-measure-text strong {
+      color: var(--sodio);
+      background: none;
+    }
+  }
+
+  .k-measure-text code {
+    font-size: 0.8em;
+  }
+
+  .k-notes {
+    display: grid;
+    gap: var(--s-5);
+    padding-top: var(--s-2);
+  }
+
+  .k-notes dt {
+    font-weight: 700;
+  }
+
+  .k-notes dd {
+    margin-top: var(--s-1);
     color: var(--fg-2);
-    max-width: 40ch;
+    max-width: 44ch;
   }
 
   .k-code {
@@ -146,7 +173,7 @@ const facts = [
 
   @media (max-width: 63.99rem) {
     .k-head,
-    .k-facts {
+    .k-proof {
       grid-template-columns: 1fr;
     }
   }

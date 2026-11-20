@@ -70,12 +70,12 @@
   --mercurio: #1f6fd1;
   --live: #d43c2a;
 
-  /* Céu */
-  --sky-top: #d9e1fa;
-  --sky-mid: #eef1fb;
-  --sky-low: #fbe9df;
-  --haze: rgb(255 168 112 / 0.32);
-  --haze-2: rgb(120 150 255 / 0.18);
+  /* Céu: de manhã é o próprio papel; só a origem dos rastros esquenta. */
+  --sky-top: #f5f6fc;
+  --sky-mid: #f5f6fc;
+  --sky-low: #f5f6fc;
+  --haze: rgb(255 168 112 / 0.16);
+  --haze-2: rgb(120 150 255 / 0);
   --grain-opacity: 0.05;
   --trail-glow: 0.16;
   --packet-white: 0;
@@ -94,7 +94,7 @@
   --t-lg: clamp(1.375rem, 1.18rem + 0.8vw, 1.875rem); /* 22–30 */
   --t-xl: clamp(1.75rem, 1.35rem + 1.7vw, 3rem); /* 28–48 */
   --t-2xl: clamp(2.375rem, 1.6rem + 3.2vw, 4.5rem); /* 38–72 */
-  --t-display: clamp(2.75rem, 1.35rem + 5.6vw, 6rem); /* 44–96 */
+  --t-display: clamp(2.75rem, 1.4rem + 5vw, 5.5rem); /* 44–88 */
 
   /* Espaço */
   --s-1: 0.25rem;
@@ -107,7 +107,7 @@
   --s-8: 4rem;
   --s-9: 6rem;
   --s-10: 8rem;
-  --section-y: clamp(5rem, 3rem + 7vw, 10rem);
+  --section-y: clamp(4rem, 2.5rem + 5vw, 7rem);
 
   --max: 80rem;
   --gutter: clamp(1rem, 0.4rem + 2.6vw, 3rem);

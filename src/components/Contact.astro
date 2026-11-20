@@ -11,7 +11,7 @@ const trails = [
 ] as const;
 ---
 
-<section class="contact grain" id="contato" aria-labelledby="contato-title">
+<section class="contact night grain" id="contato" aria-labelledby="contato-title">
   <svg class="contact-trails" viewBox="0 0 1200 280" preserveAspectRatio="none" aria-hidden="true" focusable="false">
     {
       trails.map((t) => (
@@ -99,14 +99,13 @@ const trails = [
   .contact {
     --band: clamp(7rem, 4rem + 12vw, 15rem);
     position: relative;
-    margin: 0.5rem;
-    border-radius: var(--r-xl);
     overflow: hidden;
     padding-block: clamp(4.5rem, 3rem + 7vw, 9rem) calc(var(--band) + 1.5rem);
     background:
       radial-gradient(90% 80% at 75% 40%, var(--haze), transparent 60%),
       radial-gradient(60% 60% at 0% 100%, var(--haze-2), transparent 60%),
       linear-gradient(180deg, var(--sky-low), var(--sky-mid) 45%, var(--sky-top));
+    background-color: var(--bg);
   }
 
   .contact-trails {
@@ -214,7 +213,6 @@ const trails = [
     border-radius: var(--r-lg);
     background: var(--bg-2);
     box-shadow: var(--shadow-2);
-    rotate: 1.5deg;
   }
 
   .letter h3 {
@@ -254,17 +252,11 @@ const trails = [
     }
 
     .letter {
-      rotate: 0deg;
       max-width: 32rem;
     }
   }
 
   @media (max-width: 40rem) {
-    .contact {
-      margin: 0.375rem;
-      border-radius: var(--r-lg);
-    }
-
     .contact-actions .btn {
       width: 100%;
     }

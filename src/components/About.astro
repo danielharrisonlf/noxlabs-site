@@ -13,7 +13,13 @@ const links = [
 <section class="section about" id="sobre" aria-labelledby="sobre-title">
   <div class="wrap about-grid">
     <div class="portrait">
-      <div class="portrait-ring">
+      <div class="portrait-frame">
+        <svg class="portrait-trails" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
+          <path class="pt-glow pt-a" d="M -70 260 C 60 250, 250 330, 400 120"></path>
+          <path class="pt-core pt-a" d="M -70 260 C 60 250, 250 330, 400 120"></path>
+          <path class="pt-glow pt-b" d="M -70 220 C 80 190, 260 290, 400 70"></path>
+          <path class="pt-core pt-b" d="M -70 220 C 80 190, 260 290, 400 70"></path>
+        </svg>
         <img
           src="/img/daniel-harrison.webp"
           width="360"
@@ -75,34 +81,50 @@ const links = [
     gap: var(--s-5);
   }
 
-  /* Retrato num anel de luz: os três tons da cidade girando em volta. */
-  .portrait-ring {
+  /* Retrato com dois rastros de luz passando por trás. */
+  .portrait-frame {
     position: relative;
+    isolation: isolate;
     width: min(100%, 20rem);
-    aspect-ratio: 1;
-    padding: 0.6rem;
-    border-radius: 50%;
-    background: conic-gradient(from 210deg, var(--sodio), var(--freio), var(--mercurio), var(--sodio));
-    box-shadow:
-      0 30px 80px -30px color-mix(in srgb, var(--freio) 60%, transparent),
-      0 0 0 1px var(--line);
   }
 
-  .portrait-ring::before {
-    content: "";
+  .portrait-trails {
     position: absolute;
-    inset: -1.5rem;
+    inset: 0;
     z-index: -1;
-    border-radius: 50%;
-    background: radial-gradient(closest-side, color-mix(in srgb, var(--sodio) 22%, transparent), transparent);
-  }
-
-  .portrait-ring img {
     width: 100%;
     height: 100%;
-    border-radius: 50%;
-    border: 0.35rem solid var(--bg);
+    overflow: visible;
+  }
+
+  .portrait-trails path {
+    fill: none;
+    stroke-linecap: round;
+  }
+
+  .pt-a {
+    stroke: var(--sodio);
+  }
+
+  .pt-b {
+    stroke: var(--mercurio);
+  }
+
+  .pt-glow {
+    stroke-width: 12;
+    opacity: var(--trail-glow);
+  }
+
+  .pt-core {
+    stroke-width: 2;
+  }
+
+  .portrait-frame img {
+    width: 100%;
+    aspect-ratio: 1;
     object-fit: cover;
+    border-radius: var(--r-xl);
+    box-shadow: var(--shadow-2);
   }
 
   .portrait-caption {
@@ -184,8 +206,8 @@ const links = [
       grid-template-columns: 1fr;
     }
 
-    .portrait-ring {
-      width: min(100%, 15rem);
+    .portrait-frame {
+      width: min(70%, 15rem);
     }
   }
 </style>
