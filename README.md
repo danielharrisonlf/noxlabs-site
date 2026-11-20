@@ -1,15 +1,15 @@
 # noxlabs.tech
 
-Site da Noxlabs, de Daniel Harrison: automação de rotinas, atendimento e WhatsApp com IA e sistemas sob medida para
-escritórios de contabilidade e pequenas e médias empresas. Página inicial, página `/contabilidade/` e três páginas de
-caso (ClinicFlow, WhatsApp Control Center e Kairos).
+Site da Noxlabs, de Daniel Harrison: automações, atendimento pelo WhatsApp com IA e sistemas sob medida para pequenas e
+médias empresas de qualquer ramo. Página inicial e três páginas de caso (ClinicFlow, WhatsApp Control Center e Kairos).
+A antiga `/contabilidade/` redireciona para o seletor de ramos da página inicial.
 
-Astro com saída estática, CSS próprio, fontes hospedadas no próprio site e JavaScript pequeno, sem biblioteca: menu,
-seção atual, contadores, calculadora de horas e cópia de e-mail. Todo o conteúdo aparece sem script. Sem rastreadores,
+Astro com saída estática, CSS próprio, fontes hospedadas no próprio site e JavaScript pequeno, sem biblioteca: menu do
+celular, cabeçalho que some ao rolar, seção atual, seletor de ramos, contadores, calculadora de horas e cópia de e-mail. Todo o conteúdo aparece sem script. Sem rastreadores,
 sem cookies e sem integrações de terceiros; a calculadora roda no navegador.
 
 - Marca, voz e exemplos de texto: `BRAND.md`.
-- Sistema visual ("Rotina em ordem"): `DESIGN.md`; referências em `docs/references.md`.
+- Sistema visual ("Mosaico"): `DESIGN.md`; referências, as três direções e a decisão em `docs/references.md`.
 - Público, ofertas, provas e a fonte de cada número (URL e citação literal): `PRODUCT.md`.
 
 ## Rodar
@@ -28,14 +28,18 @@ pnpm preview        # serve o dist/
 ```bash
 pnpm exec playwright install chromium   # uma vez
 pnpm build
-node scripts/check-page.mjs             # 6 rotas x 14 tamanhos: transbordo, contraste, títulos, alvos, CTA na dobra,
-                                        # fonte e ano em todo dado, sem termo técnico, menu, calculadora, sem JS
+node scripts/check-page.mjs             # 5 rotas x 14 tamanhos: transbordo, contraste, títulos, alvos, CTA na dobra,
+                                        # fonte e ano em todo dado, sem termo técnico, menu do celular (foco, trava,
+                                        # Esc, toque fora, voltar, link, 48 px), cabeçalho, seletor de ramos,
+                                        # calculadora, cópia, movimento reduzido, sem JS
 BASE_URL=http://localhost:8088 node scripts/check-page.mjs   # o mesmo contra o contêiner
 pnpm shots          # capturas em docs/screenshots/local/ (fora do git); SIZES=390x844,1440x900 limita os tamanhos
+pnpm videos         # vídeos do menu e de uma rolagem completa em 390x844 e 360x740 (docs/screenshots/local/videos/)
 pnpm perf           # quadros, tarefas longas, pior evento e CLS com a CPU 4x mais lenta
 ```
 
-`pnpm og` regenera `public/og.png`, os ícones PNG, o `favicon.svg` e o `favicon.ico` (este via ffmpeg).
+`pnpm og` regenera `public/og.png`, os ícones PNG, o `favicon.svg` e o `favicon.ico` (este via ffmpeg), com as fontes e
+os pictogramas do site.
 
 Capturas não vão para o repositório: ficam em `docs/screenshots/local/`, que está no `.gitignore`.
 
@@ -49,21 +53,22 @@ curl -s localhost:8088/healthz
 
 Build em `node:24-alpine` com pnpm; runtime em `nginx:alpine` na porta 80. O nginx (`deploy/nginx.conf`) faz gzip,
 cache de um ano para `/_astro/`, `no-cache` para HTML, `try_files` para as rotas, 404 próprio, `/healthz` e cabeçalhos de
-segurança. A CSP lista o hash SHA-256 de cada script inline, gerado no build por `scripts/csp.mjs`, sem
+segurança, além do redirecionamento 301 de `/contabilidade/`. A CSP lista o hash SHA-256 de cada script inline, gerado no build por `scripts/csp.mjs`, sem
 `'unsafe-inline'` para scripts. TLS termina no proxy à frente (Traefik do Dokploy).
 
 ## Estrutura
 
 ```text
 src/
-  data/          conteúdo: contato, soluções, segmentos e contabilidade, casos, dados de mercado, calculadora, FAQ, ícones
-  components/    seções (Hero, MarketData/Stat, Solutions, HowItWorks, AccountingBlock, Segments, Work, Estimator,
-                 About, Security, Faq, Contact), cabeçalho, rodapé, marca e ícones
-  scripts/       motion.ts (entradas por rolagem e contadores)
+  data/          conteúdo: contato, soluções, ramos e cenários, casos, dados de mercado, calculadora, FAQ, ícones,
+                 pictogramas de ramo
+  components/    seções (Hero, SectorStrip, MarketData/Stat, Solutions, Scenarios, HowItWorks, Work, Estimator,
+                 About, Security, Faq, Contact), cabeçalho com o menu do celular, rodapé, marca, ícones e pictogramas
+  scripts/       motion.ts (entradas por rolagem e contadores) e copy.ts (copiar e-mail)
   layouts/       Base.astro: head, SEO, JSON-LD, cabeçalho e rodapé
-  pages/         index, contabilidade, casos/[slug] e 404
+  pages/         index, casos/[slug] e 404
   styles/        tokens e base (global.css)
-public/          fontes Bricolage Grotesque e Figtree (OFL), imagens dos casos, ícones, og.png, robots.txt
+public/          fontes Parkinsans e Onest (OFL), imagens dos casos, ícones, og.png, robots.txt
 scripts/         verificações, capturas, CSP e geração de imagens
 deploy/          nginx.conf
 ```
@@ -79,3 +84,4 @@ de mercado novo entra em `src/data/stats.ts` com fonte, ano e link, e na tabela 
 - E-mail no domínio (hoje o Gmail do Daniel).
 - Confirmar se a conversa inicial de 30 min é gratuita. O site hoje não promete.
 - Captura atual do Kairos: o caso usa o ícone do sistema no lugar da tela.
+- Reabrir a página da McKinsey e conferir a citação do dado "60 a 70%" (na v4 a página não abriu daqui; ver `PRODUCT.md`).

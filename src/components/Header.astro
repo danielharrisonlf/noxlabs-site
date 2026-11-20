@@ -125,10 +125,12 @@ const whats = whatsappHref();
 
   /* ---- Cabeçalho: fundo ao sair do topo; no celular, some ao descer e volta ao subir ---- */
   let lastY = window.scrollY;
+  // Durante a rolagem que o próprio menu dispara, o cabeçalho fica visível.
+  let holdUntil = 0;
   const onScroll = () => {
     const y = window.scrollY;
     header?.toggleAttribute("data-scrolled", y > 8);
-    if (!open && !desktop.matches && header && !header.contains(document.activeElement)) {
+    if (!open && !desktop.matches && header && !header.contains(document.activeElement) && performance.now() > holdUntil) {
       if (y > lastY + 6 && y > 160) header.dataset.hidden = "true";
       else if (y < lastY - 6 || y < 160) delete header.dataset.hidden;
     } else if (header) delete header.dataset.hidden;
@@ -204,6 +206,7 @@ const whats = whatsappHref();
       // Espera o navegador restaurar a rolagem do estado anterior; só então rola até a seção.
       if (target)
         window.setTimeout(() => {
+          holdUntil = performance.now() + 1500;
           history.replaceState(null, "", hash);
           target.scrollIntoView({ behavior: reduce.matches ? "auto" : "smooth", block: "start" });
           target.focus({ preventScroll: true });
