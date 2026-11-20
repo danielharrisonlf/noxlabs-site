@@ -408,8 +408,8 @@ import Icon from "./Icon.astro";
 
   @media (prefers-reduced-motion: no-preference) {
     .svc[data-enhanced="true"] .svc-panel:not([hidden]) > * {
-      animation: svc-in 520ms var(--ease-out) both;
-      animation-delay: calc(var(--k, 0) * 55ms);
+      animation: svc-in 420ms var(--ease-out) both;
+      animation-delay: calc(var(--k, 0) * 35ms);
     }
 
     .svc[data-dir="prev"] .svc-panel:not([hidden]) > * {
@@ -419,14 +419,14 @@ import Icon from "./Icon.astro";
 
   @keyframes svc-in {
     from {
-      opacity: 0;
+      opacity: 0.18;
       translate: var(--svc-dx, 0) var(--svc-dy, 18px);
     }
   }
 
   @keyframes svc-in-prev {
     from {
-      opacity: 0;
+      opacity: 0.18;
       translate: calc(var(--svc-dx, 0) * -1) calc(var(--svc-dy, 18px) * -1);
     }
   }

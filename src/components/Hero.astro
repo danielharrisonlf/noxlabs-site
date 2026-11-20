@@ -37,8 +37,8 @@ const wide: Layout = {
     { d: "M -340 900 C -170 780, 0 560, 170 500", tone: "mercurio" },
   ],
   ambient: [
-    { d: "M -60 900 C 120 700, 400 640, 720 600", tone: "mercurio" },
-    { d: "M -200 900 C 0 780, 300 720, 720 700", tone: "sodio" },
+    { d: "M -60 900 C 120 700, 500 620, 1500 560", tone: "mercurio" },
+    { d: "M -200 900 C 0 780, 400 700, 1500 690", tone: "sodio" },
   ],
 };
 
@@ -76,9 +76,18 @@ const at = (i: number) =>
 <section class="hero grain" aria-labelledby="hero-title" data-hero>
   <!-- Céu do celular e do tablet: três rastros finos sobem pela direita, atrás do título. -->
   <svg class="hero-sky" viewBox="0 0 390 844" preserveAspectRatio="xMaxYMin slice" aria-hidden="true" focusable="false">
-    <path class="tone-sodio" d="M 500 900 C 390 660, 440 400, 368 70" pathLength="1"></path>
-    <path class="tone-freio" d="M 540 860 C 430 640, 470 380, 400 40" pathLength="1"></path>
-    <path class="tone-mercurio" d="M 470 940 C 370 720, 400 480, 340 190" pathLength="1"></path>
+    {
+      [
+        { d: "M 520 900 C 400 680, 440 420, 372 60", tone: "sodio" },
+        { d: "M 560 880 C 440 660, 470 400, 404 20", tone: "freio" },
+        { d: "M 480 940 C 390 740, 410 500, 350 200", tone: "mercurio" },
+      ].map((t) => (
+        <g class={`tone-${t.tone}`}>
+          <path class="sky-glow" d={t.d} pathLength="1" />
+          <path class="sky-core" d={t.d} pathLength="1" />
+        </g>
+      ))
+    }
   </svg>
   <div class="wrap hero-grid">
     <div class="hero-copy">
@@ -258,12 +267,25 @@ const at = (i: number) =>
     pointer-events: none;
   }
 
+  .hero-sky {
+    -webkit-mask-image: linear-gradient(90deg, transparent 58%, #000 82%);
+    mask-image: linear-gradient(90deg, transparent 58%, #000 82%);
+  }
+
   .hero-sky path {
     fill: none;
     stroke: var(--c);
-    stroke-width: 1.5;
     stroke-linecap: round;
-    opacity: 0.45;
+  }
+
+  .sky-glow {
+    stroke-width: 9;
+    opacity: var(--trail-glow);
+  }
+
+  .sky-core {
+    stroke-width: 1.75;
+    opacity: 0.85;
   }
 
   @media (min-width: 64rem) {

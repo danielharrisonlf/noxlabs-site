@@ -297,6 +297,7 @@ const total = kairosFlow.length;
     };
 
     let lastIndex = 0;
+    let revealNodeRef: (() => void) | null = null;
     tabs = enhanceTabs(root, {
       orientation: "horizontal",
       onChange: (_id, index, source) => {
@@ -304,7 +305,10 @@ const total = kairosFlow.length;
         lastIndex = index;
         paint(index);
         if (source !== "init") runPackets(index + 1);
-        if (source === "user") setPlaying(false);
+        if (source === "user") {
+          setPlaying(false);
+          requestAnimationFrame(() => revealNodeRef?.());
+        }
         if (index === total - 1 && !playing) setPlaying(false, true);
         else if (!playing && play?.dataset.state === "done") setPlaying(false);
       },
@@ -314,14 +318,30 @@ const total = kairosFlow.length;
     if (controls) controls.hidden = false;
     pauseOffscreen(root);
 
+    // No celular, ao mudar de passo pelos controles, o nó aceso não fica escondido sob o cabeçalho.
+    const narrow = window.matchMedia("(max-width: 63.99rem)");
+    const revealNode = () => {
+      if (!narrow.matches) return;
+      const node = root.querySelector<SVGGElement>(".kf-tall .kf-node.is-now");
+      const header = document.querySelector<HTMLElement>(".header-pill");
+      if (!node || !header) return;
+      const top = node.getBoundingClientRect().top;
+      const limit = header.getBoundingClientRect().bottom + 12;
+      if (top < limit) window.scrollBy({ top: top - limit, behavior: reduce.matches ? "auto" : "smooth" });
+    };
+
     const goNext = () => {
       setPlaying(false);
       ctl.select(Math.min(ctl.current() + 1, ctl.count - 1), "api");
+      revealNode();
     };
     const goPrev = () => {
       setPlaying(false);
       ctl.select(Math.max(ctl.current() - 1, 0), "api");
+      revealNode();
     };
+
+    revealNodeRef = revealNode;
 
     // Polegar: deslizar para os lados avança ou volta; tocar num ponto do diagrama vai ao passo dele.
     onSwipe(root, goNext, goPrev);
@@ -902,6 +922,20 @@ const total = kairosFlow.length;
 
     .kf-panels {
       order: 1;
+    }
+
+    .kf-count {
+      display: none;
+    }
+
+    .kf-text {
+      font-size: 1.0625rem;
+      line-height: 1.5;
+    }
+
+    .kf-canvas {
+      padding-top: var(--s-3);
+      padding-bottom: 0;
     }
 
     .kf-rail {
