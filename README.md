@@ -65,10 +65,13 @@ O conteúdo mora em `src/data/`. Trocar e-mail, links ou textos de serviço não
 - `src/data/site.ts` → `scheduleUrl`: link de agenda (Cal.com ou similar). Enquanto for `null`, o diagnóstico é
   pedido por e-mail e o botão de agenda não aparece.
 - Captura atual do Kairos (as do repositório ainda mostram a marca antiga). Hoje o caso usa só o diagrama.
-- Confirmar os compromissos de processo escritos no site: diagnóstico gratuito de 30 min por vídeo, resumo semanal
-  por escrito, preço por etapa na proposta.
+- Confirmar se a conversa inicial de 30 min é gratuita. O site hoje diz só "conversa inicial de 30 minutos";
+  formato e preço de contratação aparecem como "sob proposta".
+- Confirmar o resumo semanal por escrito (vem do brief, não do portfólio).
 
 ## Fontes do conteúdo
+
+A origem de cada afirmação e de cada imagem está em `PRODUCT.md` (Evidence on Hand).
 
 Bio, experiência e projetos vêm do portfólio do Daniel e dos READMEs dos repositórios em
 [github.com/danielharrisonlf](https://github.com/danielharrisonlf). Só repositórios públicos têm link. A medição citada

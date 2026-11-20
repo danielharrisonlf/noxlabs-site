@@ -6,8 +6,8 @@ import ServiceGlyph from "./ServiceGlyph.astro";
 <section class="section seam" id="servicos" aria-labelledby="servicos-title">
   <div class="wrap grid">
     <header class="section-head">
-      <h2 id="servicos-title">Seis problemas que eu resolvo.</h2>
-      <p>Cada trabalho começa pelo problema do seu negócio. A tecnologia é escolhida depois, e explicada em português.</p>
+      <h2 id="servicos-title">Seis frentes de trabalho.</h2>
+      <p>Cada trabalho começa pelo problema do seu negócio; a tecnologia vem depois, explicada em português. Escopo e formato de contratação saem da proposta.</p>
     </header>
 
     <ol class="svc-list" role="list">
@@ -17,7 +17,6 @@ import ServiceGlyph from "./ServiceGlyph.astro";
             <div class="svc-id">
               <ServiceGlyph glyph={s.glyph} />
               <h3>{s.title}</h3>
-              <p class="svc-format">{s.format}</p>
             </div>
             <dl class="svc-body">
               <div class="svc-when">
@@ -74,11 +73,6 @@ import ServiceGlyph from "./ServiceGlyph.astro";
   .svc-id h3 {
     font-size: var(--t-xl);
     max-width: 14ch;
-  }
-
-  .svc-format {
-    font-size: var(--t-sm);
-    color: var(--fg-2);
   }
 
   .svc-body {

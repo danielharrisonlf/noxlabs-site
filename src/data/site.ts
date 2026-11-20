@@ -20,7 +20,7 @@ export const site = {
   url: "https://noxlabs.tech",
   title: "Noxlabs — software e IA aplicada, do diagnóstico à operação",
   description:
-    "Consultoria de software e IA de Daniel Harrison. Produtos sob medida, agentes de IA via MCP, integrações, arquitetura e redução de custo de nuvem. Diagnóstico gratuito de 30 minutos.",
+    "Consultoria de software e IA de Daniel Harrison. Produtos sob medida, agentes de IA via MCP, integrações, arquitetura e redução de custo de nuvem. Comece por uma conversa de 30 minutos.",
   locale: "pt_BR",
   email,
   mailto: `mailto:${email}`,

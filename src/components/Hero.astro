@@ -32,7 +32,7 @@ const poem = [
       <a class="btn btn-ghost" href="#kairos">Ver o Kairos, no ar</a>
     </div>
     <p class="hero-note">
-      Gratuito, por vídeo. Você sai com um próximo passo, mesmo que a gente não trabalhe junto.
+      Uma conversa inicial de 30 minutos sobre o problema. Você sai com um próximo passo claro.
     </p>
   </div>
 
@@ -65,14 +65,14 @@ const poem = [
       [content-start] calc(min(var(--max), 100% - 2 * var(--gutter)) * 0.67)
       [split] calc(min(var(--max), 100% - 2 * var(--gutter)) * 0.33)
       [content-end] minmax(var(--gutter), 1fr) [full-end];
-    min-height: min(calc(100svh - 4.5rem - 6.5rem), 52rem);
+    min-height: min(calc(100svh - 4.5rem - 8.5rem), 48rem);
   }
 
   .hero-copy {
     grid-column: content-start / split;
     padding-right: var(--col-gap);
     align-self: center;
-    padding-block: clamp(3rem, 2rem + 5vw, 6.5rem);
+    padding-block: clamp(2rem, 1rem + 2.5vw, 3rem);
   }
 
   .hero h1 {
@@ -84,33 +84,33 @@ const poem = [
   }
 
   .hero-lede {
-    margin-top: var(--s-6);
+    margin-top: var(--s-5);
     font-size: var(--t-md);
     line-height: 1.5;
     color: var(--fg-2);
-    max-width: 34ch;
+    max-width: 46ch;
   }
 
   .hero-own {
-    margin-top: var(--s-4);
+    margin-top: var(--s-3);
     font-size: var(--t-md);
     line-height: 1.5;
     font-weight: 600;
-    max-width: 34ch;
+    max-width: 46ch;
   }
 
   .hero-actions {
     display: flex;
     flex-wrap: wrap;
     gap: var(--s-3);
-    margin-top: var(--s-7);
+    margin-top: var(--s-6);
   }
 
   .hero-note {
-    margin-top: var(--s-4);
+    margin-top: var(--s-3);
     font-size: var(--t-sm);
     color: var(--fg-2);
-    max-width: 44ch;
+    max-width: 72ch;
   }
 
   /* O campo anil sangra até a borda direita da janela. */
@@ -199,14 +199,14 @@ const poem = [
 
   @keyframes poem-in {
     from {
-      opacity: 0;
-      transform: translateX(-0.4em);
+      opacity: 0.55;
+      transform: translateX(-0.3em);
     }
   }
 
   @keyframes bar-grow {
     from {
-      transform: scaleX(0);
+      transform: scaleX(0.25);
     }
   }
 

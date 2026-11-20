@@ -75,6 +75,44 @@ Processo: diagnóstico → proposta → entregas incrementais → operação.
 - Experiência profissional anterior: não citar nomes de empregadores no site.
 - Ausentes: depoimentos, clientes nomeáveis, métricas de negócio, preços. Não fabricar.
 
+### Fontes das afirmações do site
+
+Portfólio do Daniel, repositório público `danielharrisonlf/portfolio`, arquivo `src/data/portfolioData.ts`
+(clone local usado: `scratchpad/portfolio-src`):
+
+- "Três anos de experiência": `personalInfo.shortBio` ("Desenvolvedor Full Stack com 3 anos de experiência").
+- Setores sem nome de empresa ("engenharia", "controle de acesso", "locação de equipamentos"): campo `context`
+  de cada item de `experiences`.
+- Portal de suporte com fila e prazos; notificações WhatsApp/Telegram sobre filas sem disparo duplicado; upload
+  direto ao S3 "adotado por mais de 10 módulos"; câmeras de obra via RTSP: `experiences[0].bullets`.
+- Integração com catracas, leitores faciais e biométricos: `experiences[1].bullets`.
+- Foco em IA aplicada e agentes em produção: `personalInfo.fullBio`.
+
+Kairos: `axial/README.md`, `axial/docs/architecture.md`, `axial/apps/mcp-server/README.md` (49 ferramentas, OAuth
+2.1), `axial/deploy/README.md` (VPS com Dokploy, sete serviços NestJS) e `axial/docs/performance/relatorio-desempenho.md`
+(A/B do keep-alive no gateway: p50 de `GET /projects` de 1.922 ms para 27 ms, 35 erros para 0; medição local).
+
+Demais casos: READMEs públicos lidos com `gh repo view danielharrisonlf/<repo>`.
+
+Processo e princípios (diagnóstico, proposta, entregas incrementais, operação; código do cliente, documentação,
+testes, LGPD, comunicação semanal): brief do pedido original. Formato e preço de contratação: "sob proposta";
+nenhum modelo comercial (piloto, mensal, projeto fechado) é afirmado no site. **[em aberto]** se a conversa inicial
+de 30 min é gratuita: o brief sugere, o portfólio não diz; o site não promete.
+
+### Proveniência das imagens
+
+Todas vêm do repositório público do portfólio (`danielharrisonlf/portfolio`), pasta `public/uploads/`. Nenhuma foi
+gerada por IA.
+
+- `public/img/daniel-harrison.webp`: `public/uploads/backback.webp` do portfólio (foto do Daniel, 360×360).
+- `public/img/clinicflow-painel.webp`: `public/uploads/projects/clinicflow-painel.webp` do portfólio; segundo
+  `docs/portfolio-sources.md` de lá, é a captura de marketing do frontend real do ClinicFlow (repositório público
+  `danielharrisonlf/clinicflow`), com dados de demonstração.
+- `public/img/whatsapp-control-center.webp`: `public/uploads/projects/whatsapp-control-center.jpg` do portfólio,
+  convertida para WebP (ffmpeg, qualidade 82). Captura do frontend real do repositório público
+  `danielharrisonlf/whatsapp-control-center`, com organização e conta de demonstração.
+- `public/og.png` e ícones: gerados por `scripts/og-image.mjs` a partir de HTML/SVG deste projeto.
+
 ## Product Principles
 
 1. Prova antes de promessa: cada afirmação aponta para código, produto no ar ou medição.

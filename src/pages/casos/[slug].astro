@@ -198,8 +198,7 @@ const breadcrumb = {
     <nav class="wrap grid case-next" aria-label="Outros casos">
       {
         others.map((o) => (
-          <a class="next" href={`/casos/${o.slug}/`}>
-            <span class="next-label">Próximo caso</span>
+          <a class="next" href={`/casos/${o.slug}/`} aria-label={`Próximo caso: ${o.name}`}>
             <span class="next-name">{o.name}</span>
             <span class="next-summary">{o.summary}</span>
             <Icon name="arrow-right" class="next-icon" />
@@ -438,11 +437,6 @@ const breadcrumb = {
       color 160ms var(--ease-out);
   }
 
-  .next-label {
-    font-size: var(--t-sm);
-    color: var(--fg-2);
-  }
-
   .next-name {
     font-family: var(--font-display);
     font-size: var(--t-xl);
@@ -469,7 +463,6 @@ const breadcrumb = {
       background: var(--fg);
       color: var(--bg);
     }
-    .next:hover .next-label,
     .next:hover .next-summary {
       color: var(--bg);
     }

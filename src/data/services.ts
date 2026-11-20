@@ -9,7 +9,6 @@ export type Service = {
   when: string;
   deliver: string[];
   outcome: string;
-  format: string;
 };
 
 export const services: Service[] = [
@@ -24,7 +23,6 @@ export const services: Service[] = [
       "Fluxos com LLM com validação de saída, registro e aprovação humana onde o erro custa caro",
     ],
     outcome: "A IA age dentro das regras do seu sistema e deixa rastro do que fez.",
-    format: "Piloto com escopo curto; depois, projeto por etapas.",
   },
   {
     id: "mvp",
@@ -37,7 +35,6 @@ export const services: Service[] = [
       "Testes, deploy e documentação desde a primeira entrega",
     ],
     outcome: "Uma primeira versão em uso cedo, com escopo cortado ao essencial e base para crescer.",
-    format: "Projeto por etapas, cada uma com entrega utilizável.",
   },
   {
     id: "arquitetura",
@@ -50,7 +47,6 @@ export const services: Service[] = [
       "Eventos com outbox, filas, observabilidade e testes de carga",
     ],
     outcome: "Um plano de mudança em ordem de risco, e a execução se você quiser.",
-    format: "Diagnóstico com plano escrito; execução opcional.",
   },
   {
     id: "integracoes",
@@ -63,7 +59,6 @@ export const services: Service[] = [
       "Ferramentas internas sob medida para a sua operação",
     ],
     outcome: "Menos trabalho manual, e falhas que aparecem em vez de sumirem em silêncio.",
-    format: "Projeto fechado por integração.",
   },
   {
     id: "cto",
@@ -76,7 +71,6 @@ export const services: Service[] = [
       "Apoio em contratação e acompanhamento do time",
     ],
     outcome: "Decisões técnicas com custo e risco escritos, que o sócio não técnico também entende.",
-    format: "Mensal, com horas reservadas.",
   },
   {
     id: "infra",
@@ -89,6 +83,5 @@ export const services: Service[] = [
       "Uma análise honesta de onde a nuvem gerenciada ainda vale o preço",
     ],
     outcome: "Custo previsível. O Kairos inteiro, com sete serviços, PostgreSQL e Redis, roda numa única VPS.",
-    format: "Projeto de migração; suporte mensal opcional.",
   },
 ];

@@ -3,7 +3,7 @@
 export const steps = [
   {
     title: "Diagnóstico",
-    meta: "30 min, gratuito",
+    meta: "Conversa de 30 min",
     text: "Você descreve o problema; eu pergunto até entender o que dói, quanto custa e o que já foi tentado. Se eu não for a pessoa certa para resolver, digo na hora.",
   },
   {
@@ -19,7 +19,7 @@ export const steps = [
   {
     title: "Operação",
     meta: "No ar e documentado",
-    text: "Deploy, monitoramento, documentação e passagem para o seu time. Se preferir, sigo cuidando do sistema em contrato mensal.",
+    text: "Deploy, monitoramento, documentação e passagem para o seu time. Se preferir, sigo cuidando do sistema, no formato combinado na proposta.",
   },
 ] as const;
 
@@ -54,7 +54,7 @@ export const faq = [
   {
     q: "Quanto custa?",
     a: [
-      "Depende do escopo, por isso não publico tabela. Depois do diagnóstico você recebe uma proposta com o preço de cada etapa, ou um valor mensal no caso de consultoria contínua.",
+      "Depende do escopo, por isso não publico tabela. Depois da conversa inicial você recebe uma proposta com escopo, formato e preço.",
       "Se o orçamento não cobrir o que você quer, eu digo o que cabe nele e o que fica para depois.",
     ],
   },
@@ -75,7 +75,7 @@ export const faq = [
   {
     q: "Quem mantém o sistema depois da entrega?",
     a: [
-      "Você escolhe. O seu time assume com documentação e uma passagem acompanhada, ou eu sigo cuidando de correções, atualizações e evolução em contrato mensal.",
+      "Você escolhe. O seu time assume com documentação e uma passagem acompanhada, ou eu sigo cuidando de correções, atualizações e evolução, no formato que combinarmos.",
     ],
   },
   {
