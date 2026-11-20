@@ -101,7 +101,7 @@ export const kairosFlow: FlowStep[] = [
   },
   {
     id: "projetos",
-    title: "O sistema confere quem pediu",
+    title: "Confere quem pediu",
     text: "Antes de mexer em qualquer coisa, o serviço de projetos confere sua empresa, seu papel e o projeto. Se você não pode criar ali, o agente também não pode.",
     detail: "JWT RS256 verificado em cada serviço",
   },

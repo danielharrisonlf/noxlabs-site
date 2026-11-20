@@ -36,8 +36,7 @@ const problems = [];
 
 async function settle(page) {
   await page.evaluate(() => document.fonts.ready);
-  // Deixa a exposição do topo se formar (rastros, pacotes e provas) antes de capturar.
-  await page.waitForTimeout(4200);
+  await page.waitForTimeout(600);
 }
 
 // Percorre a página para que as animações ligadas à rolagem e as que esperam a
@@ -68,6 +67,8 @@ for (const width of widths) {
       viewport: { width, height: width < 600 ? 844 : 900 },
       deviceScaleFactor: width < 600 ? 2 : 1,
       colorScheme: theme,
+      // Estado final e estável de cada peça; o movimento fica em scripts/frames.mjs.
+      reducedMotion: "reduce",
     });
     const page = await context.newPage();
     const tag = `${width}-${theme}`;

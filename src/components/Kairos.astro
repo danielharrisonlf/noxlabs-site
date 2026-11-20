@@ -5,8 +5,8 @@ import KairosFlow from "./KairosFlow.astro";
 
 const notes = [
   {
-    title: "Em produção",
-    text: "Sete serviços, PostgreSQL e Redis numa única VPS com Dokploy, com cadastro aberto de empresas e convites.",
+    title: "Medido",
+    text: "Num A/B local com o mesmo código, ligar o keep-alive no gateway levou o p50 de uma rota de 1,9 s para 27 ms e zerou os erros do teste.",
   },
   {
     title: "Limite assumido",
@@ -42,10 +42,9 @@ const notes = [
 
     <div class="k-proof">
       <div class="k-measure">
-        <p class="k-kind">Medido</p>
+        <p class="k-kind">Em produção</p>
         <p class="k-measure-text">
-          Num A/B local com o mesmo código, ligar o keep-alive no gateway levou o p50 de <code>GET /projects</code> de
-          <strong class="tabular">1,9 s para 27 ms</strong> e zerou os erros do teste.
+          Sete serviços, PostgreSQL e Redis numa única VPS com Dokploy, com cadastro aberto de empresas e convites.
         </p>
       </div>
       <dl class="k-notes">
@@ -123,27 +122,6 @@ const notes = [
     line-height: 1.3;
     letter-spacing: -0.015em;
     max-width: 30ch;
-  }
-
-  .k-measure-text strong {
-    font-weight: 600;
-    color: var(--sodio);
-  }
-
-  :global(:root:not([data-theme="dark"])) .k-measure-text strong {
-    color: var(--fg);
-    background: linear-gradient(transparent 62%, color-mix(in srgb, var(--sodio) 28%, transparent) 62%);
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :global(:root:not([data-theme="light"])) .k-measure-text strong {
-      color: var(--sodio);
-      background: none;
-    }
-  }
-
-  .k-measure-text code {
-    font-size: 0.8em;
   }
 
   .k-notes {
