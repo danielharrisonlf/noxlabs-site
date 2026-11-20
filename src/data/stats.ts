@@ -38,7 +38,7 @@ export const stats: Stat[] = [
     suffix: "%",
     text: "dos donos de pequenos negócios usaram IA no trabalho nas duas semanas antes da entrevista.",
     source: {
-      org: "Sebrae",
+      org: "Sebrae e Meta Instituto de Pesquisa",
       title: "Transformação Digital nos Pequenos Negócios",
       year: "2026",
       url: "https://agenciasebrae.com.br/dados/pequenos-negocios-do-brasil-usam-mais-ia-que-os-norte-americanos-aponta-sebrae/",
@@ -51,7 +51,7 @@ export const stats: Stat[] = [
     suffix: "%",
     text: "pretendem começar a usar IA ou usar mais no próximo semestre.",
     source: {
-      org: "Sebrae",
+      org: "Sebrae e Meta Instituto de Pesquisa",
       title: "Transformação Digital nos Pequenos Negócios",
       year: "2026",
       url: "https://agenciasebrae.com.br/dados/pequenos-negocios-do-brasil-usam-mais-ia-que-os-norte-americanos-aponta-sebrae/",

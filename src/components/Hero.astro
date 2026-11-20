@@ -11,19 +11,20 @@ import { site } from "../data/site";
 import Icon from "./Icon.astro";
 import Ill from "./Ill.astro";
 
-type Piece = { name: string; ill: IllustrationName; tone: "lila" | "goiaba" | "caju" | "white" };
+/** Cada peça leva ao exemplo do mesmo ramo no seletor "Como funcionaria na sua empresa". */
+type Piece = { name: string; ill: IllustrationName; tone: "lila" | "goiaba" | "caju" | "white"; scenario: string };
 
 /** Os quatro primeiros abrem o topo no celular; a ordem não privilegia nenhum ramo de escritório. */
 const pieces: Piece[] = [
-  { name: "Loja", ill: "loja", tone: "goiaba" },
-  { name: "Indústria", ill: "industria", tone: "caju" },
-  { name: "Clínica", ill: "clinica", tone: "lila" },
-  { name: "Agro", ill: "agro", tone: "white" },
-  { name: "Escola", ill: "escola", tone: "lila" },
-  { name: "Transportadora", ill: "transportadora", tone: "white" },
-  { name: "Imobiliária", ill: "imobiliaria", tone: "goiaba" },
-  { name: "Distribuidora", ill: "distribuidora", tone: "white" },
-  { name: "E-commerce", ill: "ecommerce", tone: "caju" },
+  { name: "Loja", ill: "loja", tone: "goiaba", scenario: "loja" },
+  { name: "Indústria", ill: "industria", tone: "caju", scenario: "industria" },
+  { name: "Clínica", ill: "clinica", tone: "lila", scenario: "clinica" },
+  { name: "Agro", ill: "agro", tone: "white", scenario: "agro" },
+  { name: "Escola", ill: "escola", tone: "lila", scenario: "escola" },
+  { name: "Transportadora", ill: "transportadora", tone: "white", scenario: "transportadora" },
+  { name: "Imobiliária", ill: "imobiliaria", tone: "goiaba", scenario: "imobiliaria" },
+  { name: "Distribuidora", ill: "distribuidora", tone: "white", scenario: "industria" },
+  { name: "E-commerce", ill: "ecommerce", tone: "caju", scenario: "ecommerce" },
 ];
 ---
 
@@ -32,12 +33,12 @@ const pieces: Piece[] = [
     <div class="board">
       {
         pieces.map((p, i) => (
-          <div class:list={["piece", `p${i + 1}`]} style={`--i:${i}`} aria-hidden="true">
+          <a class:list={["piece", `p${i + 1}`]} style={`--i:${i}`} href={`#panel-${p.scenario}`} data-scen-link={p.scenario}>
             <span class:list={["tile", `tile-${p.tone}`, "piece-tile"]}>
               <Ill name={p.ill} />
             </span>
             <span class="piece-name">{p.name}</span>
-          </div>
+          </a>
         ))
       }
 
@@ -99,10 +100,29 @@ const pieces: Piece[] = [
     min-height: 100%;
     padding: 18% 18% 26%;
     border-radius: var(--r-lg);
+    transition:
+      transform var(--d-base) var(--ease-out),
+      box-shadow var(--d-base) var(--ease-out);
   }
 
   .piece-tile :global(.ill) {
-    max-width: 6.5rem;
+    max-width: 7.5rem;
+  }
+
+  @media (hover: hover) {
+    .piece:hover .piece-tile:not(.open-tile) {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-2);
+    }
+  }
+
+  .piece:focus-visible {
+    outline: none;
+  }
+
+  .piece:focus-visible .piece-tile {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
   }
 
   .piece-name {

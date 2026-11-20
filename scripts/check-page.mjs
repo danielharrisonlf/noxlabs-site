@@ -302,13 +302,13 @@ const browser = await chromium.launch();
   if (!(await page.locator("#panel-clinica").isVisible()) || (await page.locator("#panel-loja").isVisible())) fail("ramos: o chip não trocou o cenário");
   await page.keyboard.press("ArrowRight");
   await page.waitForTimeout(500);
-  if ((await page.locator("#tab-imobiliaria").getAttribute("aria-selected")) !== "true") fail("ramos: seta para a direita não andou");
+  if ((await page.locator("#tab-agro").getAttribute("aria-selected")) !== "true") fail("ramos: seta para a direita não andou");
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await page.waitForTimeout(300);
 
   // CTA da base: escondido no topo, aparece no meio da página.
   if ((await page.locator("[data-dock]").getAttribute("data-visible")) !== "false") fail("cta da base: visível no topo");
-  await page.evaluate(() => document.getElementById("casos")?.scrollIntoView());
+  await page.evaluate(() => document.getElementById("solucoes")?.scrollIntoView());
   await page.waitForTimeout(800);
   if ((await page.locator("[data-dock]").getAttribute("data-visible")) !== "true") fail("cta da base: não apareceu ao rolar");
 
@@ -416,7 +416,7 @@ for (const [width, height] of [
   if (hidden) fail(`sem JS: ${hidden} blocos invisíveis`);
   if ((await page.locator('[data-res="freed"]').textContent()) !== "43") fail("sem JS: calculadora sem a conta inicial");
   const panels = await page.locator("[data-scen-panel]").evaluateAll((els) => els.filter((el) => el.getBoundingClientRect().height > 0).length);
-  if (panels !== 6) fail(`sem JS: ${panels} de 6 cenários de ramo visíveis`);
+  if (panels !== 9) fail(`sem JS: ${panels} de 9 cenários de ramo visíveis`);
   await context.close();
 }
 

@@ -90,11 +90,11 @@ const breadcrumb = {
     {
       study.image && (
         <div class="wrap case-visual">
-          <figure class="shot">
+          <figure class:list={["shot", { "shot-portrait": study.image.portrait }]}>
             <img
               src={study.image.src}
-              srcset={srcset(study.image.src, study.image.width)}
-              sizes="(min-width: 80rem) 76rem, 94vw"
+              srcset={study.image.portrait ? undefined : srcset(study.image.src, study.image.width)}
+              sizes={study.image.portrait ? undefined : "(min-width: 80rem) 76rem, 94vw"}
               width={study.image.width}
               height={study.image.height}
               alt={study.image.alt}
@@ -259,6 +259,17 @@ const breadcrumb = {
 
   .shot img {
     width: 100%;
+  }
+
+  /* Tela de celular: estreita e centrada, sobre o azulejo do cabeçalho. */
+  .shot-portrait {
+    max-width: 26rem;
+    margin-inline: auto;
+    background: var(--lila);
+  }
+
+  .shot-portrait img {
+    padding: var(--s-5) var(--s-5) 0;
   }
 
   .shot figcaption {

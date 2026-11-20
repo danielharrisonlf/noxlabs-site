@@ -1,6 +1,7 @@
 /**
- * Os cenários "Como funcionaria na sua empresa". Nenhum ramo é o foco: todos
- * têm o mesmo peso, e a ordem começa por varejo e indústria. Os cenários são
+ * Os cenários "Como funcionaria na sua empresa": um para cada ramo do topo,
+ * todos com o mesmo peso; a ordem começa por varejo e indústria e deixa o
+ * escritório por último. Os cenários são
  * ilustrações de como uma automação funcionaria, não casos de clientes; as
  * conversas são de exemplo, com nomes fictícios.
  */
@@ -105,6 +106,84 @@ export const scenarios: Scenario[] = [
       "Retorno vira lembrete com data; quem não responde vai para a lista de ligação da recepção.",
     ],
     gain: "Menos cadeira vazia e uma recepção livre para quem está na frente dela.",
+  },
+  {
+    id: "agro",
+    label: "Agro",
+    ill: "agro",
+    tone: "white",
+    chatName: "Agropecuária Santa Rita",
+    chatRole: "Pedidos e entregas",
+    chat: [
+      { from: "client", text: "Bom dia! Tem ração de engorda de 40 kg? Preciso de 30 sacos no sítio até quinta." },
+      { from: "bot", text: "Tem, sim: 30 sacos a R$ 112 cada. A entrega na sua região sai quarta de manhã. Confirmo?", who: "Assistente da loja" },
+      { from: "client", text: "Confirma. Dá para pagar na colheita?" },
+      { from: "note", text: "Pedido lançado. Pagamento a prazo enviado para o Sérgio aprovar" },
+      { from: "team", text: "Oi, aqui é o Sérgio. Aprovado para 15 de março, como da última vez.", who: "Sérgio" },
+    ],
+    today: [
+      "Pedido chega por telefone e WhatsApp e é anotado no caderno do balcão.",
+      "A entrega é combinada de boca, e o motorista descobre a rota na hora.",
+      "Venda a prazo para a colheita fica numa planilha que só uma pessoa entende.",
+    ],
+    then: [
+      "Um assistente responde preço e estoque e registra o pedido com o dia da entrega.",
+      "As entregas do dia saem agrupadas por região para o motorista.",
+      "Os vencimentos a prazo aparecem numa tela, com lembrete antes da data.",
+    ],
+    gain: "Nenhum pedido perdido no caderno e a cobrança da safra em dia.",
+  },
+  {
+    id: "transportadora",
+    label: "Transportadora",
+    ill: "transportadora",
+    tone: "caju",
+    chatName: "Rota Sul Transportes",
+    chatRole: "Atendimento",
+    chat: [
+      { from: "client", text: "Boa tarde! Onde está a carga da nota 48213?" },
+      { from: "bot", text: "Saiu de Curitiba às 7h e está a caminho. A previsão de entrega é hoje até as 16h.", who: "Assistente da transportadora" },
+      { from: "client", text: "Ótimo. Me manda o comprovante quando entregar?" },
+      { from: "note", text: "Entrega registrada às 15h20, com foto do canhoto" },
+      { from: "bot", text: "Entregue às 15h20. Segue a foto do canhoto assinado.", who: "Assistente da transportadora" },
+    ],
+    today: [
+      "Clientes ligam o dia todo perguntando onde está a carga.",
+      "O motorista manda a foto do canhoto pelo WhatsApp e alguém arquiva à mão.",
+      "Atraso e ocorrência só chegam ao cliente quando ele reclama.",
+    ],
+    then: [
+      "O andamento de cada nota é respondido na hora, com a previsão de entrega.",
+      "O canhoto que o motorista envia vai sozinho para a pasta do cliente.",
+      "Atraso ou ocorrência avisam o cliente e a equipe no mesmo momento.",
+    ],
+    gain: "Menos ligação de “cadê minha carga” e comprovante achado em segundos.",
+  },
+  {
+    id: "ecommerce",
+    label: "E-commerce",
+    ill: "ecommerce",
+    tone: "goiaba",
+    chatName: "Ateliê Flor de Lis",
+    chatRole: "Atendimento da loja virtual",
+    chat: [
+      { from: "client", text: "Oi! Meu pedido 5521 ainda não chegou." },
+      { from: "bot", text: "Ele está com a transportadora e chega amanhã. Segue o link para acompanhar.", who: "Assistente da loja" },
+      { from: "client", text: "E se a blusa não servir, como troco?" },
+      { from: "bot", text: "Você tem 30 dias. É só responder “troca” aqui que eu mando a etiqueta de envio.", who: "Assistente da loja" },
+      { from: "note", text: "Pedido de troca aberto e avisado ao estoque" },
+    ],
+    today: [
+      "O atendimento responde “onde está meu pedido” um por um.",
+      "Troca e devolução chegam por e-mail, mensagem e rede social, sem controle.",
+      "O estoque da loja virtual não bate com o da loja física, e vende-se o que acabou.",
+    ],
+    then: [
+      "Rastreio e prazo são respondidos na hora, a qualquer hora.",
+      "Toda troca vira um pedido com etiqueta, acompanhado do começo ao fim.",
+      "O estoque da loja virtual e o do sistema se atualizam juntos.",
+    ],
+    gain: "Atendimento livre para os casos difíceis e nenhuma venda de item esgotado.",
   },
   {
     id: "imobiliaria",

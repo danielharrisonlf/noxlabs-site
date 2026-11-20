@@ -50,7 +50,7 @@ export const solutions: Solution[] = [
     title: "Integração do que você já usa",
     promise:
       "A informação é digitada uma vez e aparece onde precisa: no sistema de gestão, na planilha, na loja virtual, no e-mail.",
-    examples: ["Sistema de gestão", "Planilhas", "Bancos", "Loja virtual", "E-mail e WhatsApp"],
+    examples: ["Sistema de gestão", "Planilhas", "Bancos", "Loja virtual", "E-mail", "WhatsApp"],
   },
   {
     id: "paineis",

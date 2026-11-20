@@ -94,10 +94,10 @@ Vêm do repositório público do portfólio (`danielharrisonlf/portfolio`, `publ
 
 - `public/img/daniel-harrison.webp`: `public/uploads/backback.webp` (foto do Daniel).
 - `public/img/clinicflow-painel*.webp`: captura do frontend real do ClinicFlow, com dados de demonstração.
-- `public/img/whatsapp-editor*.webp` e `whatsapp-celular.webp`: recortes da captura do frontend real do WhatsApp Control
-  Center (conta de demonstração), sem o menu lateral e a barra de ferramentas, que mostravam termos de desenvolvedor.
-  A captura inteira saiu do repositório.
-- `public/img/clinicflow-consultas.webp`: recorte legível da tabela "Consultas de hoje" de `clinicflow-painel.webp`.
+- `public/img/whatsapp-tela.webp` e `whatsapp-celular.webp`: recortes da captura do frontend real do WhatsApp Control
+  Center (conta de demonstração): só a prévia no celular e a mensagem. A captura inteira, que mostrava termos de
+  desenvolvedor no menu e no formulário, saiu do repositório (continua no histórico, commit `8c6cf25`).
+- `public/img/clinicflow-consultas.webp`: recorte legível de três consultas de `clinicflow-painel.webp`.
 - `public/og.png`, `favicon.svg`, `favicon.ico` e ícones PNG: desenhados neste projeto e gerados por
   `scripts/og-image.mjs`.
 - Pictogramas de ramo (`src/data/illustrations.ts`): desenhados à mão em SVG para o site; nenhum gerado por IA.

@@ -1,8 +1,9 @@
 ---
 /**
- * Fecho da página: como começa (quatro passos) e o contato, lado a lado, na
- * única faixa escura do site. O e-mail abre com um roteiro; WhatsApp e agenda
- * aparecem sozinhos quando estiverem configurados em src/data/site.ts.
+ * Fecho da página, na única faixa escura do site: quem cuida da sua rotina
+ * (o Daniel), como começa (quatro passos) e o contato. O e-mail abre com um
+ * roteiro; WhatsApp e agenda aparecem sozinhos quando estiverem configurados
+ * em src/data/site.ts. Nas páginas de caso, `about` desliga o bloco do Daniel.
  */
 import { steps } from "../data/content";
 import { mailScript, site, talkMailto, whatsappHref } from "../data/site";
@@ -11,10 +12,11 @@ import Icon from "./Icon.astro";
 interface Props {
   /** Assunto do e-mail, quando a página pede um contexto (ex.: uma página de caso). */
   topic?: string;
-  title?: string;
+  /** Mostra quem faz antes dos passos (página inicial). */
+  about?: boolean;
 }
 
-const { topic, title = "Da primeira mensagem à primeira rotina funcionando" } = Astro.props;
+const { topic, about = false } = Astro.props;
 const mailto = topic ? talkMailto(topic) : site.talkMailto;
 const whats = whatsappHref();
 const subject = topic ? `${site.talkSubject}: ${topic}` : site.talkSubject;
@@ -22,39 +24,75 @@ const subject = topic ? `${site.talkSubject}: ${topic}` : site.talkSubject;
 
 <section class="contact dark" id="contato" aria-labelledby="contato-title" data-copy-scope>
   <div class="wrap">
-    <h2 id="contato-title" class="contact-title" data-reveal>{title}</h2>
+    {
+      about && (
+        <div class="who" id="sobre" data-reveal>
+          <figure class="portrait">
+            <img
+              src="/img/daniel-harrison.webp"
+              width="360"
+              height="360"
+              alt="Daniel Harrison, de camiseta preta, diante de uma parede vermelha."
+              loading="lazy"
+              decoding="async"
+            />
+          </figure>
+          <div class="who-copy">
+            <h2 class="who-title">Quem cuida da sua rotina</h2>
+            <p class="who-lede">
+              Eu sou o Daniel Harrison, e a Noxlabs é o meu trabalho. Quem conversa com você é quem entende a rotina e constrói
+              a solução, sem repasse para uma equipe que você nunca viu.
+            </p>
+            <p>
+              Antes da Noxlabs, construí sistemas para empresas de engenharia, controle de acesso e locação de equipamentos: um
+              portal de suporte com fila e prazos, avisos automáticos por WhatsApp e Telegram, integração com catracas e
+              câmeras de obra acompanhadas a distância.
+            </p>
+            <p class="who-links">
+              <a class="text-link" href={site.links.linkedin}>
+                LinkedIn
+                <Icon name="arrow-up-right" />
+              </a>
+              <a class="text-link" href={site.links.portfolio}>
+                Portfólio
+                <Icon name="arrow-up-right" />
+              </a>
+            </p>
+          </div>
+        </div>
+      )
+    }
 
-    <div class="contact-grid">
-      <ol role="list" class="steps">
-        {
-          steps.map((step, i) => (
-            <li data-reveal style={`--i:${i}`}>
-              <span class="step-n tabular" aria-hidden="true">
-                {i + 1}
-              </span>
-              <div>
-                <h3>
-                  <span class="visually-hidden">Passo {i + 1}: </span>
-                  {step.title}
-                </h3>
-                <p>{step.text}</p>
-              </div>
-            </li>
-          ))
-        }
-      </ol>
+    <h2 id="contato-title" class="contact-title" data-reveal>Como começa</h2>
+    <ol role="list" class="steps">
+      {
+        steps.map((step, i) => (
+          <li data-reveal style={`--i:${i}`}>
+            <span class="step-n tabular" aria-hidden="true">
+              {i + 1}
+            </span>
+            <h3>
+              <span class="visually-hidden">Passo {i + 1}: </span>
+              {step.title}
+            </h3>
+            <p>{step.text}</p>
+          </li>
+        ))
+      }
+    </ol>
 
-      <div class="start" data-reveal style="--i:1">
+    <div class="start" data-reveal>
+      <div class="start-main">
         <h3 class="start-title">Comece pelo primeiro passo</h3>
         <p class="start-lede">Escreva em poucas linhas como é a rotina hoje. Eu leio e respondo pessoalmente.</p>
         <div class="start-actions" data-cta-anchor>
-          <a class="btn btn-primary btn-block" href={mailto}>
+          <a class="btn btn-primary" href={mailto}>
             <Icon name="mail" class="no-nudge" />
             Escrever o e-mail
           </a>
           {
             whats && (
-              <a class="btn btn-secondary btn-block" href={whats}>
+              <a class="btn btn-secondary" href={whats}>
                 <Icon name="phone" class="no-nudge" />
                 Chamar no WhatsApp
               </a>
@@ -62,13 +100,13 @@ const subject = topic ? `${site.talkSubject}: ${topic}` : site.talkSubject;
           }
           {
             site.scheduleUrl && (
-              <a class="btn btn-secondary btn-block" href={site.scheduleUrl}>
+              <a class="btn btn-secondary" href={site.scheduleUrl}>
                 <Icon name="calendar" class="no-nudge" />
                 Escolher horário na agenda
               </a>
             )
           }
-          <button class="btn btn-secondary btn-block" type="button" data-copy={site.email} data-copy-done="E-mail copiado">
+          <button class="btn btn-secondary" type="button" data-copy={site.email} data-copy-done="E-mail copiado">
             <span class="copy-icon"><Icon name="copy" class="no-nudge" /></span>
             <span class="check-icon"><Icon name="check" class="no-nudge" /></span>
             <span data-copy-label>Copiar e-mail</span>
@@ -76,15 +114,15 @@ const subject = topic ? `${site.talkSubject}: ${topic}` : site.talkSubject;
         </div>
         <p class="contact-email"><a href={site.mailto}>{site.email}</a></p>
         <p class="contact-status" role="status" aria-live="polite" data-copy-status></p>
+      </div>
 
-        <div class="script">
-          <p class="script-h">O e-mail já abre com este roteiro</p>
-          <p class="script-subject"><span>Assunto:</span> {subject}</p>
-          <ul role="list">
-            {mailScript.map((line) => <li>{line}</li>)}
-          </ul>
-          <p class="script-note">Não precisa de nada pronto. Duas linhas bastam para começar.</p>
-        </div>
+      <div class="script">
+        <p class="script-h">O e-mail já abre com este roteiro</p>
+        <p class="script-subject"><span>Assunto:</span> {subject}</p>
+        <ul role="list">
+          {mailScript.map((line) => <li>{line}</li>)}
+        </ul>
+        <p class="script-note">Não precisa de nada pronto. Duas linhas bastam para começar.</p>
       </div>
     </div>
   </div>
@@ -95,60 +133,115 @@ const subject = topic ? `${site.talkSubject}: ${topic}` : site.talkSubject;
     padding-block: clamp(4rem, 3rem + 5vw, 7.5rem);
   }
 
-  .contact-title {
-    max-width: 20ch;
-    margin-bottom: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+  /* ---- Quem cuida ---- */
+  .who {
+    display: grid;
+    grid-template-columns: minmax(0, 18rem) minmax(0, 1fr);
+    gap: var(--s-6) clamp(2rem, 5vw, 5rem);
+    align-items: center;
+    padding-bottom: clamp(3rem, 2rem + 3vw, 5rem);
+    margin-bottom: clamp(3rem, 2rem + 3vw, 5rem);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .portrait {
+    padding: 0.75rem;
+    border-radius: var(--r-xl);
+    background: var(--goiaba);
+  }
+
+  .portrait img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: calc(var(--r-xl) - 0.75rem);
+  }
+
+  .who-copy {
+    display: grid;
+    gap: var(--s-4);
+    max-width: 44rem;
+  }
+
+  .who-title {
     font-size: var(--t-2xl);
   }
 
-  .contact-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-    gap: var(--s-7) clamp(2rem, 6vw, 6rem);
-    align-items: start;
+  .who-lede {
+    font-size: var(--t-md);
+    line-height: 1.5;
+  }
+
+  .who-copy p:not(.who-lede) {
+    color: var(--ink-2);
+  }
+
+  .who-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s-5);
+  }
+
+  /* ---- Como começa ---- */
+  .contact-title {
+    margin-bottom: var(--s-6);
+    font-size: var(--t-2xl);
   }
 
   .steps {
     display: grid;
-    gap: var(--s-6);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--s-3);
   }
 
   .steps li {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: var(--s-4);
+    align-content: start;
+    gap: var(--s-2);
+    padding: var(--s-5);
+    border-radius: var(--r-lg);
+    background: rgb(255 255 255 / 0.06);
   }
 
   .step-n {
     display: grid;
     place-items: center;
-    width: 3rem;
-    height: 3rem;
-    border-radius: 14px;
-    background: rgb(255 255 255 / 0.1);
-    color: var(--caju);
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-bottom: var(--s-2);
+    border-radius: 50%;
+    background: var(--caju);
+    color: var(--jabu);
     font-family: var(--font-display);
-    font-size: 1.25rem;
+    font-size: 1.15rem;
     font-weight: 700;
   }
 
   .steps h3 {
-    margin-bottom: var(--s-1);
-    font-size: var(--t-lg);
+    font-size: var(--t-md);
   }
 
   .steps p {
     color: var(--ink-2);
-    max-width: 44ch;
+    font-size: var(--t-sm);
   }
 
+  /* ---- Contato ---- */
   .start {
     display: grid;
-    gap: var(--s-4);
-    padding: clamp(1.25rem, 1rem + 1.5vw, 2rem);
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: var(--s-6) clamp(2rem, 5vw, 5rem);
+    margin-top: var(--s-6);
+    padding: clamp(1.5rem, 1rem + 2vw, 3rem);
     border-radius: var(--r-xl);
-    background: rgb(255 255 255 / 0.06);
+    background: var(--surface);
     border: 1px solid var(--line);
+  }
+
+  .start-main {
+    display: grid;
+    align-content: start;
+    gap: var(--s-4);
   }
 
   .start-title {
@@ -157,11 +250,13 @@ const subject = topic ? `${site.talkSubject}: ${topic}` : site.talkSubject;
 
   .start-lede {
     color: var(--ink-2);
+    font-size: var(--t-md);
   }
 
   .start-actions {
-    display: grid;
-    gap: var(--s-2);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-3);
   }
 
   .copy-icon,
@@ -199,8 +294,6 @@ const subject = topic ? `${site.talkSubject}: ${topic}` : site.talkSubject;
   }
 
   .script {
-    padding-top: var(--s-4);
-    border-top: 1px solid var(--line);
     font-size: var(--t-sm);
   }
 
@@ -230,8 +323,30 @@ const subject = topic ? `${site.talkSubject}: ${topic}` : site.talkSubject;
   }
 
   @media (max-width: 63.99rem) {
-    .contact-grid {
+    .steps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .start {
       grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 47.99rem) {
+    .who {
+      grid-template-columns: 1fr;
+    }
+
+    .portrait {
+      max-width: 14rem;
+    }
+
+    .steps {
+      grid-template-columns: 1fr;
+    }
+
+    .start-actions .btn {
+      width: 100%;
     }
   }
 </style>

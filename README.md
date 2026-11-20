@@ -62,8 +62,8 @@ segurança, além do redirecionamento 301 de `/contabilidade/`. A CSP lista o ha
 src/
   data/          conteúdo: contato, soluções, ramos e cenários, casos, dados de mercado, calculadora, FAQ, ícones,
                  pictogramas de ramo
-  components/    seções (Hero, Scenarios, Solutions, Work, MarketData/Stat, Estimator, About, Security, Faq, Contact
-                 com os passos de como começa), cabeçalho com o menu do celular, rodapé, marca, ícones e pictogramas
+  components/    seções (Hero, Scenarios, Work, Solutions, MarketData/Stat, Estimator, Faq, Security e Contact, que fecha
+                 com quem faz, como começa e o contato), cabeçalho com o menu do celular, rodapé, marca, ícones e pictogramas
   scripts/       motion.ts (entradas por rolagem e contadores) e copy.ts (copiar e-mail)
   layouts/       Base.astro: head, SEO, JSON-LD, cabeçalho e rodapé
   pages/         index, casos/[slug] e 404

@@ -34,15 +34,14 @@ const sizes = [
 const sections = [
   ["01-topo", ".hero"],
   ["02-na-sua-empresa", "#na-sua-empresa"],
-  ["03-solucoes", "#solucoes"],
-  ["04-casos", "#casos"],
+  ["03-casos", "#casos"],
+  ["04-solucoes", "#solucoes"],
   ["05-numeros", "#numeros"],
   ["06-estimativa", "#estimativa"],
-  ["07-sobre", "#sobre"],
+  ["07-perguntas", "#perguntas"],
   ["08-seguranca", "#seguranca"],
-  ["09-perguntas", "#perguntas"],
-  ["10-contato", "#contato"],
-  ["11-rodape", "footer"],
+  ["09-contato", "#contato"],
+  ["10-rodape", "footer"],
 ];
 const pages = [
   ["caso-clinicflow", "/casos/clinicflow/"],

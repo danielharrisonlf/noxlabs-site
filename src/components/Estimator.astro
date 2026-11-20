@@ -42,26 +42,26 @@ const share = stepper("share", "por cento");
       <form class="sentence" aria-labelledby="est-title" data-est-form>
         <p>
           Na minha empresa,
-          <span class="num" role="group" aria-labelledby="lbl-people">
+          <span class="nowrap"><span class="num" role="group" aria-labelledby="lbl-people">
             <button type="button" class="step" data-step="people" data-dir="-1" aria-label="Menos uma pessoa">−</button>
             <input id="est-people" name="people" type="number" inputmode="numeric" min={people.min} max={people.max} step={people.step} value={people.value} aria-describedby="hint-people" />
             <button type="button" class="step" data-step="people" data-dir="1" aria-label="Mais uma pessoa">+</button>
           </span>
-          <label for="est-people" id="lbl-people">pessoas</label> passam
-          <span class="num" role="group" aria-labelledby="lbl-hours">
+          <label for="est-people" id="lbl-people">pessoas</label></span> passam
+          <span class="nowrap"><span class="num" role="group" aria-labelledby="lbl-hours">
             <button type="button" class="step" data-step="hours" data-dir="-1" aria-label="Menos uma hora">−</button>
             <input id="est-hours" name="hours" type="number" inputmode="numeric" min={hours.min} max={hours.max} step={hours.step} value={hours.value} aria-describedby="hint-hours" />
             <button type="button" class="step" data-step="hours" data-dir="1" aria-label="Mais uma hora">+</button>
           </span>
-          <label for="est-hours" id="lbl-hours">horas por semana</label>, cada uma, em tarefas repetitivas.
+          <label for="est-hours" id="lbl-hours">horas</label></span> por semana, cada uma, em tarefas repetitivas.
         </p>
         <p>
           <label for="est-cost">Cada pessoa custa</label>
-          <span class="money">
+          <span class="nowrap"><span class="money">
             <span aria-hidden="true">R$</span>
             <input id="est-cost" name="cost" type="text" inputmode="decimal" autocomplete="off" value={moneyInput(d.cost)} data-min={lim.cost.min} data-max={lim.cost.max} aria-describedby="est-cost-error hint-cost" />
           </span>
-          por mês, com encargos.
+          por mês</span>, com encargos.
         </p>
         <p>
           Se
@@ -70,7 +70,7 @@ const share = stepper("share", "por cento");
             <input id="est-share" name="share" type="number" inputmode="numeric" min={share.min} max={share.max} step={share.step} value={share.value} aria-describedby="hint-share" />
             <button type="button" class="step" data-step="share" data-dir="1" aria-label="Mais 5 por cento">+</button>
           </span>
-          <label for="est-share" id="lbl-share">% desse trabalho</label> fosse automático…
+          <label for="est-share" id="lbl-share">por cento</label> desse trabalho fosse automático…
         </p>
         <p class="field-error" id="est-cost-error" data-cost-error hidden></p>
         <ul role="list" class="hints">
@@ -92,23 +92,12 @@ const share = stepper("share", "por cento");
         <p class="answer-lead">…a equipe ganharia cerca de</p>
         <p class="answer-big tabular"><span data-res="freed">{num(r.freed)}</span> <span class="answer-unit">horas por mês</span></p>
         <div class="bar" aria-hidden="true"><span data-res-bar style={`--p:${freedPct}%`}></span></div>
-        <p class="answer-of">
-          de <strong class="tabular" data-res="repetitive">{num(r.repetitive)}</strong> horas por mês que hoje vão em tarefas repetitivas.
+        <p class="answer-prose">
+          Das <strong class="tabular" data-res="repetitive">{num(r.repetitive)}</strong> horas que hoje vão em tarefas
+          repetitivas. É como ter <strong class="tabular" data-res-fte>{fteText(r.fte)}</strong> livre para outra coisa, ou
+          <strong class="tabular"><span data-res="month">{brl(r.month)}</span> por mês</strong> em horas de trabalho
+          (<span class="tabular" data-res="year">{brl(r.year)}</span> por ano).
         </p>
-        <dl class="answer-list">
-          <div>
-            <dt>Equivale a</dt>
-            <dd class="tabular" data-res-fte>{fteText(r.fte)}</dd>
-          </div>
-          <div>
-            <dt>Em horas de trabalho</dt>
-            <dd class="tabular"><span data-res="month">{brl(r.month)}</span> por mês</dd>
-          </div>
-          <div>
-            <dt>Em um ano</dt>
-            <dd class="tabular"><span data-res="year">{brl(r.year)}</span></dd>
-          </div>
-        </dl>
         <a class="btn btn-primary btn-block" href={initialMail} data-est-mail>
           <Icon name="mail" class="no-nudge" />
           <span>Mandar esta conta por <span class="nowrap">e-mail</span></span>
@@ -383,6 +372,8 @@ const share = stepper("share", "por cento");
 
   /* ---- A resposta ---- */
   .answer {
+    position: sticky;
+    top: calc(var(--header-h) + 1.5rem);
     display: grid;
     gap: var(--s-3);
     padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
@@ -436,32 +427,15 @@ const share = stepper("share", "por cento");
     transition: width var(--d-slow) var(--ease-out);
   }
 
-  .answer-of {
-    font-size: var(--t-sm);
+  .answer-prose {
+    margin-block: var(--s-2) var(--s-3);
+    font-size: var(--t-md);
+    line-height: 1.55;
     color: var(--ink-2);
   }
 
-  .answer-list {
-    display: grid;
-    margin-block: var(--s-2);
-    border-top: 1px solid rgb(42 20 48 / 0.14);
-  }
-
-  .answer-list div {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: var(--s-1) var(--s-4);
-    padding-block: var(--s-3);
-    border-bottom: 1px solid rgb(42 20 48 / 0.14);
-  }
-
-  .answer-list dt {
-    color: var(--ink-2);
-  }
-
-  .answer-list dd {
-    font-weight: 700;
+  .answer-prose strong {
+    color: var(--jabu);
   }
 
   .answer-note {
@@ -511,6 +485,10 @@ const share = stepper("share", "por cento");
   @media (max-width: 63.99rem) {
     .est-grid {
       grid-template-columns: 1fr;
+    }
+
+    .answer {
+      position: static;
     }
 
     .est-mini {

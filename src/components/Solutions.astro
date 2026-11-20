@@ -1,52 +1,44 @@
 ---
 /**
- * O que a Noxlabs faz: seis ofertas contadas pela rotina que mudam. Duas
- * colunas no desktop, uma no celular, cada oferta com uma peça de cor e
- * exemplos em texto corrido (nada de telas miúdas).
+ * O que a Noxlabs faz: seis ofertas como peças de um mosaico de cor, em
+ * xadrez de goiaba, caju e lilás. Cada peça diz a rotina que muda e três
+ * exemplos curtos; nada de telas miúdas.
  */
 import { site, talkMailto } from "../data/site";
 import { solutions } from "../data/solutions";
 import Icon from "./Icon.astro";
 
-const order = ["atendimento", "rotinas", "sistemas", "integracoes", "paineis", "diagnostico"];
+const order = ["atendimento", "rotinas", "sistemas", "paineis", "integracoes", "diagnostico"];
 const items = order.map((id) => solutions.find((s) => s.id === id)).filter((s) => s !== undefined);
-const tones = ["goiaba", "caju", "lila", "goiaba", "caju", "lila"];
+const tones = ["goiaba", "caju", "lila", "lila", "goiaba", "caju"];
 
-/** Partes do texto com "e-mail" protegido contra quebra no hífen. */
+/** "e-mail" protegido contra quebra no hífen. */
 const keep = (text: string) => text.split(/(e-mail)/);
-
-/** "a, b e c" em português. */
-const list = (xs: string[]) => (xs.length > 1 ? `${xs.slice(0, -1).join(", ")} e ${xs[xs.length - 1]}` : xs[0]);
 ---
 
 <section class="section solutions" id="solucoes" aria-labelledby="solucoes-title">
   <div class="wrap">
-    <header class="section-head" data-reveal>
+    <header class="section-head split" data-reveal>
       <h2 id="solucoes-title" class="section-title">O que eu faço</h2>
       <p class="section-lede">
-        Cada trabalho começa por uma rotina que já existe na sua empresa e termina com ela dando menos trabalho, menos espera
-        e menos erro.
+        Seis jeitos de tirar trabalho da equipe. Cada um começa por uma rotina que já existe na sua empresa.
       </p>
     </header>
 
-    <ul role="list" class="offers">
+    <ul role="list" class="pieces">
       {
         items.map((s, i) => (
-          <li class="offer" data-reveal style={`--i:${i % 2}`}>
-            <span class:list={["tile", `tile-${tones[i]}`, "offer-ico"]}>
+          <li class:list={["tile", `tile-${tones[i]}`, "offer"]} data-reveal style={`--i:${i % 3}`}>
+            <span class="offer-ico">
               <Icon name={s.icon} class="no-nudge" />
             </span>
-            <div class="offer-body">
-              <h3>{s.title}</h3>
-              <p>{s.promise}</p>
-              <p class="offer-ex">
-                <span>Por exemplo:</span>{" "}
-                {keep(list(s.examples.map((e) => e.charAt(0).toLowerCase() + e.slice(1)))).map((part) =>
-                  part === "e-mail" ? <span class="nowrap">e-mail</span> : part,
-                )}
-                .
-              </p>
-            </div>
+            <h3>{s.title}</h3>
+            <p class="offer-promise">{s.promise}</p>
+            <ul role="list" class="offer-ex" aria-label="Exemplos">
+              {s.examples.slice(0, 3).map((e) => (
+                <li>{keep(e).map((part) => (part === "e-mail" ? <span class="nowrap">e-mail</span> : part))}</li>
+              ))}
+            </ul>
           </li>
         ))
       }
@@ -64,19 +56,18 @@ const list = (xs: string[]) => (xs.length > 1 ? `${xs.slice(0, -1).join(", ")} e
 </section>
 
 <style>
-  .offers {
+  .pieces {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0 clamp(2rem, 5vw, 5rem);
-    border-top: 1px solid var(--line-2);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(0.6rem, 0.4rem + 0.6vw, 1rem);
   }
 
   .offer {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: var(--s-5);
-    padding-block: clamp(1.5rem, 1rem + 1.5vw, 2.25rem);
-    border-bottom: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    padding: clamp(1.5rem, 1rem + 1.5vw, 2.25rem);
+    color: var(--jabu);
   }
 
   .offer-ico {
@@ -84,8 +75,11 @@ const list = (xs: string[]) => (xs.length > 1 ? `${xs.slice(0, -1).join(", ")} e
     place-items: center;
     width: 3.5rem;
     height: 3.5rem;
-    border-radius: 16px;
-    color: var(--jabu);
+    margin-bottom: var(--s-3);
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--goiaba-ink);
+    box-shadow: var(--shadow-1);
   }
 
   .offer-ico :global(svg) {
@@ -93,26 +87,39 @@ const list = (xs: string[]) => (xs.length > 1 ? `${xs.slice(0, -1).join(", ")} e
     height: 1.6rem;
   }
 
-  .offer-body {
-    display: grid;
-    gap: var(--s-2);
-  }
-
   .offer h3 {
     font-size: var(--t-lg);
   }
 
-  .offer p {
+  .offer-promise {
     color: var(--ink-2);
   }
 
   .offer-ex {
+    display: grid;
+    gap: 0.35rem;
+    margin-top: auto;
+    padding-top: var(--s-3);
+    border-top: 1px solid rgb(42 20 48 / 0.14);
     font-size: var(--t-sm);
+    font-weight: 600;
+    color: var(--jabu);
   }
 
-  .offer-ex > span:first-child {
-    font-weight: 700;
-    color: var(--ink);
+  .offer-ex li {
+    position: relative;
+    padding-left: 1rem;
+  }
+
+  .offer-ex li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: var(--goiaba-ink);
   }
 
   .sol-foot {
@@ -124,20 +131,21 @@ const list = (xs: string[]) => (xs.length > 1 ? `${xs.slice(0, -1).join(", ")} e
     color: var(--ink-2);
   }
 
-  @media (max-width: 52rem) {
-    .offers {
-      grid-template-columns: 1fr;
+  @media (max-width: 63.99rem) {
+    .pieces {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
-  @media (max-width: 30rem) {
-    .offer {
-      gap: var(--s-4);
+  @media (max-width: 39.99rem) {
+    .pieces {
+      grid-template-columns: 1fr;
     }
 
     .offer-ico {
       width: 3rem;
       height: 3rem;
+      margin-bottom: var(--s-1);
     }
   }
 </style>

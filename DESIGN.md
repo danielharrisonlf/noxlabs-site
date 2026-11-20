@@ -78,18 +78,20 @@ são cor de texto sobre fundo claro.
 - **Seletor de ramos** (`Scenarios.astro`): abas com pictograma, na ordem loja, indústria e distribuidora, clínica,
   imobiliária, escola, escritório e serviços (chips roláveis no celular, setas do teclado, Home e End); celular de
   exemplo, "Hoje", "Com a Noxlabs" e "O que você ganha". Sem JS, os seis cenários aparecem em sequência.
-- **Ofertas** (`Solutions.astro`): seis linhas em duas colunas, cada uma com uma peça de cor e o ícone, título, promessa e
-  exemplos em texto corrido.
-- **Projetos** (`Work.astro`): recortes legíveis das telas reais (a conversa no celular; as consultas de hoje) numa
-  moldura branca sobre azulejo de cor; "Também construí" em quatro colunas, duas no tablet, faixa rolável com contador
-  no celular.
+- **Ofertas** (`Solutions.astro`): mosaico de seis peças em xadrez de goiaba, caju e lilás (3×2, 2×3 no tablet, uma
+  coluna no celular), cada uma com ícone num círculo branco, título, promessa e três exemplos.
+- **Projetos** (`Work.astro`): faixas alternadas, com o recorte legível da tela real (a mensagem no celular; três
+  consultas de hoje) em moldura branca sobre uma peça de cor ao lado do texto; "Também construí" em quatro peças de cor,
+  duas no tablet, faixa rolável com contador no celular.
 - **Dado de mercado** (`MarketData.astro`, `Stat.astro`): título fixo à esquerda e uma lista à direita; cada linha tem o
   número em goiaba-escuro, a frase e a fonte com link, ano e ressalva.
 - **A conta** (`Estimator.astro`): uma frase para completar ("Na minha empresa, 6 pessoas passam 6 horas por semana…"),
   com botões de menos e mais de 48 px e campos com teclado numérico; a resposta num azulejo goiaba-claro; premissas num
   bloco que abre; resumo fixo no celular.
-- **Como começa e contato** (`Contact.astro`): a única faixa escura; os quatro passos à esquerda e, à direita, o cartão
-  com o e-mail, a cópia do endereço e o roteiro que o e-mail já traz.
+- **Fecho** (`Contact.astro`): a única faixa escura. Quem cuida da sua rotina (foto do Daniel numa moldura goiaba e
+  texto curto), os quatro passos de como começa em peças, e o cartão de contato com o e-mail, a cópia do endereço e o
+  roteiro que o e-mail já traz.
+- **Perguntas** (`Faq.astro`): duas colunas de peças lilás que abrem em goiaba-claro.
 
 ## Celular
 
@@ -123,9 +125,10 @@ Pouco e com propósito; só `transform` e `opacity` (e `width` na barra da calcu
 
 ## Páginas
 
-Home: topo (mensagem no mosaico de ramos) → como funcionaria na sua empresa (seis ramos) → o que eu faço → feito por mim
-(projetos) → números do Sebrae → a conta da sua equipe → quem cuida da sua rotina → seus dados → antes de começar
-(perguntas) → como começa e contato → rodapé.
+Home: topo (mensagem no mosaico de ramos; cada peça abre o exemplo do ramo) → como funcionaria na sua empresa (nove
+ramos) → feito por mim (projetos) → o que eu faço (mosaico de seis peças) → números do Sebrae → a conta da sua equipe →
+antes de começar (perguntas em duas colunas) → seus dados → fecho escuro: quem cuida da sua rotina, como começa e
+contato → rodapé.
 
 `/casos/<slug>/` (ClinicFlow, WhatsApp Control Center, Kairos): cabeçalho com status e "serve para", captura, problema,
 o que o sistema faz, o que muda na rotina, rodapé técnico recolhido, outros casos, contato.

@@ -1,9 +1,10 @@
 ---
 /**
- * "Como funcionaria na sua empresa": seis ramos com o mesmo peso, cada um
+ * "Como funcionaria na sua empresa": nove ramos com o mesmo peso, cada um
  * com uma conversa de exemplo no celular, o antes, o depois e o ganho.
  * Com JS vira um seletor de abas (chips que rolam de lado no celular);
- * sem JS, os seis cenários aparecem um embaixo do outro.
+ * sem JS, os nove cenários aparecem um embaixo do outro. As peças do topo
+ * (links "#panel-<ramo>") escolhem o ramo e rolam até aqui.
  */
 import { scenarios } from "../data/sectors";
 import { talkMailto } from "../data/site";
@@ -143,6 +144,26 @@ const first = scenarios[0].id;
       }
       for (const p of panels) p.dataset.active = String(p.dataset.scenPanel === id);
     };
+
+    // Peças do topo (e links "#panel-<ramo>"): escolhe o ramo e rola até a seção.
+    const section = document.getElementById("na-sua-empresa");
+    const fromHash = () => {
+      const id = location.hash.match(/^#panel-([\w-]+)$/)?.[1];
+      if (!id || !tabs.some((t) => t.dataset.scenTab === id)) return false;
+      select(id);
+      section?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      return true;
+    };
+    for (const a of document.querySelectorAll<HTMLAnchorElement>("[data-scen-link]")) {
+      a.addEventListener("click", (event) => {
+        event.preventDefault();
+        history.replaceState(null, "", `#panel-${a.dataset.scenLink}`);
+        fromHash();
+        tabs.find((t) => t.dataset.scenTab === a.dataset.scenLink)?.focus({ preventScroll: true });
+      });
+    }
+    window.addEventListener("hashchange", fromHash);
+    fromHash();
 
     for (const t of tabs) {
       t.addEventListener("click", () => select(t.dataset.scenTab ?? ""));

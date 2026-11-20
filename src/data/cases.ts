@@ -15,6 +15,8 @@ export type CaseImage = {
   height: number;
   alt: string;
   caption: string;
+  /** Tela de celular, em pé: a página mostra mais estreita e sem variações de tamanho. */
+  portrait?: boolean;
 };
 
 /** Variações 720 e 1080 px geradas ao lado da original (mesma origem, ver PRODUCT.md). */
@@ -79,9 +81,9 @@ export const clinicflow: CaseStudy = {
   },
   thumb: {
     src: "/img/clinicflow-consultas.webp",
-    width: 770,
-    height: 440,
-    alt: "Consultas de hoje no ClinicFlow: horário, paciente, estado (em atendimento, aguardando 18 min, confirmada, a confirmar) e o botão do próximo passo.",
+    width: 556,
+    height: 196,
+    alt: "Três consultas de hoje no ClinicFlow, com horário, paciente e estado: em atendimento, aguardando há 18 minutos, confirmada.",
   },
   links: [],
   tech: [
@@ -114,16 +116,17 @@ export const whatsapp: CaseStudy = {
     "Problema de envio aparece com a causa, não some em silêncio.",
   ],
   image: {
-    src: "/img/whatsapp-editor.webp",
-    width: 1232,
-    height: 800,
-    alt: "Editor de mensagem pronta do WhatsApp Control Center: formulário com conta, idioma, nome e categoria à esquerda, e prévia da mensagem num celular à direita.",
-    caption: "Editor de mensagens prontas com prévia, em conta de demonstração.",
+    src: "/img/whatsapp-tela.webp",
+    width: 384,
+    height: 540,
+    alt: "Prévia no celular de uma mensagem pronta, como o cliente vai ver: “Olá! Seu pedido foi confirmado. Estamos preparando tudo para você. Acompanhe as atualizações por aqui.”",
+    caption: "Prévia de uma mensagem pronta no editor, em conta de demonstração.",
+    portrait: true,
   },
   thumb: {
     src: "/img/whatsapp-celular.webp",
     width: 344,
-    height: 300,
+    height: 150,
     alt: "Prévia no celular de uma mensagem pronta: “Olá! Seu pedido foi confirmado. Estamos preparando tudo para você.”",
   },
   links: [],

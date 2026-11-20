@@ -28,12 +28,12 @@ export const security: { icon: IconName; title: string; text: string }[] = [
   {
     icon: "lock",
     title: "Cada pessoa vê só o que precisa",
-    text: "Acesso por pessoa e por função, que você retira quando alguém sai da equipe.",
+    text: "O desenho prevê acesso por pessoa e por função, que você retira quando alguém sai da equipe.",
   },
   {
     icon: "eye",
-    title: "Tudo fica registrado",
-    text: "Quem fez o quê e quando, inclusive o que o assistente de IA fez.",
+    title: "Registro do que foi feito",
+    text: "O desenho prevê guardar quem fez o quê e quando, inclusive o que o assistente de IA fez.",
   },
   {
     icon: "person",
@@ -77,7 +77,7 @@ export const faq = [
     q: "Minha equipe vai conseguir usar?",
     a: [
       "A ideia é que a equipe faça menos coisas, não aprenda mais telas. Boa parte das automações roda sem ninguém abrir nada: a pessoa só recebe o que precisa conferir.",
-      "Quando há tela nova, ela é desenhada com quem vai usar e vem com um guia curto e acompanhamento no começo, no formato combinado na proposta.",
+      "Quando há tela nova, ela é desenhada com quem vai usar. Guia de uso e acompanhamento no começo são combinados na proposta.",
     ],
   },
   {
@@ -97,7 +97,7 @@ export const faq = [
   {
     q: "E depois da entrega, quem cuida?",
     a: [
-      "Você escolhe: eu sigo cuidando de ajustes, atualizações e novas rotinas no formato que combinarmos, ou a sua equipe de TI assume com documentação e uma passagem acompanhada.",
+      "Isso se combina na proposta. A ideia é que você possa escolher entre eu continuar com ajustes e novas rotinas ou a sua equipe de TI assumir, com documentação.",
     ],
   },
   {
