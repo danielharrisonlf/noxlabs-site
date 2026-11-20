@@ -11,6 +11,7 @@ export const finePointer = () => window.matchMedia("(hover: hover) and (pointer:
 export function revealFallback() {
   const root = document.documentElement;
   if (!root.classList.contains("reveal-io")) return;
+  root.classList.add("reveal-ready");
   const items = document.querySelectorAll<HTMLElement>("[data-reveal]");
   if (!("IntersectionObserver" in window)) {
     for (const el of items) el.classList.add("is-in");

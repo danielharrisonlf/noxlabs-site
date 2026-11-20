@@ -101,19 +101,20 @@ import Icon from "./Icon.astro";
     // Indicador que desliza até a aba escolhida: barra vertical no desktop, traço sob o chip no celular.
     const moveIndicator = () => {
       const tab = root.querySelector<HTMLElement>('[aria-selected="true"]');
-      if (!tab || !ind) return;
-      ind.style.setProperty("--ty", `${tab.offsetTop}px`);
+      if (!tab || !ind || !list) return;
+      const at = offsetIn(tab, list);
+      ind.style.setProperty("--ty", `${at.y}px`);
       ind.style.setProperty("--th", `${tab.offsetHeight / 100}`);
-      ind.style.setProperty("--tx", `${tab.offsetLeft}px`);
+      ind.style.setProperty("--tx", `${at.x}px`);
       ind.style.setProperty("--tw", `${tab.offsetWidth / 100}`);
       ind.dataset.on = "true";
     };
 
-    const offsetIn = (el: HTMLElement) => {
+    const offsetIn = (el: HTMLElement, stop: HTMLElement = root) => {
       let x = 0;
       let y = 0;
       let node: HTMLElement | null = el;
-      while (node && node !== root) {
+      while (node && node !== stop) {
         x += node.offsetLeft;
         y += node.offsetTop;
         node = node.offsetParent as HTMLElement | null;
@@ -162,7 +163,7 @@ import Icon from "./Icon.astro";
         // No celular, o chip escolhido vem para dentro da faixa rolável.
         const tab = root.querySelector<HTMLElement>('[aria-selected="true"]');
         if (source !== "init" && scroller && tab && !wide.matches) {
-          const left = tab.offsetLeft - (scroller.clientWidth - tab.offsetWidth) / 2;
+          const left = offsetIn(tab, scroller).x - (scroller.clientWidth - tab.offsetWidth) / 2;
           scroller.scrollTo({ left, behavior: reducedMotion() ? "auto" : "smooth" });
         }
       },

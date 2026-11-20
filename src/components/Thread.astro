@@ -41,8 +41,11 @@ const sections = ["servicos", "kairos", "casos", "processo", "sobre", "perguntas
       if (!main || !content) return;
       // O fio corre no meio da margem esquerda do conteúdo.
       const gutter = content.getBoundingClientRect().left + parseFloat(getComputedStyle(content).paddingLeft);
-      const x = Math.max(gutter / 2, 14);
+      // Ancorado ao conteúdo: a até 44 px da borda do texto, nunca colado na janela.
+      const anchor = Math.max(gutter - Math.min(44, gutter / 2), 14);
+      const x = 40;
       const amp = Math.min(gutter * 0.28, 22);
+      svg.style.left = `${anchor - x}px`;
       const tops = ids
         .map((id) => document.getElementById(id))
         .filter((el): el is HTMLElement => el !== null)
@@ -67,8 +70,8 @@ const sections = ["servicos", "kairos", "casos", "processo", "sobre", "perguntas
         prev = y;
       });
       const height = prev + 40;
-      svg.setAttribute("viewBox", `0 0 ${Math.ceil(x * 2)} ${Math.ceil(height)}`);
-      svg.style.width = `${Math.ceil(x * 2)}px`;
+      svg.setAttribute("viewBox", `0 0 ${x * 2} ${Math.ceil(height)}`);
+      svg.style.width = `${x * 2}px`;
       svg.style.height = `${Math.ceil(height)}px`;
       for (const p of paths) p.setAttribute("d", d);
 

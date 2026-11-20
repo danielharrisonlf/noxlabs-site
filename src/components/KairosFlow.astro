@@ -63,37 +63,37 @@ const wideEdges = [
   { step: 6, d: "M 180 245 C 240 350, 700 330, 820 385" },
 ];
 
-/* Composição estreita: zigue-zague em duas colunas, rótulos para fora. */
+/* Composição estreita: zigue-zague compacto em duas colunas, rótulos para fora. */
 const tall: Record<string, Placement> = {
-  voce: { x: 50, y: 50, lx: 36, ly: 86, anchor: "start" },
-  agente: { x: 290, y: 50, lx: 306, ly: 86, anchor: "end" },
-  gateway: { x: 290, y: 150, lx: 306, ly: 186, anchor: "end" },
-  mcp: { x: 50, y: 150, lx: 36, ly: 186, anchor: "start" },
-  projetos: { x: 50, y: 250, lx: 36, ly: 286, anchor: "start" },
-  banco: { x: 290, y: 250, lx: 306, ly: 286, anchor: "end" },
-  relay: { x: 290, y: 350, lx: 266, ly: 347, anchor: "end" },
-  filas: { x: 170, y: 430, lx: 148, ly: 427, anchor: "end" },
-  realtime: { x: 50, y: 520, lx: 50, ly: 556, anchor: "middle" },
-  notif: { x: 170, y: 520, lx: 170, ly: 556, anchor: "middle" },
-  audit: { x: 290, y: 520, lx: 290, ly: 556, anchor: "middle" },
+  voce: { x: 50, y: 40, lx: 36, ly: 74, anchor: "start" },
+  agente: { x: 290, y: 40, lx: 306, ly: 74, anchor: "end" },
+  gateway: { x: 290, y: 120, lx: 306, ly: 154, anchor: "end" },
+  mcp: { x: 50, y: 120, lx: 36, ly: 154, anchor: "start" },
+  projetos: { x: 50, y: 200, lx: 36, ly: 234, anchor: "start" },
+  banco: { x: 290, y: 200, lx: 306, ly: 234, anchor: "end" },
+  relay: { x: 290, y: 280, lx: 266, ly: 277, anchor: "end" },
+  filas: { x: 170, y: 345, lx: 148, ly: 342, anchor: "end" },
+  realtime: { x: 50, y: 420, lx: 50, ly: 454, anchor: "middle" },
+  notif: { x: 170, y: 420, lx: 170, ly: 454, anchor: "middle" },
+  audit: { x: 290, y: 420, lx: 290, ly: 454, anchor: "middle" },
 };
 
 const tallEdges = [
-  { step: 1, d: "M 50 50 C 130 15, 210 15, 290 50" },
-  { step: 2, d: "M 290 50 C 340 50, 340 150, 290 150" },
-  { step: 2, d: "M 290 150 C 210 115, 130 115, 50 150" },
-  { step: 3, d: "M 50 150 C 0 150, 0 250, 50 250" },
-  { step: 4, d: "M 50 250 C 130 215, 210 215, 290 250" },
-  { step: 5, d: "M 290 250 C 340 250, 340 350, 290 350" },
-  { step: 5, d: "M 290 350 C 290 400, 220 430, 170 430" },
-  { step: 6, d: "M 170 430 C 170 480, 50 470, 50 520" },
-  { step: 6, d: "M 170 430 L 170 520" },
-  { step: 6, d: "M 170 430 C 170 480, 290 470, 290 520" },
+  { step: 1, d: "M 50 40 C 130 15, 210 15, 290 40" },
+  { step: 2, d: "M 290 40 C 335 40, 335 120, 290 120" },
+  { step: 2, d: "M 290 120 C 210 95, 130 95, 50 120" },
+  { step: 3, d: "M 50 120 C 5 120, 5 200, 50 200" },
+  { step: 4, d: "M 50 200 C 130 175, 210 175, 290 200" },
+  { step: 5, d: "M 290 200 C 335 200, 335 280, 290 280" },
+  { step: 5, d: "M 290 280 C 290 320, 220 345, 170 345" },
+  { step: 6, d: "M 170 345 C 170 385, 50 380, 50 420" },
+  { step: 6, d: "M 170 345 L 170 420" },
+  { step: 6, d: "M 170 345 C 170 385, 290 380, 290 420" },
 ];
 
 const layouts = [
   { cls: "kf-wide", viewBox: "0 0 1040 462", place: wide, edges: wideEdges, r: 15 },
-  { cls: "kf-tall", viewBox: "0 0 352 590", place: tall, edges: tallEdges, r: 13 },
+  { cls: "kf-tall", viewBox: "0 0 352 482", place: tall, edges: tallEdges, r: 13 },
 ] as const;
 
 const total = kairosFlow.length;
@@ -345,9 +345,12 @@ const total = kairosFlow.length;
       timer = window.setTimeout(tick, STEP_MS);
     });
 
-    // Na primeira vez que o palco aparece inteiro, o caminho se reproduz sozinho
-    // (com pausa à mão). Com movimento reduzido, fica parado no primeiro passo.
+    // Na primeira vez que o palco aparece (no celular, quando o texto do passo
+    // também está na tela), o caminho se reproduz sozinho, com pausa à mão.
+    // Com movimento reduzido, fica parado no primeiro passo.
     if (!reduce.matches && "IntersectionObserver" in window) {
+      const narrow = window.matchMedia("(max-width: 63.99rem)").matches;
+      const target = narrow ? root.querySelector(".kf-panels") : root.querySelector(".kf-canvas");
       const io = new IntersectionObserver(
         (entries) => {
           if (!entries.some((e) => e.isIntersecting)) return;
@@ -357,9 +360,14 @@ const total = kairosFlow.length;
           setPlaying(true);
           timer = window.setTimeout(tick, STEP_MS);
         },
-        { threshold: 0.55 },
+        { threshold: narrow ? 0.95 : 0.55 },
       );
-      io.observe(root.querySelector(".kf-canvas") ?? root);
+      io.observe(target ?? root);
+
+      // Fora da tela, a reprodução para de verdade (o relógio também).
+      new IntersectionObserver((entries) => {
+        if (entries.some((e) => !e.isIntersecting) && playing) setPlaying(false);
+      }).observe(root);
     }
   }
 </script>
@@ -881,8 +889,33 @@ const total = kairosFlow.length;
       white-space: nowrap;
     }
 
+    /* O texto do passo vem logo abaixo do diagrama; trilho e controles depois. */
+    .kf-console {
+      display: flex;
+      flex-direction: column;
+      padding-top: var(--s-4);
+    }
+
     .kf-body {
-      grid-template-columns: 1fr;
+      display: contents;
+    }
+
+    .kf-panels {
+      order: 1;
+    }
+
+    .kf-rail {
+      order: 2;
+      margin-top: var(--s-5);
+    }
+
+    .kf-track {
+      order: 3;
+    }
+
+    .kf-controls {
+      order: 4;
+      margin-top: var(--s-4);
     }
 
     .kf-panel {
@@ -901,9 +934,7 @@ const total = kairosFlow.length;
       margin-top: var(--s-3);
     }
 
-    .kf-controls {
-      order: -1;
-    }
+
   }
 
   @media (max-width: 30rem) {

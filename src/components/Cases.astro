@@ -450,5 +450,13 @@ const folded = moreCases.slice(4);
     .more-list {
       grid-template-columns: 1fr;
     }
+
+    /* No celular a captura inteira fica ilegível: mostra o canto de cima, maior. */
+    .case-frame img {
+      aspect-ratio: 4 / 3.2;
+      height: auto;
+      object-fit: cover;
+      object-position: top left;
+    }
   }
 </style>

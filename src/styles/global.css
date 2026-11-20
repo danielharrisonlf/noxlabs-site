@@ -242,6 +242,13 @@ html {
   }
 }
 
+/* Celular: âncoras e foco não ficam sob o CTA da base. */
+@media (max-width: 39.99rem) {
+  html {
+    scroll-padding-bottom: 5.5rem;
+  }
+}
+
 @media (min-width: 120rem) {
   :root {
     --max: 88rem;
@@ -751,6 +758,10 @@ code {
   html.reveal-io [data-reveal]:not(.is-in) {
     opacity: 0;
     translate: var(--rv-x, 0) var(--rv-y, 36px);
+  }
+
+  /* Trava: se o script do fallback não rodar em 4 s, tudo aparece. */
+  html.reveal-io:not(.reveal-ready) [data-reveal]:not(.is-in) {
     animation: rv-failsafe 1ms 4s forwards;
   }
 

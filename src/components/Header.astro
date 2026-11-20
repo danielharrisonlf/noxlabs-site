@@ -41,9 +41,9 @@ import Logo from "./Logo.astro";
           </button>
         </div>
       </div>
-      <svg class="menu-trails" viewBox="0 0 400 300" preserveAspectRatio="xMaxYMax slice" aria-hidden="true">
-        <path d="M 420 120 C 300 160, 180 260, -20 300" pathLength="1"></path>
-        <path d="M 420 170 C 320 200, 200 280, 40 330" pathLength="1"></path>
+      <svg class="menu-trails" viewBox="0 0 400 200" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M -10 170 C 120 160, 260 90, 410 40" pathLength="1"></path>
+        <path d="M -10 140 C 140 135, 280 70, 410 20" pathLength="1"></path>
       </svg>
     </nav>
 
@@ -224,7 +224,6 @@ import Logo from "./Logo.astro";
     padding: calc(0.75rem + env(safe-area-inset-top)) max(var(--gutter), env(safe-area-inset-right)) 0
       max(var(--gutter), env(safe-area-inset-left));
     pointer-events: none;
-    view-transition-name: site-header;
   }
 
   .header-pill {
@@ -559,8 +558,7 @@ import Logo from "./Logo.astro";
     .menu-foot {
       display: grid;
       gap: var(--s-4);
-      margin-top: auto;
-      padding-top: var(--s-7);
+      padding-top: var(--s-4);
     }
 
     .menu-row {
@@ -583,15 +581,20 @@ import Logo from "./Logo.astro";
       border: 1px solid var(--line-2);
     }
 
+    /* Os rastros ocupam o vão entre a lista e o CTA, sem passar por cima de nada. */
     .menu-trails {
       display: block;
-      position: absolute;
-      right: 0;
-      bottom: 0;
-      width: min(100%, 28rem);
-      height: 16rem;
+      flex: 1 1 0;
+      width: calc(100% + 2 * var(--gutter));
+      min-height: 0;
+      max-height: 18rem;
+      margin-inline: calc(-1 * var(--gutter));
       pointer-events: none;
-      z-index: -1;
+      order: 1;
+    }
+
+    .menu-foot {
+      order: 2;
     }
 
     .menu-trails path {

@@ -51,12 +51,12 @@ const tall: Layout = {
     { x: 70, y: 330, tone: "sodio" },
   ],
   trails: [
-    { d: "M -60 480 C 0 380, 20 140, 70 50", tone: "sodio", lead: true },
-    { d: "M -20 480 C 30 390, 40 150, 70 50", tone: "freio" },
-    { d: "M -40 480 C 10 400, 30 270, 70 190", tone: "mercurio", lead: true },
-    { d: "M 0 480 C 40 410, 50 280, 70 190", tone: "sodio" },
-    { d: "M -20 480 C 20 430, 40 370, 70 330", tone: "freio", lead: true },
-    { d: "M 20 480 C 50 440, 55 380, 70 330", tone: "mercurio" },
+    { d: "M -60 600 C 0 420, 20 140, 70 50", tone: "sodio", lead: true },
+    { d: "M -20 600 C 30 430, 40 150, 70 50", tone: "freio" },
+    { d: "M -40 600 C 10 440, 30 270, 70 190", tone: "mercurio", lead: true },
+    { d: "M 0 600 C 40 450, 50 280, 70 190", tone: "sodio" },
+    { d: "M -20 600 C 20 470, 40 370, 70 330", tone: "freio", lead: true },
+    { d: "M 20 600 C 50 480, 55 380, 70 330", tone: "mercurio" },
   ],
   ambient: [],
 };
@@ -74,6 +74,12 @@ const at = (i: number) =>
 ---
 
 <section class="hero grain" aria-labelledby="hero-title" data-hero>
+  <!-- Céu do celular e do tablet: três rastros finos sobem pela direita, atrás do título. -->
+  <svg class="hero-sky" viewBox="0 0 390 844" preserveAspectRatio="xMaxYMin slice" aria-hidden="true" focusable="false">
+    <path class="tone-sodio" d="M 500 900 C 390 660, 440 400, 368 70" pathLength="1"></path>
+    <path class="tone-freio" d="M 540 860 C 430 640, 470 380, 400 40" pathLength="1"></path>
+    <path class="tone-mercurio" d="M 470 940 C 370 720, 400 480, 340 190" pathLength="1"></path>
+  </svg>
   <div class="wrap hero-grid">
     <div class="hero-copy">
       <h1 id="hero-title">Software e IA que saem do papel e ficam no ar.</h1>
@@ -155,18 +161,24 @@ const at = (i: number) =>
   if (hero && exposure && !reducedMotion()) {
     pauseOffscreen(hero);
 
-    // "49" conta de 0 até 49 quando a prova acende.
+    // "49" sobe de 30 até 49 quando a prova aparece na tela (uma vez).
     const counter = exposure.querySelector<HTMLElement>("[data-count]");
-    if (counter) {
+    if (counter && "IntersectionObserver" in window) {
       const target = Number(counter.dataset.count);
-      counter.textContent = "0";
-      const start = performance.now() + 2700;
-      const tick = (now: number) => {
-        const t = Math.min(Math.max((now - start) / 1100, 0), 1);
-        counter.textContent = String(Math.round(target * (1 - (1 - t) ** 3)));
-        if (t < 1) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
+      const from = 30;
+      const io = new IntersectionObserver((entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        const start = performance.now() + 350;
+        const tick = (now: number) => {
+          const t = Math.min(Math.max((now - start) / 900, 0), 1);
+          counter.textContent = String(Math.round(from + (target - from) * (1 - (1 - t) ** 3)));
+          if (t < 1) requestAnimationFrame(tick);
+        };
+        counter.textContent = String(from);
+        requestAnimationFrame(tick);
+      });
+      io.observe(counter);
     }
 
     // No desktop, o céu responde ao ponteiro: camadas em profundidades diferentes
@@ -218,6 +230,48 @@ const at = (i: number) =>
       linear-gradient(180deg, var(--sky-top), var(--sky-mid) 50%, var(--sky-low) 88%, var(--bg));
   }
 
+  /* O céu termina exatamente no fundo da página: os rastros se dissolvem na borda. */
+  .hero {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .hero::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    height: calc(clamp(2.5rem, 5vw, 5rem) + 3rem);
+    background: linear-gradient(to bottom, transparent, var(--bg));
+    pointer-events: none;
+  }
+
+  .hero-sky {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: min(100svh, 56rem);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .hero-sky path {
+    fill: none;
+    stroke: var(--c);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    opacity: 0.45;
+  }
+
+  @media (min-width: 64rem) {
+    .hero-sky {
+      display: none;
+    }
+  }
+
   .hero-grid {
     display: grid;
     grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
@@ -228,7 +282,7 @@ const at = (i: number) =>
 
   .hero-copy {
     position: relative;
-    z-index: 2;
+    z-index: 3;
     display: flex;
     flex-direction: column;
   }
@@ -277,7 +331,6 @@ const at = (i: number) =>
     --px: 0;
     --py: 0;
     position: relative;
-    z-index: 1;
     width: 100%;
     max-width: 32.5rem;
     aspect-ratio: 520 / 620;
@@ -359,6 +412,7 @@ const at = (i: number) =>
   .proofs {
     position: absolute;
     inset: 0;
+    z-index: 2;
   }
 
   .proofs li {
@@ -404,8 +458,13 @@ const at = (i: number) =>
     .trail path:not(.packet),
     .ambient path {
       stroke-dasharray: 1000;
-      animation: trail-draw 2.2s var(--ease-out) both;
-      animation-delay: calc(150ms + var(--i, 0) * 110ms);
+      animation: trail-draw 1.8s var(--ease-out) both;
+      animation-delay: calc(80ms + var(--i, 0) * 70ms);
+    }
+
+    .hero-sky path {
+      stroke-dasharray: 1;
+      animation: sky-draw 2.4s var(--ease-out) 200ms both;
     }
 
     .ambient path {
@@ -416,29 +475,29 @@ const at = (i: number) =>
           vez, em intervalos longos; os pontos respiram devagar. */
     .trail .packet {
       animation:
-        packet-run 1.7s var(--ease-in-out) calc(1.2s + var(--i) * 140ms) both,
-        packet-loop 9s linear calc(4.5s + var(--i) * 1.5s) infinite;
+        packet-run 1.4s var(--ease-in-out) calc(0.5s + var(--i) * 120ms) both,
+        packet-loop 9s linear calc(3.5s + var(--i) * 1.5s) infinite;
     }
 
     .node {
       transform-box: fill-box;
       transform-origin: center;
-      animation: node-on 900ms var(--ease-out) calc(2.6s + var(--i) * 280ms) both;
+      animation: node-on 700ms var(--ease-out) calc(0.9s + var(--i) * 140ms) both;
     }
 
     .node-halo {
       transform-box: fill-box;
       transform-origin: center;
-      animation: node-breathe 5.2s ease-in-out calc(3.6s + var(--i) * 0.9s) infinite;
+      animation: node-breathe 5.2s ease-in-out calc(2.4s + var(--i) * 0.9s) infinite;
     }
 
     .proofs li {
-      animation: proof-in 900ms var(--ease-out) both;
-      animation-delay: calc(2.5s + var(--i) * 280ms);
+      animation: proof-in 600ms var(--ease-out) both;
+      animation-delay: calc(0.35s + var(--i) * 140ms);
     }
 
     /* Fora da tela, nada corre. */
-    .hero.is-offscreen :is(.packet, .node-halo) {
+    .hero.is-offscreen :is(.packet, .node-halo, .hero-sky path) {
       animation-play-state: paused;
     }
 
@@ -467,16 +526,18 @@ const at = (i: number) =>
 
     /* 4. Rolagem: o céu se afasta em profundidade enquanto o texto sobe. */
     @supports (animation-timeline: scroll()) {
-      .exposure {
-        animation: hero-depth linear both;
-        animation-timeline: scroll(root);
-        animation-range: 0 100svh;
-      }
+      @media (min-width: 64rem) {
+        .exposure .trails {
+          animation: hero-depth linear both;
+          animation-timeline: scroll(root);
+          animation-range: 0 100svh;
+        }
 
-      .hero-copy {
-        animation: hero-lift linear both;
-        animation-timeline: scroll(root);
-        animation-range: 0 100svh;
+        .hero-copy {
+          animation: hero-lift linear both;
+          animation-timeline: scroll(root);
+          animation-range: 0 100svh;
+        }
       }
     }
   }
@@ -544,8 +605,17 @@ const at = (i: number) =>
 
   @keyframes proof-in {
     from {
-      opacity: 0.25;
-      translate: -8px 0;
+      opacity: 0;
+      translate: -10px 0;
+    }
+  }
+
+  @keyframes sky-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
     }
   }
 
@@ -583,41 +653,20 @@ const at = (i: number) =>
     }
   }
 
-  /* Tablet retrato (768–1023): texto e provas lado a lado, provas compactas. */
-  @media (min-width: 48rem) and (max-width: 63.99rem) {
-    .hero-grid {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      min-height: 0;
-    }
-
-    .hero h1 {
-      font-size: clamp(2.4rem, 0.8rem + 5vw, 3.25rem);
-    }
-
-    .exposure {
-      justify-self: stretch;
-    }
-
-    .proof-title {
-      font-size: 1.125rem;
-    }
-
-    .proof-text {
-      font-size: 0.8125rem;
-      line-height: 1.4;
-    }
-  }
-
-  /* Tablet pequeno (600–767): uma coluna; provas sob os botões, como no celular. */
-  @media (min-width: 40rem) and (max-width: 47.99rem) {
+  /* Tablet (640–1023): uma coluna, como no celular, com mais ar; provas sob os botões. */
+  @media (min-width: 40rem) and (max-width: 63.99rem) {
     .hero-grid {
       grid-template-columns: 1fr;
       min-height: 0;
     }
 
+    .hero h1 {
+      font-size: clamp(3rem, 1rem + 6vw, 4.5rem);
+    }
+
     .exposure {
       justify-self: start;
-      max-width: 28rem;
+      max-width: 30rem;
     }
   }
 
@@ -658,6 +707,7 @@ const at = (i: number) =>
 
     .hero-actions .btn {
       width: 100%;
+      max-width: 26rem;
     }
 
     .exposure {
@@ -702,7 +752,7 @@ const at = (i: number) =>
   /* Paisagem baixa (celular deitado): menos respiro no topo. */
   @media (max-height: 30rem) and (orientation: landscape) {
     .hero {
-      padding-top: calc(var(--header-h) + 0.5rem);
+      padding-top: calc(var(--header-h) + 1.5rem);
     }
 
     .hero h1 {
