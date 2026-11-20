@@ -16,8 +16,8 @@ const trails = [
     {
       trails.map((t) => (
         <g class={`tone-${t.tone}`}>
-          <path class="ct-glow" d={t.d} />
-          <path class="ct-core" d={t.d} />
+          <path class="ct-glow" d={t.d} pathLength="1" />
+          <path class="ct-core" d={t.d} pathLength="1" />
         </g>
       ))
     }
@@ -25,13 +25,13 @@ const trails = [
 
   <div class="wrap contact-grid">
     <div class="contact-copy">
-      <h2 id="contato-title">Traga o problema. Saia com um próximo passo.</h2>
-      <p class="contact-lede">
+      <h2 id="contato-title" data-reveal="head">Traga o problema. Saia com um próximo passo.</h2>
+      <p class="contact-lede" data-reveal style="--i:1">
         Escreva em poucas linhas o que está travando: um processo manual, um sistema lento, uma ideia de produto, uma conta
         de nuvem alta. Eu leio e respondo pessoalmente para marcarmos os 30 minutos.
       </p>
 
-      <div class="contact-actions">
+      <div class="contact-actions" data-reveal style="--i:2" data-cta-anchor>
         <a class="btn btn-primary" href={site.diagnosisMailto}>
           Escrever o e-mail
           <Icon name="mail" class="no-nudge" />
@@ -56,7 +56,7 @@ const trails = [
       <p class="contact-status" role="status" aria-live="polite" data-copy-status></p>
     </div>
 
-    <aside class="letter" aria-labelledby="letter-title">
+    <aside class="letter" aria-labelledby="letter-title" data-reveal="tilt" style="--i:1">
       <h3 id="letter-title">O e-mail já abre com este roteiro</h3>
       <p class="letter-subject">
         <span>Assunto</span>
@@ -134,6 +134,27 @@ const trails = [
     --c: var(--mercurio);
   }
 
+  /* Os rastros do pé do bloco se desenham enquanto o contato entra na tela. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .contact-trails path {
+        stroke-dasharray: 1;
+        animation: ct-draw linear both;
+        animation-timeline: view();
+        animation-range: entry 0% cover 55%;
+      }
+    }
+  }
+
+  @keyframes ct-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
   .ct-glow {
     stroke-width: 10;
     opacity: calc(var(--trail-glow) * 0.6);
@@ -191,6 +212,48 @@ const trails = [
   [data-copied="true"] .check-icon {
     display: inline-flex;
     color: var(--sodio);
+  }
+
+  /* Confirmação: o visto se desenha e um anel de luz sai do botão. */
+  @media (prefers-reduced-motion: no-preference) {
+    [data-copied="true"] .check-icon :global(path) {
+      stroke-dasharray: 22;
+      animation: check-draw 420ms var(--ease-out) both;
+    }
+
+    [data-copied="true"] {
+      animation: copy-ring 700ms var(--ease-out);
+    }
+
+    [data-copied="true"] [data-copy-label] {
+      display: inline-block;
+      animation: copy-label 360ms var(--ease-out);
+    }
+  }
+
+  @keyframes check-draw {
+    from {
+      stroke-dashoffset: 22;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes copy-ring {
+    from {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--sodio) 60%, transparent);
+    }
+    to {
+      box-shadow: 0 0 0 14px transparent;
+    }
+  }
+
+  @keyframes copy-label {
+    from {
+      opacity: 0;
+      translate: 0 6px;
+    }
   }
 
   .contact-email a {

@@ -1,5 +1,5 @@
 ---
-import { clinicflow, moreCases, whatsapp } from "../data/cases";
+import { clinicflow, moreCases, srcset, whatsapp } from "../data/cases";
 import Icon from "./Icon.astro";
 
 const pair = [clinicflow, whatsapp];
@@ -11,7 +11,7 @@ const folded = moreCases.slice(4);
 <section class="section cases" id="casos" aria-labelledby="casos-title">
   <div class="wrap">
     <div class="pair">
-      <header class="cases-head">
+      <header class="cases-head" data-reveal="head">
         <h2 id="casos-title" class="section-title">Casos que você pode abrir.</h2>
         <p class="section-lede">
           Sem logo de cliente nem depoimento inventado. São sistemas que construí, com código aberto sempre que possível e
@@ -21,11 +21,18 @@ const folded = moreCases.slice(4);
 
       {
         pair.map((c, i) => (
-          <article class:list={["case", `case-${i + 1}`]} aria-labelledby={`${c.slug}-title`}>
+          <article
+            class:list={["case", `case-${i + 1}`]}
+            aria-labelledby={`${c.slug}-title`}
+            data-reveal="tilt"
+            style={`--i:${i}`}
+          >
             {c.image && (
-              <a class="case-frame" href={`/casos/${c.slug}/`} tabindex="-1" aria-hidden="true">
+              <a class="case-frame" href={`/casos/${c.slug}/`} tabindex="-1" aria-hidden="true" data-tilt>
                 <img
                   src={c.image.src}
+                  srcset={srcset(c.image.src, c.image.width)}
+                  sizes="(min-width: 64rem) 46vw, 92vw"
                   width={c.image.width}
                   height={c.image.height}
                   alt=""
@@ -33,11 +40,14 @@ const folded = moreCases.slice(4);
                   decoding="async"
                   style={`view-transition-name: shot-${c.slug}`}
                 />
+                <span class="case-glare" aria-hidden="true"></span>
               </a>
             )}
             <div class="case-meta">
               <h3 id={`${c.slug}-title`}>
-                <a href={`/casos/${c.slug}/`}>{c.name}</a>
+                <a href={`/casos/${c.slug}/`} style={`view-transition-name: title-${c.slug}`}>
+                  {c.name}
+                </a>
               </h3>
               <p class="case-summary">{c.summary}</p>
               <p class="case-proves">Serviço relacionado: {c.proves}</p>
@@ -55,8 +65,8 @@ const folded = moreCases.slice(4);
       <h3 class="more-title">Também construí</h3>
       <ul class="more-list" role="list">
         {
-          shown.map((c) => (
-            <li class="more-item">
+          shown.map((c, i) => (
+            <li class="more-item" data-reveal style={`--i:${i % 2}`}>
               <div class="more-top">
                 <p class="more-name">{c.name}</p>
                 <p class:list={["more-vis", c.visibility === "público" ? "is-public" : "is-private"]}>
@@ -114,6 +124,45 @@ const folded = moreCases.slice(4);
   </div>
 </section>
 
+<script>
+  import { finePointer, reducedMotion } from "../scripts/motion";
+
+  // Moldura inclina levemente para o ponteiro e um reflexo segue o cursor (desktop).
+  if (finePointer() && !reducedMotion()) {
+    for (const frame of document.querySelectorAll<HTMLElement>("[data-tilt]")) {
+      let raf = 0;
+      let rx = 0;
+      let ry = 0;
+      let gx = 50;
+      let gy = 50;
+      const apply = () => {
+        raf = 0;
+        frame.style.setProperty("--rx", `${rx}deg`);
+        frame.style.setProperty("--ry", `${ry}deg`);
+        frame.style.setProperty("--gx", `${gx}%`);
+        frame.style.setProperty("--gy", `${gy}%`);
+      };
+      frame.addEventListener("pointermove", (e) => {
+        const r = frame.getBoundingClientRect();
+        const u = (e.clientX - r.left) / r.width;
+        const v = (e.clientY - r.top) / r.height;
+        ry = (u - 0.5) * 7;
+        rx = (0.5 - v) * 5;
+        gx = u * 100;
+        gy = v * 100;
+        frame.dataset.hot = "true";
+        if (!raf) raf = requestAnimationFrame(apply);
+      });
+      frame.addEventListener("pointerleave", () => {
+        rx = 0;
+        ry = 0;
+        delete frame.dataset.hot;
+        if (!raf) raf = requestAnimationFrame(apply);
+      });
+    }
+  }
+</script>
+
 <style>
   /*
    * Duas colunas desencontradas: o primeiro caso sobe até o topo da seção à
@@ -144,6 +193,8 @@ const folded = moreCases.slice(4);
   }
 
   .case-frame {
+    --rx: 0deg;
+    --ry: 0deg;
     position: relative;
     display: block;
     padding: clamp(0.75rem, 1.5vw, 1.25rem) clamp(0.75rem, 1.5vw, 1.25rem) 0;
@@ -152,9 +203,33 @@ const folded = moreCases.slice(4);
     overflow: hidden;
     background: var(--bg-3);
     box-shadow: var(--shadow-2);
+    transform: perspective(1100px) rotateX(var(--rx)) rotateY(var(--ry));
     transition:
-      transform 500ms var(--ease-spring),
+      transform 600ms var(--ease-out),
       box-shadow 500ms var(--ease-out);
+  }
+
+  .case-frame[data-hot="true"] {
+    transition:
+      transform 140ms linear,
+      box-shadow 500ms var(--ease-out);
+  }
+
+  .case-glare {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      40% 50% at var(--gx, 50%) var(--gy, 50%),
+      rgb(255 255 255 / 0.22),
+      transparent 70%
+    );
+    opacity: 0;
+    transition: opacity 400ms var(--ease-out);
+    pointer-events: none;
+  }
+
+  .case-frame[data-hot="true"] .case-glare {
+    opacity: 1;
   }
 
   .case-frame img {
@@ -177,10 +252,12 @@ const folded = moreCases.slice(4);
 
   @media (hover: hover) {
     .case:hover .case-frame {
-      transform: translateY(-6px);
+      box-shadow:
+        0 2px 6px rgb(17 26 69 / 0.08),
+        0 44px 80px -34px rgb(17 26 69 / 0.45);
     }
     .case:hover .case-frame img {
-      transform: scale(1.025);
+      transform: scale(1.02);
     }
   }
 
@@ -367,6 +444,9 @@ const folded = moreCases.slice(4);
       grid-template-rows: auto;
     }
 
+  }
+
+  @media (max-width: 47.99rem) {
     .more-list {
       grid-template-columns: 1fr;
     }

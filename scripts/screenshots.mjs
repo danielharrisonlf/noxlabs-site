@@ -1,17 +1,37 @@
-// Capturas de cada seção em 390 e 1440 px, temas claro e escuro, mais as
-// páginas de caso. Também mede transbordo horizontal. Rode depois de `pnpm build`.
+// Capturas do estado final (movimento reduzido) em todos os tamanhos de tela,
+// nos dois temas. O movimento fica em scripts/frames.mjs e scripts/motion-video.mjs.
+// Rode depois de `pnpm build`. Saída em docs/screenshots/:
+//   fold/   primeira tela (PNG) de cada tamanho e tema
+//   full/   página inteira (JPEG) de cada tamanho e tema
+//   home-<390|1440>-<tema>-NN-secao.png   seções da home
+//   caso-*, 404-*                          páginas de caso e 404 (390, 768 e 1440)
 import { mkdirSync } from "node:fs";
 import { chromium } from "@playwright/test";
 import { serveDist } from "./serve-dist.mjs";
 
 const out = "docs/screenshots";
-mkdirSync(out, { recursive: true });
+for (const dir of [out, `${out}/fold`, `${out}/full`]) mkdirSync(dir, { recursive: true });
 
 const port = 4329;
 const base = `http://127.0.0.1:${port}`;
 const server = await serveDist(port);
 
-const widths = [390, 1440];
+const sizes = [
+  [320, 640],
+  [360, 740],
+  [390, 844],
+  [430, 932],
+  [600, 900],
+  [768, 1024],
+  [1024, 768],
+  [1280, 800],
+  [1440, 900],
+  [1920, 1080],
+  [2560, 1440],
+  [844, 390],
+  [1366, 768],
+  [1280, 600],
+];
 const themes = ["light", "dark"];
 const sections = [
   ["01-hero", ".hero"],
@@ -36,17 +56,11 @@ const problems = [];
 
 async function settle(page) {
   await page.evaluate(() => document.fonts.ready);
-  await page.waitForTimeout(600);
-}
-
-// Percorre a página para que as animações ligadas à rolagem e as que esperam a
-// seção aparecer cheguem ao estado final; depois volta ao topo.
-async function walk(page) {
+  // Carrega imagens preguiçosas antes da página inteira.
   await page.evaluate(async () => {
-    const step = Math.round(window.innerHeight * 0.6);
-    for (let y = 0; y < document.documentElement.scrollHeight; y += step) {
+    for (let y = 0; y < document.documentElement.scrollHeight; y += 600) {
       window.scrollTo({ top: y, behavior: "instant" });
-      await new Promise((r) => setTimeout(r, 120));
+      await new Promise((r) => setTimeout(r, 50));
     }
     window.scrollTo({ top: 0, behavior: "instant" });
   });
@@ -54,45 +68,44 @@ async function walk(page) {
 }
 
 async function overflow(page, label) {
-  const result = await page.evaluate(() => ({
-    scroll: document.documentElement.scrollWidth,
-    inner: window.innerWidth,
-  }));
+  const result = await page.evaluate(() => ({ scroll: document.documentElement.scrollWidth, inner: window.innerWidth }));
   if (result.scroll > result.inner) problems.push(`${label}: scrollWidth ${result.scroll} > ${result.inner}`);
 }
 
-for (const width of widths) {
-  for (const theme of themes) {
+for (const theme of themes) {
+  for (const [width, height] of sizes) {
+    const mobile = width < 600;
     const context = await browser.newContext({
-      viewport: { width, height: width < 600 ? 844 : 900 },
-      deviceScaleFactor: width < 600 ? 2 : 1,
+      viewport: { width, height },
+      deviceScaleFactor: mobile ? 2 : 1,
       colorScheme: theme,
-      // Estado final e estável de cada peça; o movimento fica em scripts/frames.mjs.
       reducedMotion: "reduce",
+      hasTouch: mobile,
     });
     const page = await context.newPage();
-    const tag = `${width}-${theme}`;
-
+    const tag = `${width}x${height}-${theme}`;
     await page.goto(`${base}/`, { waitUntil: "networkidle" });
     await settle(page);
     await overflow(page, `/ ${tag}`);
-    await page.screenshot({ path: `${out}/home-${tag}-fold.png` });
-    await walk(page);
-    await page.screenshot({ path: `${out}/home-${tag}-full.png`, fullPage: true });
-    // O cabeçalho flutuante cobriria o topo das capturas de elemento; some só aqui.
-    await page.addStyleTag({ content: ".header{visibility:hidden!important}" });
-    for (const [name, selector] of sections) {
-      const el = page.locator(selector).first();
-      await el.scrollIntoViewIfNeeded();
-      await el.screenshot({ path: `${out}/home-${tag}-${name}.png` });
+    await page.screenshot({ path: `${out}/fold/home-${tag}.png` });
+    await page.screenshot({ path: `${out}/full/home-${tag}.jpg`, fullPage: true, type: "jpeg", quality: 78 });
+
+    if ((width === 390 && height === 844) || (width === 1440 && height === 900)) {
+      await page.addStyleTag({ content: ".header,.dock{visibility:hidden!important}" });
+      for (const [name, selector] of sections) {
+        const el = page.locator(selector).first();
+        await el.scrollIntoViewIfNeeded();
+        await el.screenshot({ path: `${out}/home-${width}-${theme}-${name}.png` });
+      }
     }
 
-    for (const [name, path] of pages) {
-      await page.goto(`${base}${path}`, { waitUntil: "networkidle" });
-      await settle(page);
-      await overflow(page, `${path} ${tag}`);
-      await walk(page);
-      await page.screenshot({ path: `${out}/${name}-${tag}-full.png`, fullPage: true });
+    if ([390, 768, 1440].includes(width) && height !== 390) {
+      for (const [name, path] of pages) {
+        await page.goto(`${base}${path}`, { waitUntil: "networkidle" });
+        await settle(page);
+        await overflow(page, `${path} ${tag}`);
+        await page.screenshot({ path: `${out}/full/${name}-${tag}.jpg`, fullPage: true, type: "jpeg", quality: 78 });
+      }
     }
     await context.close();
   }
@@ -105,5 +118,5 @@ if (problems.length) {
   console.error("Transbordo horizontal:\n" + problems.join("\n"));
   process.exitCode = 1;
 } else {
-  console.log(`Capturas em ${out}/. Sem transbordo horizontal em ${widths.join(" e ")} px.`);
+  console.log(`Capturas em ${out}/. Sem transbordo em ${sizes.length} tamanhos de tela, nos dois temas.`);
 }

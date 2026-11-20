@@ -7,6 +7,7 @@ import Hero from "../components/Hero.astro";
 import Kairos from "../components/Kairos.astro";
 import Process from "../components/Process.astro";
 import Services from "../components/Services.astro";
+import Thread from "../components/Thread.astro";
 import { faq } from "../data/content";
 import Base from "../layouts/Base.astro";
 
@@ -22,6 +23,7 @@ const faqSchema = {
 ---
 
 <Base path="/" schema={[faqSchema]}>
+  <Thread />
   <Hero />
   <Services />
   <Kairos />

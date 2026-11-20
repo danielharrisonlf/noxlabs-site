@@ -6,7 +6,7 @@ import Icon from "./Icon.astro";
 
 <section class="section faq" id="perguntas" aria-labelledby="perguntas-title">
   <div class="wrap faq-grid">
-    <header class="faq-head">
+    <header class="faq-head" data-reveal="head">
       <h2 id="perguntas-title" class="section-title">Perguntas antes de contratar.</h2>
       <p class="section-lede">As dúvidas que aparecem em quase todo diagnóstico, respondidas sem rodeio.</p>
       <p class="faq-ask">
@@ -21,7 +21,7 @@ import Icon from "./Icon.astro";
     <div class="faq-list">
       {
         faq.map((item, i) => (
-          <details class="faq-item" open={i === 0}>
+          <details class="faq-item" open={i === 0} data-reveal style={`--i:${Math.min(i, 3)}`}>
             <summary>
               <span>{item.q}</span>
               <span class="faq-sign" aria-hidden="true">

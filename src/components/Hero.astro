@@ -3,48 +3,77 @@ import { site } from "../data/site";
 import Icon from "./Icon.astro";
 
 /*
- * Céu de longa exposição: rastros que chegam de fora da tela e terminam em
- * três provas que se pode conferir. As coordenadas valem para a coluna de
- * provas (520 x 620); o SVG transborda para a esquerda e passa sob o texto.
+ * Céu de longa exposição: rastros que sobem da borda de baixo e terminam em
+ * três provas que se pode conferir. Duas composições desenhadas:
+ * - larga (>= 64rem): coluna 520 x 620 à direita do texto, rastros vindo de
+ *   baixo, à direita do texto, sem cruzá-lo;
+ * - estreita: coluna 360 x 400 sob os botões, os rastros sobem pela esquerda e
+ *   cada prova fica à direita do seu ponto de luz.
  */
-type Trail = { d: string; tone: "sodio" | "freio" | "mercurio"; lead?: boolean; p1?: boolean };
+type Tone = "sodio" | "freio" | "mercurio";
+type Trail = { d: string; tone: Tone; lead?: boolean };
+type Layout = {
+  cls: string;
+  viewBox: string;
+  nodes: { x: number; y: number; tone: Tone }[];
+  trails: Trail[];
+  ambient: Trail[];
+};
 
-const nodes = [
-  { x: 150, y: 120, tone: "freio" },
-  { x: 80, y: 310, tone: "mercurio" },
-  { x: 170, y: 500, tone: "sodio" },
-] as const;
+const wide: Layout = {
+  cls: "ex-wide",
+  viewBox: "0 0 520 620",
+  nodes: [
+    { x: 150, y: 120, tone: "freio" },
+    { x: 80, y: 310, tone: "mercurio" },
+    { x: 170, y: 500, tone: "sodio" },
+  ],
+  trails: [
+    { d: "M -260 900 C -120 640, -40 260, 150 120", tone: "sodio", lead: true },
+    { d: "M -200 900 C -90 640, -10 280, 150 120", tone: "freio" },
+    { d: "M -300 900 C -150 700, -60 420, 80 310", tone: "mercurio", lead: true },
+    { d: "M -230 900 C -110 700, -30 430, 80 310", tone: "sodio" },
+    { d: "M -160 900 C -60 760, 40 560, 170 500", tone: "freio", lead: true },
+    { d: "M -340 900 C -170 780, 0 560, 170 500", tone: "mercurio" },
+  ],
+  ambient: [
+    { d: "M -60 900 C 120 700, 400 640, 720 600", tone: "mercurio" },
+    { d: "M -200 900 C 0 780, 300 720, 720 700", tone: "sodio" },
+  ],
+};
 
-/*
- * Os rastros sobem da borda de baixo, à direita do texto, como faróis vindo
- * pela avenida: nunca cruzam o título, o texto ou os botões.
- */
-const trails: Trail[] = [
-  { d: "M -260 900 C -120 640, -40 260, 150 120", tone: "sodio", lead: true, p1: true },
-  { d: "M -200 900 C -90 640, -10 280, 150 120", tone: "freio", p1: true },
-  { d: "M -300 900 C -150 700, -60 420, 80 310", tone: "mercurio", lead: true },
-  { d: "M -230 900 C -110 700, -30 430, 80 310", tone: "sodio" },
-  { d: "M -160 900 C -60 760, 40 560, 170 500", tone: "freio", lead: true },
-  { d: "M -340 900 C -170 780, 0 560, 170 500", tone: "mercurio" },
-];
+const tall: Layout = {
+  cls: "ex-tall",
+  viewBox: "0 0 360 400",
+  nodes: [
+    { x: 70, y: 50, tone: "freio" },
+    { x: 70, y: 190, tone: "mercurio" },
+    { x: 70, y: 330, tone: "sodio" },
+  ],
+  trails: [
+    { d: "M -60 480 C 0 380, 20 140, 70 50", tone: "sodio", lead: true },
+    { d: "M -20 480 C 30 390, 40 150, 70 50", tone: "freio" },
+    { d: "M -40 480 C 10 400, 30 270, 70 190", tone: "mercurio", lead: true },
+    { d: "M 0 480 C 40 410, 50 280, 70 190", tone: "sodio" },
+    { d: "M -20 480 C 20 430, 40 370, 70 330", tone: "freio", lead: true },
+    { d: "M 20 480 C 50 440, 55 380, 70 330", tone: "mercurio" },
+  ],
+  ambient: [],
+};
 
-/* Rastros que atravessam o quadro sem parar: o resto da cidade em movimento. */
-const ambient: Trail[] = [
-  { d: "M -60 900 C 120 700, 400 640, 720 600", tone: "mercurio" },
-  { d: "M -200 900 C 0 780, 300 720, 720 700", tone: "sodio" },
-];
-
-/* No celular, a primeira prova sobe para a dobra numa faixa curta de rastros. */
-const band = [
-  { d: "M -220 74 C -90 72, 80 44, 196 28", tone: "sodio" },
-  { d: "M -220 60 C -100 58, 90 38, 196 28", tone: "freio" },
-  { d: "M -220 86 C -60 84, 110 50, 196 28", tone: "mercurio" },
-] as const;
-
+const layouts = [wide, tall];
 const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
+const at = (i: number) =>
+  [
+    `--wx:${pct(wide.nodes[i].x + 38, 520)}`,
+    `--wy:${pct(wide.nodes[i].y, 620)}`,
+    `--tx:${pct(tall.nodes[i].x + 30, 360)}`,
+    `--ty:${pct(tall.nodes[i].y, 400)}`,
+    `--i:${i}`,
+  ].join(";");
 ---
 
-<section class="hero grain" aria-labelledby="hero-title">
+<section class="hero grain" aria-labelledby="hero-title" data-hero>
   <div class="wrap hero-grid">
     <div class="hero-copy">
       <h1 id="hero-title">Software e IA que saem do papel e ficam no ar.</h1>
@@ -53,27 +82,7 @@ const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
         empresas que precisam de sistema funcionando, não de apresentação.
       </p>
       <p class="hero-own">Você fala direto com quem escreve o código. E o código é seu.</p>
-      <div class="hero-band">
-        <svg class="band-trails" viewBox="0 0 210 56" preserveAspectRatio="xMaxYMid meet" aria-hidden="true" focusable="false">
-          {
-            band.map((t, i) => (
-              <g class={`trail tone-${t.tone}`} style={`--i:${i}`}>
-                <path class="glow" d={t.d} pathLength="1000" />
-                <path class="core" d={t.d} pathLength="1000" />
-              </g>
-            ))
-          }
-          <g class="node tone-freio" style="--i:0">
-            <circle class="node-halo" cx="196" cy="28" r="16"></circle>
-            <circle class="node-core" cx="196" cy="28" r="5.5"></circle>
-          </g>
-        </svg>
-        <div class="band-label">
-          <p class="proof-title">Kairos no ar</p>
-          <a class="proof-link" href={site.links.kairos}>kairos.noxlabs.tech</a>
-        </div>
-      </div>
-      <div class="hero-actions">
+      <div class="hero-actions" data-cta-anchor>
         <a class="btn btn-primary" href={site.diagnosisMailto}>
           Pedir diagnóstico de 30 min
           <Icon name="arrow-right" />
@@ -83,42 +92,51 @@ const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
       <p class="hero-note">Uma conversa de 30 minutos sobre o problema. Você sai com um próximo passo claro.</p>
     </div>
 
-    <div class="exposure">
-      <svg class="trails" viewBox="0 0 520 620" aria-hidden="true" focusable="false">
-        <g class="ambient">
-          {ambient.map((t) => <path d={t.d} class={`tone-${t.tone}`} pathLength="1000" />)}
-        </g>
-        {
-          trails.map((t, i) => (
-            <g class:list={["trail", `tone-${t.tone}`, { p1: t.p1 }]} style={`--i:${i}`}>
-              <path class="glow-wide" d={t.d} pathLength="1000" />
-              <path class="glow" d={t.d} pathLength="1000" />
-              <path class="core" d={t.d} pathLength="1000" />
-              {t.lead && <path class="packet" d={t.d} pathLength="1000" />}
+    <div class="exposure" data-exposure>
+      {
+        layouts.map((layout) => (
+          <svg class={`trails ${layout.cls}`} viewBox={layout.viewBox} aria-hidden="true" focusable="false">
+            <g class="ambient">
+              {layout.ambient.map((t) => (
+                <path d={t.d} class={`tone-${t.tone}`} pathLength="1000" />
+              ))}
             </g>
-          ))
-        }
-        {
-          nodes.map((n, i) => (
-            <g class:list={["node", `tone-${n.tone}`, { p1: i === 0 }]} style={`--i:${i}`}>
-              <circle class="node-halo" cx={n.x} cy={n.y} r="20" />
-              <circle class="node-core" cx={n.x} cy={n.y} r="6.5" />
+            <g class="layer">
+              {layout.trails.map((t, i) => (
+                <g class={`trail tone-${t.tone}`} style={`--i:${i}`}>
+                  <path class="glow-wide" d={t.d} pathLength="1000" />
+                  <path class="glow" d={t.d} pathLength="1000" />
+                  <path class="core" d={t.d} pathLength="1000" />
+                  {t.lead && <path class="packet" d={t.d} pathLength="1000" />}
+                </g>
+              ))}
+              {layout.nodes.map((n, i) => (
+                <g class={`node tone-${n.tone}`} style={`--i:${i}`} data-node={i}>
+                  <circle class="node-halo" cx={n.x} cy={n.y} r="20" />
+                  <circle class="node-core" cx={n.x} cy={n.y} r="6.5" />
+                </g>
+              ))}
             </g>
-          ))
-        }
-      </svg>
+          </svg>
+        ))
+      }
 
       <ul class="proofs" role="list" aria-label="Provas que você pode conferir">
-        <li class="p1" style={`--x:${pct(nodes[0].x + 38, 520)};--y:${pct(nodes[0].y, 620)};--i:0`}>
+        <li style={at(0)}>
           <p class="proof-title live">Kairos no ar</p>
           <p class="proof-text">Produto próprio em produção, com cadastro aberto de empresas.</p>
           <a class="proof-link" href={site.links.kairos}>kairos.noxlabs.tech</a>
         </li>
-        <li style={`--x:${pct(nodes[1].x + 38, 520)};--y:${pct(nodes[1].y, 620)};--i:1`}>
-          <p class="proof-title">49 ferramentas MCP</p>
+        <li style={at(1)}>
+          <p class="proof-title">
+            <span>
+              <span class="tabular" data-count="49" aria-hidden="true">49</span><span class="visually-hidden">49</span>
+              ferramentas MCP
+            </span>
+          </p>
           <p class="proof-text">Agentes de IA entram com o login e o escopo de cada usuário.</p>
         </li>
-        <li style={`--x:${pct(nodes[2].x + 38, 520)};--y:${pct(nodes[2].y, 620)};--i:2`}>
+        <li style={at(2)}>
           <p class="proof-title">Código aberto</p>
           <p class="proof-text">Repositórios públicos para você ler antes de contratar.</p>
           <a class="proof-link" href={site.links.github}>github.com/danielharrisonlf</a>
@@ -128,13 +146,74 @@ const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
   </div>
 </section>
 
+<script>
+  import { finePointer, pauseOffscreen, reducedMotion } from "../scripts/motion";
+
+  const hero = document.querySelector<HTMLElement>("[data-hero]");
+  const exposure = document.querySelector<HTMLElement>("[data-exposure]");
+
+  if (hero && exposure && !reducedMotion()) {
+    pauseOffscreen(hero);
+
+    // "49" conta de 0 até 49 quando a prova acende.
+    const counter = exposure.querySelector<HTMLElement>("[data-count]");
+    if (counter) {
+      const target = Number(counter.dataset.count);
+      counter.textContent = "0";
+      const start = performance.now() + 2700;
+      const tick = (now: number) => {
+        const t = Math.min(Math.max((now - start) / 1100, 0), 1);
+        counter.textContent = String(Math.round(target * (1 - (1 - t) ** 3)));
+        if (t < 1) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+
+    // No desktop, o céu responde ao ponteiro: camadas em profundidades diferentes
+    // e o ponto de luz mais próximo cresce.
+    if (finePointer()) {
+      let frame = 0;
+      let px = 0;
+      let py = 0;
+      let cx = 0;
+      let cy = 0;
+      const nodes = [...exposure.querySelectorAll<SVGGElement>(".ex-wide [data-node]")];
+      const apply = () => {
+        frame = 0;
+        exposure.style.setProperty("--px", px.toFixed(3));
+        exposure.style.setProperty("--py", py.toFixed(3));
+        for (const node of nodes) {
+          const r = node.getBoundingClientRect();
+          const d = Math.hypot(r.left + r.width / 2 - cx, r.top + r.height / 2 - cy);
+          node.style.setProperty("--near", Math.max(0, 1 - d / 260).toFixed(3));
+        }
+      };
+      hero.addEventListener("pointermove", (e) => {
+        const r = hero.getBoundingClientRect();
+        px = ((e.clientX - r.left) / r.width) * 2 - 1;
+        py = ((e.clientY - r.top) / r.height) * 2 - 1;
+        cx = e.clientX;
+        cy = e.clientY;
+        if (!frame) frame = requestAnimationFrame(apply);
+      });
+      hero.addEventListener("pointerleave", () => {
+        px = 0;
+        py = 0;
+        cx = -9999;
+        cy = -9999;
+        if (!frame) frame = requestAnimationFrame(apply);
+      });
+    }
+  }
+</script>
+
 <style>
   .hero {
     overflow: hidden;
-    padding-top: calc(var(--header-h) + clamp(1.5rem, 4vw, 4rem));
+    padding-top: calc(var(--header-h) + env(safe-area-inset-top) + clamp(1rem, 4vw, 4rem));
     padding-bottom: clamp(2.5rem, 5vw, 5rem);
     background:
-      radial-gradient(70% 55% at 35% 88%, var(--haze), transparent 70%),
+      radial-gradient(70% 45% at 35% 75%, var(--haze), transparent 65%),
       radial-gradient(70% 60% at 100% 0%, var(--haze-2), transparent 60%),
       linear-gradient(180deg, var(--sky-top), var(--sky-mid) 50%, var(--sky-low) 88%, var(--bg));
   }
@@ -150,10 +229,13 @@ const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
   .hero-copy {
     position: relative;
     z-index: 2;
+    display: flex;
+    flex-direction: column;
   }
 
+  /* O título acompanha a altura da tela também: em 1280 x 600 o botão ainda aparece. */
   .hero h1 {
-    font-size: var(--t-display);
+    font-size: clamp(2.5rem, min(1.4rem + 5vw, 1.2rem + 7.2svh), 5.5rem);
     font-weight: 500;
     line-height: 0.98;
     letter-spacing: -0.04em;
@@ -192,6 +274,8 @@ const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
 
   /* Coluna de provas: proporção fixa, então os nós do SVG e os textos coincidem. */
   .exposure {
+    --px: 0;
+    --py: 0;
     position: relative;
     z-index: 1;
     width: 100%;
@@ -209,8 +293,11 @@ const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
     z-index: -1;
   }
 
-  .trails path,
-  .band-trails path {
+  .ex-tall {
+    display: none;
+  }
+
+  .trails path {
     fill: none;
     stroke-linecap: round;
   }
@@ -268,10 +355,16 @@ const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
     stroke-width: 2.5;
   }
 
+  /* A lista ocupa a coluna inteira: é o bloco de contenção das provas, e o paralaxe a move inteira. */
+  .proofs {
+    position: absolute;
+    inset: 0;
+  }
+
   .proofs li {
     position: absolute;
-    left: var(--x);
-    top: var(--y);
+    left: var(--wx);
+    top: var(--wy);
     right: 0;
     transform: translateY(-1.05em);
   }
@@ -305,8 +398,9 @@ const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
     text-underline-offset: 0.3em;
   }
 
-  /* O único momento orquestrado: a exposição se forma uma vez. */
+  /* ---- Movimento ---- */
   @media (prefers-reduced-motion: no-preference) {
+    /* 1. A exposição se forma uma vez no carregamento. */
     .trail path:not(.packet),
     .ambient path {
       stroke-dasharray: 1000;
@@ -318,21 +412,72 @@ const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
       animation-duration: 3.2s;
     }
 
-    .packet {
-      animation: packet-run 1.7s var(--ease-in-out) both;
-      animation-delay: calc(1.2s + var(--i) * 140ms);
+    /* 2. Depois, vida contínua e discreta: uma luz corre por um rastro de cada
+          vez, em intervalos longos; os pontos respiram devagar. */
+    .trail .packet {
+      animation:
+        packet-run 1.7s var(--ease-in-out) calc(1.2s + var(--i) * 140ms) both,
+        packet-loop 9s linear calc(4.5s + var(--i) * 1.5s) infinite;
     }
 
     .node {
       transform-box: fill-box;
       transform-origin: center;
-      animation: node-on 900ms var(--ease-out) both;
-      animation-delay: calc(2.6s + var(--i) * 280ms);
+      animation: node-on 900ms var(--ease-out) calc(2.6s + var(--i) * 280ms) both;
+    }
+
+    .node-halo {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: node-breathe 5.2s ease-in-out calc(3.6s + var(--i) * 0.9s) infinite;
     }
 
     .proofs li {
       animation: proof-in 900ms var(--ease-out) both;
       animation-delay: calc(2.5s + var(--i) * 280ms);
+    }
+
+    /* Fora da tela, nada corre. */
+    .hero.is-offscreen :is(.packet, .node-halo) {
+      animation-play-state: paused;
+    }
+
+    /* 3. Ponteiro (desktop): camadas em profundidades diferentes. */
+    .layer {
+      transform: translate(calc(var(--px) * 10px), calc(var(--py) * 8px));
+      transition: transform 900ms var(--ease-out);
+    }
+
+    .ambient {
+      transform: translate(calc(var(--px) * 22px), calc(var(--py) * 14px));
+      transition: transform 1200ms var(--ease-out);
+    }
+
+    .proofs {
+      transform: translate(calc(var(--px) * 10px), calc(var(--py) * 8px));
+      transition: transform 900ms var(--ease-out);
+    }
+
+    .ex-wide .node .node-core {
+      transform-box: fill-box;
+      transform-origin: center;
+      transform: scale(calc(1 + var(--near, 0) * 0.45));
+      transition: transform 500ms var(--ease-out);
+    }
+
+    /* 4. Rolagem: o céu se afasta em profundidade enquanto o texto sobe. */
+    @supports (animation-timeline: scroll()) {
+      .exposure {
+        animation: hero-depth linear both;
+        animation-timeline: scroll(root);
+        animation-range: 0 100svh;
+      }
+
+      .hero-copy {
+        animation: hero-lift linear both;
+        animation-timeline: scroll(root);
+        animation-range: 0 100svh;
+      }
     }
   }
 
@@ -350,12 +495,28 @@ const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
       stroke-dashoffset: 60;
       opacity: 0;
     }
-    10% {
-      opacity: 1;
-    }
+    10%,
     90% {
       opacity: 1;
     }
+    100% {
+      stroke-dashoffset: -1000;
+      opacity: 0;
+    }
+  }
+
+  /* Corre nos primeiros 20% do ciclo e descansa o resto. */
+  @keyframes packet-loop {
+    0% {
+      stroke-dashoffset: 60;
+      opacity: 0;
+      animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+    }
+    2%,
+    18% {
+      opacity: 0.85;
+    }
+    20%,
     100% {
       stroke-dashoffset: -1000;
       opacity: 0;
@@ -369,6 +530,18 @@ const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
     }
   }
 
+  @keyframes node-breathe {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.2;
+    }
+    50% {
+      transform: scale(1.4);
+      opacity: 0.32;
+    }
+  }
+
   @keyframes proof-in {
     from {
       opacity: 0.25;
@@ -376,68 +549,120 @@ const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
     }
   }
 
+  @keyframes hero-depth {
+    to {
+      translate: 0 70px;
+      opacity: 0.55;
+    }
+  }
+
+  @keyframes hero-lift {
+    to {
+      translate: 0 -40px;
+    }
+  }
+
+  /* ---- Abaixo de 64rem: coluna estreita com os pontos à esquerda ---- */
   @media (max-width: 63.99rem) {
+    .ex-wide {
+      display: none;
+    }
+
+    .ex-tall {
+      display: block;
+    }
+
+    .exposure {
+      aspect-ratio: 360 / 400;
+      max-width: 26rem;
+    }
+
+    .proofs li {
+      left: var(--tx);
+      top: var(--ty);
+    }
+  }
+
+  /* Tablet retrato (768–1023): texto e provas lado a lado, provas compactas. */
+  @media (min-width: 48rem) and (max-width: 63.99rem) {
+    .hero-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      min-height: 0;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.4rem, 0.8rem + 5vw, 3.25rem);
+    }
+
+    .exposure {
+      justify-self: stretch;
+    }
+
+    .proof-title {
+      font-size: 1.125rem;
+    }
+
+    .proof-text {
+      font-size: 0.8125rem;
+      line-height: 1.4;
+    }
+  }
+
+  /* Tablet pequeno (600–767): uma coluna; provas sob os botões, como no celular. */
+  @media (min-width: 40rem) and (max-width: 47.99rem) {
     .hero-grid {
       grid-template-columns: 1fr;
       min-height: 0;
     }
 
     .exposure {
-      justify-self: stretch;
-      max-width: 30rem;
-      margin-top: var(--s-4);
+      justify-self: start;
+      max-width: 28rem;
     }
   }
 
-  .hero-band {
-    display: none;
-  }
-
-  @media (max-width: 40rem) {
-    .hero-band {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: center;
-      gap: var(--s-3);
-      margin-top: var(--s-5);
-    }
-
-    .band-trails {
-      width: 100%;
-      height: 3.5rem;
-      overflow: visible;
-    }
-
-    .band-label .proof-title {
-      font-size: 1.25rem;
-    }
-
-    .band-label .proof-link {
-      min-height: 2.75rem;
-      margin-top: -0.35rem;
-    }
-
-    /* A primeira prova já está na faixa; a coluna mostra as outras duas e
-       sobe sobre o espaço vazio que a primeira deixaria. */
-    .exposure .p1 {
-      display: none;
-    }
-
-    .exposure {
-      margin-top: -22%;
-      pointer-events: none;
-    }
-
-    .exposure a {
-      pointer-events: auto;
+  /* Celular: título, texto curto, botões na primeira tela; frase de posse e provas depois. */
+  @media (max-width: 39.99rem) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+      min-height: 0;
+      gap: var(--s-6);
     }
 
     .hero h1 {
+      font-size: clamp(2.25rem, 1.2rem + 6.4vw, 3rem);
       letter-spacing: -0.035em;
+    }
+
+    .hero-lede {
+      margin-top: var(--s-4);
+      font-size: 1.0625rem;
+    }
+
+    .hero-actions {
+      order: 3;
+      margin-top: var(--s-5);
+      gap: var(--s-2);
+    }
+
+    .hero-own {
+      order: 4;
+      margin-top: var(--s-5);
+      font-size: 1.0625rem;
+    }
+
+    .hero-note {
+      order: 5;
+      margin-top: var(--s-2);
     }
 
     .hero-actions .btn {
       width: 100%;
+    }
+
+    .exposure {
+      justify-self: stretch;
+      max-width: 24rem;
     }
 
     .proof-title {
@@ -446,6 +671,50 @@ const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
 
     .proof-text {
       font-size: 0.875rem;
+    }
+  }
+
+  /* Desktop baixo (1280 x 600): botões sobem antes da frase de posse. */
+  @media (min-width: 64rem) and (max-height: 42.5rem) {
+    .hero {
+      padding-top: calc(var(--header-h) + 1rem);
+    }
+
+    .hero-lede {
+      margin-top: var(--s-4);
+    }
+
+    .hero-actions {
+      order: 3;
+      margin-top: var(--s-5);
+    }
+
+    .hero-own {
+      order: 4;
+      margin-top: var(--s-4);
+    }
+
+    .hero-note {
+      display: none;
+    }
+  }
+
+  /* Paisagem baixa (celular deitado): menos respiro no topo. */
+  @media (max-height: 30rem) and (orientation: landscape) {
+    .hero {
+      padding-top: calc(var(--header-h) + 0.5rem);
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 1rem + 6svh, 3rem);
+    }
+
+    .hero-lede {
+      margin-top: var(--s-3);
+    }
+
+    .hero-actions {
+      margin-top: var(--s-4);
     }
   }
 </style>

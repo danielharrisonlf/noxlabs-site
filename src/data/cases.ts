@@ -13,6 +13,12 @@ export type CaseImage = {
   caption: string;
 };
 
+/** Variações 720 e 1080 px geradas ao lado da original (mesma origem, ver PRODUCT.md). */
+export function srcset(src: string, width: number) {
+  const base = src.replace(/\.webp$/, "");
+  return `${base}-720.webp 720w, ${base}-1080.webp 1080w, ${src} ${width}w`;
+}
+
 export type CaseStudy = {
   slug: string;
   name: string;

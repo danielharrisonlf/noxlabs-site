@@ -7,6 +7,8 @@ export type Service = {
   id: string;
   /** O problema, na voz de quem tem: vira o rótulo do seletor e o assunto do e-mail. */
   problem: string;
+  /** Versão curta do problema para os chips do celular. */
+  short: string;
   title: string;
   when: string;
   deliver: string[];
@@ -17,6 +19,7 @@ export type Service = {
 export const services: Service[] = [
   {
     id: "ia",
+    short: "Tarefas que uma IA faria",
     problem: "Minha equipe repete tarefas que uma IA faria",
     title: "IA dentro do produto e da operação",
     when: "Sua equipe repete tarefas que um modelo faria com supervisão, ou seus clientes já esperam um assistente que conheça os dados da empresa.",
@@ -34,6 +37,7 @@ export const services: Service[] = [
   },
   {
     id: "mvp",
+    short: "Tirar do papel",
     problem: "Preciso tirar um produto ou processo do papel",
     title: "Software sob medida e MVP",
     when: "Você tem um processo rodando em planilha e WhatsApp, ou uma ideia de produto que precisa sair do papel sem virar dívida técnica.",
@@ -51,6 +55,7 @@ export const services: Service[] = [
   },
   {
     id: "arquitetura",
+    short: "Sistema lento e frágil",
     problem: "O sistema ficou lento e cada mudança quebra outra coisa",
     title: "Arquitetura e modernização",
     when: "O sistema ficou lento, cada mudança quebra outra coisa, ou ninguém mais sabe explicar como ele funciona.",
@@ -68,6 +73,7 @@ export const services: Service[] = [
   },
   {
     id: "integracoes",
+    short: "Trabalho manual repetido",
     problem: "Dados digitados duas vezes, mensagens disparadas à mão",
     title: "Automação e integrações",
     when: "Dados digitados duas vezes, mensagens disparadas à mão, CRM que ninguém atualiza.",
@@ -85,6 +91,7 @@ export const services: Service[] = [
   },
   {
     id: "cto",
+    short: "Sem CTO",
     problem: "Não tenho CTO, ou meu time precisa de direção",
     title: "Consultoria técnica e CTO fracionado",
     when: "Você não tem CTO, ou tem um time pequeno que precisa de direção, revisão e ajuda para contratar.",
@@ -102,6 +109,7 @@ export const services: Service[] = [
   },
   {
     id: "infra",
+    short: "Conta de nuvem alta",
     problem: "A conta da nuvem cresce mais rápido que o uso",
     title: "Infraestrutura e custo de nuvem",
     when: "A fatura da nuvem cresce mais rápido que o uso, e boa parte dela paga serviços gerenciados que você não precisa.",

@@ -8,7 +8,8 @@
  *   [data-panel="id"]#painel
  */
 export type TabsOptions = {
-  orientation?: "horizontal" | "vertical";
+  /** Orientação anunciada; pode depender de uma media query. As setas dos dois eixos funcionam sempre. */
+  orientation?: "horizontal" | "vertical" | MediaQueryList;
   /** Chamado a cada troca, inclusive na primeira seleção. */
   onChange?: (id: string, index: number, source: "init" | "user" | "api") => void;
 };
@@ -27,7 +28,12 @@ export function enhanceTabs(root: HTMLElement, options: TabsOptions = {}): TabsC
 
   const orientation = options.orientation ?? "horizontal";
   list.setAttribute("role", "tablist");
-  list.setAttribute("aria-orientation", orientation);
+  const announce = () => {
+    const value = typeof orientation === "string" ? orientation : orientation.matches ? "vertical" : "horizontal";
+    list.setAttribute("aria-orientation", value);
+  };
+  announce();
+  if (typeof orientation !== "string") orientation.addEventListener("change", announce);
   for (const li of list.querySelectorAll(":scope > li")) li.setAttribute("role", "presentation");
 
   let active = 0;
@@ -61,11 +67,9 @@ export function enhanceTabs(root: HTMLElement, options: TabsOptions = {}): TabsC
       select(i, "user");
     });
     tab.addEventListener("keydown", (event) => {
-      const prev = orientation === "vertical" ? "ArrowUp" : "ArrowLeft";
-      const next = orientation === "vertical" ? "ArrowDown" : "ArrowRight";
       let target: number | null = null;
-      if (event.key === prev) target = i - 1;
-      else if (event.key === next) target = i + 1;
+      if (event.key === "ArrowUp" || event.key === "ArrowLeft") target = i - 1;
+      else if (event.key === "ArrowDown" || event.key === "ArrowRight") target = i + 1;
       else if (event.key === "Home") target = 0;
       else if (event.key === "End") target = tabs.length - 1;
       if (target === null) return;

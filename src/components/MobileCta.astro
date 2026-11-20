@@ -1,0 +1,88 @@
+---
+/**
+ * CTA de polegar no celular: aparece quando os botões do topo saem da tela e
+ * some quando o contato, o rodapé ou uma peça interativa (seletor, Kairos) entram. Respeita a barra inferior do
+ * aparelho (safe-area). Fora do celular, a cápsula do cabeçalho já carrega o CTA.
+ */
+import { site } from "../data/site";
+import Icon from "./Icon.astro";
+---
+
+<div class="dock" data-dock data-visible="false" inert>
+  <a class="btn btn-primary dock-cta" href={site.diagnosisMailto}>
+    Pedir diagnóstico de 30 min
+    <Icon name="mail" class="no-nudge" />
+  </a>
+</div>
+
+<script>
+  const dock = document.querySelector<HTMLElement>("[data-dock]");
+  const narrow = window.matchMedia("(max-width: 39.99rem)");
+
+  if (dock && "IntersectionObserver" in window) {
+    const anchors = [...document.querySelectorAll<HTMLElement>("[data-cta-anchor]")];
+    // Some também sobre as peças interativas, para não cobrir os controles nem o texto do passo.
+    const blockers = [
+      document.getElementById("contato"),
+      document.querySelector("footer"),
+      ...document.querySelectorAll("[data-flow], .svc-panels"),
+    ].filter(
+      (el): el is HTMLElement => el !== null,
+    );
+    const seen = new Map<Element, boolean>();
+
+    const update = () => {
+      const anchorVisible = anchors.some((el) => seen.get(el));
+      const blocked = blockers.some((el) => seen.get(el));
+      const show = narrow.matches && !anchorVisible && !blocked && window.scrollY > 240;
+      dock.dataset.visible = String(show);
+      dock.inert = !show;
+    };
+
+    const io = new IntersectionObserver((entries) => {
+      for (const entry of entries) seen.set(entry.target, entry.isIntersecting);
+      update();
+    });
+    for (const el of [...anchors, ...blockers]) io.observe(el);
+    narrow.addEventListener("change", update);
+    window.addEventListener("scroll", update, { passive: true });
+  }
+</script>
+
+<style>
+  .dock {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    display: none;
+    padding: 0 max(0.75rem, env(safe-area-inset-right)) calc(0.75rem + env(safe-area-inset-bottom))
+      max(0.75rem, env(safe-area-inset-left));
+    pointer-events: none;
+  }
+
+  @media (max-width: 39.99rem) {
+    .dock {
+      display: block;
+    }
+  }
+
+  .dock-cta {
+    width: 100%;
+    pointer-events: auto;
+    box-shadow:
+      0 10px 30px -8px rgb(0 0 0 / 0.45),
+      0 0 0 1px color-mix(in srgb, var(--accent-fg) 12%, transparent);
+    transform: translateY(calc(100% + 1.5rem));
+    opacity: 0;
+    transition:
+      transform 420ms var(--ease-out),
+      opacity 300ms var(--ease-out);
+  }
+
+  .dock[data-visible="true"] .dock-cta {
+    transform: none;
+    opacity: 1;
+  }
+</style>

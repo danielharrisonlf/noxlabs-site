@@ -10,7 +10,7 @@ const wave =
 
 <section class="section process" id="processo" aria-labelledby="processo-title">
   <div class="wrap">
-    <header class="process-head">
+    <header class="process-head" data-reveal="head">
       <h2 id="processo-title" class="section-title">Como um projeto anda.</h2>
       <p class="section-lede">Quatro etapas, nesta ordem. Ao fim de cada uma, você decide se segue.</p>
     </header>
@@ -25,7 +25,7 @@ const wave =
       <ol class="steps" role="list">
         {
           steps.map((step, i) => (
-            <li class="step" style={`--ny:${heights[i]}`}>
+            <li class="step" style={`--ny:${heights[i]};--i:${i}`} data-reveal>
               <span class="step-node tabular" aria-hidden="true">
                 {i + 1}
               </span>
@@ -42,11 +42,11 @@ const wave =
     </div>
 
     <div class="principles">
-      <h3 class="principles-title">O que vale em qualquer projeto</h3>
+      <h3 class="principles-title" data-reveal="head">O que vale em qualquer projeto</h3>
       <ul role="list" class="principles-list">
         {
-          principles.map((p) => (
-            <li>
+          principles.map((p, i) => (
+            <li data-reveal style={`--i:${i % 3}`}>
               <h4>{p.title}.</h4> <p>{p.text}</p>
             </li>
           ))

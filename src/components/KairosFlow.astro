@@ -99,7 +99,7 @@ const layouts = [
 const total = kairosFlow.length;
 ---
 
-<div class="kf night grain" data-flow id={id}>
+<div class="kf night grain" data-flow id={id} data-dir="next" data-reveal="stage" style="view-transition-name: kairos-stage">
   <div class="kf-canvas">
     {
       layouts.map((layout, li) => (
@@ -135,6 +135,7 @@ const total = kairosFlow.length;
             return (
               <g class={`kf-node is-${n.kind}`} data-s={n.step}>
                 <circle class="kf-halo" cx={p.x} cy={p.y} r={layout.r + 11} />
+                <circle class="kf-ring" cx={p.x} cy={p.y} r={layout.r + 4} />
                 {n.kind === "data" ? (
                   <rect
                     class="kf-dot"
@@ -216,9 +217,11 @@ const total = kairosFlow.length;
 </div>
 
 <script>
+  import { onSwipe, pauseOffscreen } from "../scripts/motion";
   import { type TabsController, enhanceTabs } from "../scripts/tabs";
 
-  const STEP_MS = 5200;
+  const STEP_MS = 4800;
+  const EDGE_MS = 820;
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   for (const root of document.querySelectorAll<HTMLElement>("[data-flow]")) {
@@ -233,24 +236,31 @@ const total = kairosFlow.length;
     let timer: number | undefined;
     let playing = false;
 
+    /*
+     * A luz percorre os trechos do passo em sequência (gateway, depois MCP), e
+     * em paralelo quando o caminho se divide (filas para os três consumidores).
+     * Cada trecho acende atrás do pacote, como numa exposição longa.
+     */
     const runPackets = (step: number) => {
       if (reduce.matches) return;
-      for (const edge of root.querySelectorAll<SVGGElement>(`.kf-edge[data-s="${step}"]`)) {
-        const core = edge.querySelector<SVGPathElement>(".kf-core");
-        const packet = edge.querySelector<SVGPathElement>(".kf-packet");
-        core?.animate([{ strokeDashoffset: "1000" }, { strokeDashoffset: "0" }], {
-          duration: 900,
-          easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+      for (const svg of root.querySelectorAll<SVGSVGElement>(".kf-svg")) {
+        const edges = [...svg.querySelectorAll<SVGGElement>(`.kf-edge[data-s="${step}"]`)];
+        edges.forEach((edge, k) => {
+          const delay = step === 6 ? 0 : k * EDGE_MS * 0.8;
+          const timing = { duration: EDGE_MS, delay, easing: "cubic-bezier(0.45, 0, 0.2, 1)", fill: "backwards" as const };
+          edge
+            .querySelector<SVGPathElement>(".kf-core")
+            ?.animate([{ strokeDashoffset: "1000" }, { strokeDashoffset: "0" }], timing);
+          edge.querySelector<SVGPathElement>(".kf-packet")?.animate(
+            [
+              { strokeDashoffset: "70", opacity: 0 },
+              { opacity: 1, offset: 0.1 },
+              { opacity: 1, offset: 0.88 },
+              { strokeDashoffset: "-1000", opacity: 0 },
+            ],
+            timing,
+          );
         });
-        packet?.animate(
-          [
-            { strokeDashoffset: "70", opacity: 0 },
-            { opacity: 1, offset: 0.12 },
-            { opacity: 1, offset: 0.85 },
-            { strokeDashoffset: "-1000", opacity: 0 },
-          ],
-          { duration: 1100, easing: "cubic-bezier(0.65, 0, 0.35, 1)" },
-        );
       }
     };
 
@@ -286,9 +296,12 @@ const total = kairosFlow.length;
       timer = window.setTimeout(tick, STEP_MS);
     };
 
+    let lastIndex = 0;
     tabs = enhanceTabs(root, {
       orientation: "horizontal",
       onChange: (_id, index, source) => {
+        root.dataset.dir = index >= lastIndex ? "next" : "prev";
+        lastIndex = index;
         paint(index);
         if (source !== "init") runPackets(index + 1);
         if (source === "user") setPlaying(false);
@@ -299,15 +312,28 @@ const total = kairosFlow.length;
     if (!tabs) continue;
     const ctl = tabs;
     if (controls) controls.hidden = false;
+    pauseOffscreen(root);
 
-    prev?.addEventListener("click", () => {
-      setPlaying(false);
-      ctl.select(ctl.current() - 1 < 0 ? 0 : ctl.current() - 1, "api");
-    });
-    next?.addEventListener("click", () => {
+    const goNext = () => {
       setPlaying(false);
       ctl.select(Math.min(ctl.current() + 1, ctl.count - 1), "api");
-    });
+    };
+    const goPrev = () => {
+      setPlaying(false);
+      ctl.select(Math.max(ctl.current() - 1, 0), "api");
+    };
+
+    // Polegar: deslizar para os lados avança ou volta; tocar num ponto do diagrama vai ao passo dele.
+    onSwipe(root, goNext, goPrev);
+    for (const node of root.querySelectorAll<SVGGElement>(".kf-node")) {
+      node.addEventListener("click", () => {
+        setPlaying(false);
+        ctl.select(Number(node.dataset.s) - 1, "api");
+      });
+    }
+
+    prev?.addEventListener("click", goPrev);
+    next?.addEventListener("click", goNext);
     play?.addEventListener("click", () => {
       if (playing) {
         setPlaying(false);
@@ -342,6 +368,7 @@ const total = kairosFlow.length;
   .kf {
     --kf-r: var(--r-xl);
     position: relative;
+    touch-action: pan-y;
     border-radius: var(--kf-r);
     overflow: hidden;
     border: 1px solid var(--line);
@@ -449,6 +476,49 @@ const total = kairosFlow.length;
     transition: opacity 500ms var(--ease-out);
   }
 
+  .kf-node {
+    cursor: pointer;
+  }
+
+  .kf-ring {
+    fill: none;
+    stroke: var(--sodio);
+    stroke-width: 2;
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  /* O nó acende quando a luz chega: um anel se abre uma vez e o halo fica. */
+  @media (prefers-reduced-motion: no-preference) {
+    .kf-node.is-now .kf-ring {
+      animation: kf-ring 1s var(--ease-out) 420ms both;
+    }
+
+    .kf-node.is-now .kf-dot {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: kf-pop 600ms var(--ease-out) 380ms both;
+    }
+  }
+
+  @keyframes kf-ring {
+    from {
+      opacity: 0.8;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(2.3);
+    }
+  }
+
+  @keyframes kf-pop {
+    40% {
+      transform: scale(1.22);
+    }
+  }
+
   .kf-dot {
     fill: var(--bg-3);
     stroke: var(--line-2);
@@ -496,6 +566,14 @@ const total = kairosFlow.length;
   .kf-sub {
     fill: var(--fg-3);
     font-size: 14px;
+  }
+
+  .kf-tall .kf-name {
+    font-size: 17px;
+  }
+
+  .kf-tall .kf-sub {
+    font-size: 15.5px;
   }
 
   .kf-node.is-now .kf-name,
@@ -644,6 +722,10 @@ const total = kairosFlow.length;
     .kf[data-enhanced="true"] .kf-panel:not([hidden]) > * {
       animation: kf-in 520ms var(--ease-out) both;
     }
+
+    .kf[data-dir="prev"] .kf-panel:not([hidden]) > * {
+      animation-name: kf-in-prev;
+    }
     .kf[data-enhanced="true"] .kf-panel:not([hidden]) > .kf-text {
       animation-delay: 60ms;
     }
@@ -654,8 +736,15 @@ const total = kairosFlow.length;
 
   @keyframes kf-in {
     from {
-      opacity: 0.2;
-      translate: 0 6px;
+      opacity: 0;
+      translate: 22px 0;
+    }
+  }
+
+  @keyframes kf-in-prev {
+    from {
+      opacity: 0;
+      translate: -22px 0;
     }
   }
 
@@ -824,6 +913,26 @@ const total = kairosFlow.length;
 
     .kf-console {
       padding-inline: 0.75rem;
+    }
+  }
+
+  /* 320 px: seis alvos de 44 px cabem sem espaço entre eles. */
+  @media (max-width: 22.5rem) {
+    .kf-console {
+      padding-inline: 0.5rem;
+    }
+
+    .kf-canvas {
+      padding-inline: 0.25rem;
+    }
+
+    .kf-rail {
+      gap: 0;
+    }
+
+    .kf-tab {
+      min-width: 2.75rem;
+      padding: 0;
     }
   }
 </style>

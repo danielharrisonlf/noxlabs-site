@@ -2,6 +2,7 @@
 import "../styles/global.css";
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
+import MobileCta from "../components/MobileCta.astro";
 import { site } from "../data/site";
 
 interface Props {
@@ -72,7 +73,7 @@ const graph = [org, person, website, ...schema];
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
@@ -113,6 +114,14 @@ const graph = [org, person, website, ...schema];
       } catch {
         // Armazenamento bloqueado: segue a preferência do sistema.
       }
+      // Sem animation-timeline, as entradas por rolagem usam IntersectionObserver (ver global.css).
+      if (
+        window.CSS &&
+        !CSS.supports("animation-timeline: view()") &&
+        !matchMedia("(prefers-reduced-motion: reduce)").matches
+      ) {
+        document.documentElement.classList.add("reveal-io");
+      }
     </script>
 
     <script type="application/ld+json" set:html={JSON.stringify(graph)} />
@@ -124,5 +133,11 @@ const graph = [org, person, website, ...schema];
       <slot />
     </main>
     <Footer />
+    <MobileCta />
+    <script>
+      import { revealFallback } from "../scripts/motion";
+
+      revealFallback();
+    </script>
   </body>
 </html>

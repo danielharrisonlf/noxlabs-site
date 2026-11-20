@@ -11,28 +11,53 @@ import Logo from "./Logo.astro";
     </a>
 
     <nav class="header-nav" id="site-nav" aria-label="Principal" data-open="false">
-      <ul role="list">
+      <ul role="list" class="nav-list">
         {
-          nav.map((item) => (
-            <li>
+          nav.map((item, i) => (
+            <li style={`--i:${i}`}>
               <a href={item.href} data-nav-link={item.id}>
+                <span class="nav-num tabular" aria-hidden="true">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
                 {item.label}
               </a>
             </li>
           ))
         }
       </ul>
+      <!-- Indicador da seção atual: desliza até o link e se enche com o progresso da seção. -->
+      <span class="nav-ind" aria-hidden="true"><span class="nav-ind-fill"></span></span>
+
+      <div class="menu-foot">
+        <a class="btn btn-primary" href={site.diagnosisMailto}>
+          Pedir diagnóstico de 30 min
+          <Icon name="mail" class="no-nudge" />
+        </a>
+        <div class="menu-row">
+          <a class="menu-mail" href={site.mailto}>{site.email}</a>
+          <button class="icon-btn theme-toggle" type="button" data-theme-toggle aria-label="Alternar tema claro e escuro">
+            <Icon name="moon" class="i-moon" />
+            <Icon name="sun" class="i-sun" />
+          </button>
+        </div>
+      </div>
+      <svg class="menu-trails" viewBox="0 0 400 300" preserveAspectRatio="xMaxYMax slice" aria-hidden="true">
+        <path d="M 420 120 C 300 160, 180 260, -20 300" pathLength="1"></path>
+        <path d="M 420 170 C 320 200, 200 280, 40 330" pathLength="1"></path>
+      </svg>
     </nav>
 
     <div class="header-actions">
-      <button class="icon-btn theme-toggle" type="button" data-theme-toggle aria-label="Alternar tema claro e escuro">
+      <button
+        class="icon-btn theme-toggle header-theme"
+        type="button"
+        data-theme-toggle
+        aria-label="Alternar tema claro e escuro"
+      >
         <Icon name="moon" class="i-moon" />
         <Icon name="sun" class="i-sun" />
       </button>
-      <a class="btn btn-primary btn-sm header-cta" href={site.diagnosisMailto}>
-        <span class="cta-long">Pedir diagnóstico</span>
-        <span class="cta-short">Diagnóstico</span>
-      </a>
+      <a class="btn btn-primary btn-sm header-cta" href={site.diagnosisMailto}>Pedir diagnóstico</a>
       <button
         class="icon-btn menu-toggle"
         type="button"
@@ -41,8 +66,7 @@ import Logo from "./Logo.astro";
         aria-label="Abrir menu"
         data-menu-toggle
       >
-        <Icon name="menu" class="i-menu" />
-        <Icon name="close" class="i-close" />
+        <span class="burger" aria-hidden="true"><span></span><span></span></span>
       </button>
     </div>
 
@@ -51,8 +75,10 @@ import Logo from "./Logo.astro";
 </header>
 
 <script>
+  import { reducedMotion } from "../scripts/motion";
+
   const root = document.documentElement;
-  const themeBtn = document.querySelector<HTMLButtonElement>("[data-theme-toggle]");
+  const themeBtns = [...document.querySelectorAll<HTMLButtonElement>("[data-theme-toggle]")];
 
   const currentTheme = (): "light" | "dark" => {
     const set = root.dataset.theme;
@@ -61,84 +87,132 @@ import Logo from "./Logo.astro";
   };
 
   const labelTheme = () => {
-    if (!themeBtn) return;
     const next = currentTheme() === "dark" ? "claro" : "escuro";
-    themeBtn.setAttribute("aria-label", `Usar tema ${next}`);
+    for (const b of themeBtns) b.setAttribute("aria-label", `Usar tema ${next}`);
   };
 
-  themeBtn?.addEventListener("click", () => {
-    const next = currentTheme() === "dark" ? "light" : "dark";
-    const apply = () => {
-      root.dataset.theme = next;
-      labelTheme();
-    };
-    // Troca de céu com uma transição de visão, quando o navegador tem e o movimento é bem-vindo.
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (!reduce && "startViewTransition" in document) document.startViewTransition(apply);
-    else apply();
-    try {
-      localStorage.setItem("noxlabs-theme", next);
-    } catch {
-      // Armazenamento bloqueado: o tema vale só para esta visita.
-    }
-  });
+  for (const btn of themeBtns) {
+    btn.addEventListener("click", () => {
+      const next = currentTheme() === "dark" ? "light" : "dark";
+      const apply = () => {
+        root.dataset.theme = next;
+        labelTheme();
+      };
+      try {
+        localStorage.setItem("noxlabs-theme", next);
+      } catch {
+        // Armazenamento bloqueado: o tema vale só para esta visita.
+      }
+      if (reducedMotion() || !("startViewTransition" in document)) {
+        apply();
+        return;
+      }
+      // O tema novo se abre num círculo a partir do botão (ver theme-reveal em global.css).
+      const r = btn.getBoundingClientRect();
+      const x = r.left + r.width / 2;
+      const y = r.top + r.height / 2;
+      const radius = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+      root.style.setProperty("--vt-x", `${x}px`);
+      root.style.setProperty("--vt-y", `${y}px`);
+      root.style.setProperty("--vt-r", `${radius}px`);
+      root.classList.add("theme-vt");
+      const vt = document.startViewTransition(apply);
+      vt.finished.finally(() => root.classList.remove("theme-vt"));
+    });
+  }
   labelTheme();
 
+  // Menu: tela cheia abaixo de 70rem, com foco preso dentro e o resto da página inerte.
   const menuBtn = document.querySelector<HTMLButtonElement>("[data-menu-toggle]");
   const menu = document.getElementById("site-nav");
+  const outside = [document.querySelector("main"), document.querySelector("footer"), document.querySelector("[data-dock]")];
 
-  const setMenu = (open: boolean) => {
+  const setMenu = (open: boolean, focusBack = true) => {
     if (!menuBtn || !menu) return;
     menuBtn.setAttribute("aria-expanded", String(open));
     menuBtn.setAttribute("aria-label", open ? "Fechar menu" : "Abrir menu");
     menu.dataset.open = String(open);
+    root.classList.toggle("menu-open", open);
+    for (const el of outside) if (el instanceof HTMLElement) el.inert = open;
+    if (open) menu.querySelector<HTMLElement>("a")?.focus({ preventScroll: true });
+    else if (focusBack) menuBtn.focus({ preventScroll: true });
   };
 
   menuBtn?.addEventListener("click", () => setMenu(menuBtn.getAttribute("aria-expanded") !== "true"));
   menu?.addEventListener("click", (event) => {
-    if ((event.target as HTMLElement).closest("a")) setMenu(false);
-  });
-  document.addEventListener("click", (event) => {
-    if (menuBtn?.getAttribute("aria-expanded") !== "true") return;
-    const target = event.target as HTMLElement;
-    if (!target.closest(".header-pill")) setMenu(false);
+    if ((event.target as HTMLElement).closest("a")) setMenu(false, false);
   });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && menuBtn?.getAttribute("aria-expanded") === "true") {
+    if (menuBtn?.getAttribute("aria-expanded") !== "true") return;
+    if (event.key === "Escape") {
       setMenu(false);
-      menuBtn.focus();
+      return;
     }
+    if (event.key !== "Tab" || !menu) return;
+    // Tab circula entre o botão do menu e os itens do menu.
+    const items = [menuBtn, ...menu.querySelectorAll<HTMLElement>("a, button")];
+    const i = items.indexOf(document.activeElement as HTMLElement);
+    const next = event.shiftKey ? (i <= 0 ? items.length - 1 : i - 1) : i === items.length - 1 ? 0 : i + 1;
+    event.preventDefault();
+    items[next].focus();
   });
   window.matchMedia("(min-width: 70rem)").addEventListener("change", (event) => {
-    if (event.matches) setMenu(false);
+    if (event.matches) setMenu(false, false);
   });
 
-  // Seção atual: o link correspondente acende enquanto a seção ocupa o meio da tela.
+  // Seção atual e progresso dentro dela, no indicador que desliza sob os links.
+  const list = document.querySelector<HTMLElement>(".nav-list");
+  const ind = document.querySelector<HTMLElement>(".nav-ind");
   const links = new Map<string, HTMLAnchorElement>();
-  for (const a of document.querySelectorAll<HTMLAnchorElement>("[data-nav-link]")) {
-    links.set(a.dataset.navLink ?? "", a);
-  }
+  for (const a of document.querySelectorAll<HTMLAnchorElement>("[data-nav-link]")) links.set(a.dataset.navLink ?? "", a);
   const sections = [...links.keys()]
     .map((id) => document.getElementById(id))
     .filter((el): el is HTMLElement => el !== null);
 
-  if (sections.length && "IntersectionObserver" in window) {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const link = links.get(entry.target.id);
-          if (!link) continue;
-          if (entry.isIntersecting) {
-            for (const other of links.values()) other.removeAttribute("aria-current");
-            link.setAttribute("aria-current", "true");
-          } else if (link.getAttribute("aria-current") === "true") {
-            link.removeAttribute("aria-current");
-          }
-        }
-      },
-      { rootMargin: "-45% 0px -50% 0px" },
-    );
-    for (const section of sections) observer.observe(section);
+  if (sections.length && list && ind) {
+    let active: HTMLElement | null = null;
+    let frame = 0;
+
+    const place = () => {
+      if (!active) {
+        ind.dataset.on = "false";
+        return;
+      }
+      const link = links.get(active.id);
+      if (!link) return;
+      ind.dataset.on = "true";
+      ind.style.setProperty("--ix", `${link.offsetLeft + 12}px`);
+      ind.style.setProperty("--iw", `${Math.max(link.offsetWidth - 24, 8) / 100}`);
+    };
+
+    const measure = () => {
+      frame = 0;
+      const mid = window.scrollY + window.innerHeight * 0.45;
+      let current: HTMLElement | null = null;
+      for (const s of sections) if (s.offsetTop <= mid) current = s;
+      if (current && mid > current.offsetTop + current.offsetHeight) current = null;
+      if (current !== active) {
+        for (const a of links.values()) a.removeAttribute("aria-current");
+        if (current) links.get(current.id)?.setAttribute("aria-current", "true");
+        active = current;
+        place();
+      }
+      if (active) {
+        const p = (mid - active.offsetTop) / active.offsetHeight;
+        ind.style.setProperty("--sp", `${Math.min(Math.max(p, 0), 1)}`);
+      }
+    };
+
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(measure);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", () => {
+      place();
+      onScroll();
+    });
+    document.fonts?.ready.then(place);
+    measure();
   }
 </script>
 
@@ -147,8 +221,10 @@ import Logo from "./Logo.astro";
     position: fixed;
     inset: 0 0 auto;
     z-index: 50;
-    padding: 0.75rem var(--gutter) 0;
+    padding: calc(0.75rem + env(safe-area-inset-top)) max(var(--gutter), env(safe-area-inset-right)) 0
+      max(var(--gutter), env(safe-area-inset-left));
     pointer-events: none;
+    view-transition-name: site-header;
   }
 
   .header-pill {
@@ -160,28 +236,45 @@ import Logo from "./Logo.astro";
     min-height: 3.75rem;
     margin-inline: auto;
     padding: 0.4rem 0.45rem 0.4rem 1.1rem;
-    border: 1px solid color-mix(in srgb, var(--line) 85%, transparent);
     border-radius: var(--r-pill);
+    isolation: isolate;
+    pointer-events: auto;
+  }
+
+  /* O vidro fica num pseudo-elemento: backdrop-filter na própria cápsula viraria o
+     bloco de contenção do menu fixo em tela cheia. */
+  .header-pill::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    border: 1px solid color-mix(in srgb, var(--line) 85%, transparent);
+    border-radius: inherit;
     background: color-mix(in srgb, var(--bg) 78%, transparent);
     box-shadow: var(--shadow-1);
     backdrop-filter: blur(16px) saturate(1.4);
     -webkit-backdrop-filter: blur(16px) saturate(1.4);
-    pointer-events: auto;
   }
 
   .header-home {
+    position: relative;
+    z-index: 2;
     margin-right: auto;
     padding-block: var(--s-2);
     text-decoration: none;
     border-radius: var(--r-sm);
   }
 
-  .header-nav ul {
+  .header-nav {
+    position: relative;
+  }
+
+  .nav-list {
     display: flex;
     gap: 0.1rem;
   }
 
-  .header-nav a {
+  .nav-list a {
     position: relative;
     display: inline-flex;
     align-items: center;
@@ -197,42 +290,61 @@ import Logo from "./Logo.astro";
       background-color 200ms var(--ease-out);
   }
 
-  /* Ponto de luz sob o link da seção atual */
-  .header-nav a::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    bottom: 0.35rem;
-    width: 0.3rem;
-    height: 0.3rem;
-    margin-left: -0.15rem;
-    border-radius: 50%;
-    background: var(--sodio);
-    box-shadow: 0 0 8px var(--sodio);
-    opacity: 0;
-    transform: scale(0.2);
-    transition:
-      opacity 250ms var(--ease-out),
-      transform 400ms var(--ease-spring);
+  .nav-num {
+    display: none;
   }
 
-  .header-nav a[aria-current="true"] {
+  .nav-list a[aria-current="true"] {
     color: var(--fg);
   }
 
-  .header-nav a[aria-current="true"]::after {
-    opacity: 1;
-    transform: scale(1);
-  }
-
   @media (hover: hover) {
-    .header-nav a:hover {
+    .nav-list a:hover {
       color: var(--fg);
       background: color-mix(in srgb, var(--fg) 7%, transparent);
     }
   }
 
+  /* Trilho de 100px escalado até a largura do link; o preenchimento é o progresso da seção. */
+  .nav-ind {
+    position: absolute;
+    left: 0;
+    bottom: 0.3rem;
+    width: 100px;
+    height: 2px;
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--fg) 14%, transparent);
+    transform-origin: left center;
+    transform: translateX(var(--ix, 0)) scaleX(var(--iw, 0));
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform 520ms var(--ease-out),
+      opacity 300ms var(--ease-out);
+  }
+
+  .nav-ind[data-on="true"] {
+    opacity: 1;
+  }
+
+  .nav-ind-fill {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--sodio), var(--freio));
+    box-shadow: 0 0 8px color-mix(in srgb, var(--sodio) 70%, transparent);
+    transform-origin: left center;
+    transform: scaleX(var(--sp, 0));
+  }
+
+  .menu-foot,
+  .menu-trails {
+    display: none;
+  }
+
   .header-actions {
+    position: relative;
+    z-index: 2;
     display: flex;
     align-items: center;
     gap: var(--s-1);
@@ -240,10 +352,6 @@ import Logo from "./Logo.astro";
 
   .header-cta {
     margin-left: var(--s-1);
-  }
-
-  .cta-short {
-    display: none;
   }
 
   .icon-btn {
@@ -257,15 +365,20 @@ import Logo from "./Logo.astro";
     border: 0;
     border-radius: 50%;
     cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition: background-color 200ms var(--ease-out);
+    transition:
+      background-color 200ms var(--ease-out),
+      transform 300ms var(--ease-spring);
+  }
+
+  .icon-btn:active {
+    transform: scale(0.92);
   }
 
   .icon-btn :global(svg) {
     width: 1.25rem;
     height: 1.25rem;
     grid-area: 1 / 1;
-    transition: transform 400ms var(--ease-spring);
+    transition: transform 500ms var(--ease-spring);
   }
 
   @media (hover: hover) {
@@ -273,7 +386,7 @@ import Logo from "./Logo.astro";
       background: color-mix(in srgb, var(--fg) 8%, transparent);
     }
     .theme-toggle:hover :global(svg) {
-      transform: rotate(-18deg);
+      transform: rotate(-25deg);
     }
   }
 
@@ -298,23 +411,46 @@ import Logo from "./Logo.astro";
     }
   }
 
+  /* Duas linhas que viram um xis. */
   .menu-toggle {
     display: none;
   }
 
-  .menu-toggle :global(.i-close) {
-    display: none;
+  .burger {
+    position: relative;
+    width: 1.25rem;
+    height: 0.75rem;
   }
 
-  .menu-toggle[aria-expanded="true"] :global(.i-close) {
-    display: block;
+  .burger span {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1.75px;
+    border-radius: 2px;
+    background: currentColor;
+    transition:
+      transform 420ms var(--ease-out),
+      top 0s;
   }
 
-  .menu-toggle[aria-expanded="true"] :global(.i-menu) {
-    display: none;
+  .burger span:first-child {
+    top: 0;
   }
 
-  /* Progresso da leitura: um rastro que cresce na borda de baixo da cápsula. */
+  .burger span:last-child {
+    top: calc(100% - 1.75px);
+  }
+
+  .menu-toggle[aria-expanded="true"] .burger span:first-child {
+    transform: translateY(calc(0.375rem - 0.875px)) rotate(45deg);
+  }
+
+  .menu-toggle[aria-expanded="true"] .burger span:last-child {
+    transform: translateY(calc(-0.375rem + 0.875px)) rotate(-45deg);
+  }
+
+  /* Progresso de leitura: só nas páginas sem seções no menu (casos, 404). */
   .header-progress {
     position: absolute;
     left: 1.5rem;
@@ -326,6 +462,10 @@ import Logo from "./Logo.astro";
     transform-origin: left center;
     transform: scaleX(0);
     opacity: 0.9;
+  }
+
+  :global(body:has(#servicos)) .header-progress {
+    display: none;
   }
 
   @supports (animation-timeline: scroll()) {
@@ -341,85 +481,182 @@ import Logo from "./Logo.astro";
     }
   }
 
+  /* ---- Abaixo de 70rem: menu em tela cheia ---- */
   @media (max-width: 69.99rem) {
     .menu-toggle {
       display: inline-grid;
     }
 
     .header-nav {
-      position: absolute;
-      top: calc(100% + 0.5rem);
-      left: 0;
-      right: 0;
-      display: none;
-      padding: var(--s-3);
-      border: 1px solid var(--line);
-      border-radius: var(--r-lg);
-      background: var(--bg-2);
-      box-shadow: var(--shadow-2);
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100dvh;
+      padding: calc(env(safe-area-inset-top) + 6.5rem) max(var(--gutter), env(safe-area-inset-right))
+        calc(env(safe-area-inset-bottom) + 1.5rem) max(var(--gutter), env(safe-area-inset-left));
+      background: var(--bg);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      visibility: hidden;
+      clip-path: inset(0 0 100% 0);
+      transition:
+        clip-path 380ms var(--ease-in-out),
+        visibility 0s linear 380ms;
+      pointer-events: auto;
     }
 
     .header-nav[data-open="true"] {
-      display: block;
+      visibility: visible;
+      clip-path: inset(0 0 0 0);
+      transition:
+        clip-path 520ms var(--ease-out),
+        visibility 0s;
     }
 
-    @media (prefers-reduced-motion: no-preference) {
-      .header-nav[data-open="true"] {
-        animation: menu-in 320ms var(--ease-out);
-      }
-    }
-
-    .header-nav ul {
+    .nav-list {
       flex-direction: column;
       gap: 0;
     }
 
-    .header-nav a {
+    .nav-list li {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav-list a {
       display: flex;
+      align-items: baseline;
+      gap: var(--s-4);
       width: 100%;
-      min-height: 3.25rem;
-      padding-inline: var(--s-4);
+      min-height: 3.75rem;
+      padding: 0.6rem 0;
+      border-radius: 0;
       font-family: var(--font-display);
-      font-size: var(--t-lg);
+      font-size: clamp(1.75rem, 1.2rem + 3vw, 2.75rem);
       font-weight: 500;
+      letter-spacing: -0.025em;
       color: var(--fg);
     }
 
-    .header-nav a::after {
-      left: auto;
-      right: var(--s-4);
-      top: 50%;
-      bottom: auto;
-      margin: -0.15rem 0 0;
+    .nav-num {
+      display: inline;
+      font-family: var(--font-text);
+      font-size: var(--t-xs);
+      font-weight: 700;
+      letter-spacing: 0;
+      color: var(--sodio);
     }
-  }
 
-  @keyframes menu-in {
-    from {
-      opacity: 0;
-      transform: translateY(-6px) scale(0.98);
+    .nav-list a[aria-current="true"] .nav-num {
+      text-shadow: 0 0 10px var(--sodio);
     }
-  }
 
-  @media (max-width: 30rem) {
-    .header-pill {
-      padding-left: 0.85rem;
-      gap: 0;
-    }
-    .cta-long {
+    .nav-ind {
       display: none;
     }
-    .cta-short {
-      display: inline;
+
+    .menu-foot {
+      display: grid;
+      gap: var(--s-4);
+      margin-top: auto;
+      padding-top: var(--s-7);
     }
-    .header-cta {
-      padding-inline: 0.95rem;
+
+    .menu-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--s-3);
+    }
+
+    .menu-mail {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.75rem;
+      color: var(--fg-2);
+      font-size: var(--t-sm);
+      overflow-wrap: anywhere;
+    }
+
+    .menu-row .theme-toggle {
+      border: 1px solid var(--line-2);
+    }
+
+    .menu-trails {
+      display: block;
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: min(100%, 28rem);
+      height: 16rem;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .menu-trails path {
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-dasharray: 1;
+    }
+
+    .menu-trails path:first-child {
+      stroke: var(--sodio);
+    }
+
+    .menu-trails path:last-child {
+      stroke: var(--mercurio);
+      opacity: 0.7;
+    }
+
+    /* Coreografia de abertura: links sobem em sequência e os rastros se desenham. */
+    @media (prefers-reduced-motion: no-preference) {
+      .header-nav[data-open="true"] .nav-list li {
+        animation: menu-item 560ms var(--ease-out) both;
+        animation-delay: calc(120ms + var(--i) * 45ms);
+      }
+
+      .header-nav[data-open="true"] .menu-foot {
+        animation: menu-item 560ms var(--ease-out) 420ms both;
+      }
+
+      .header-nav[data-open="true"] .menu-trails path {
+        animation: menu-trail 1.4s var(--ease-out) 250ms both;
+      }
+    }
+
+    .menu-trails path {
+      stroke-dashoffset: 0;
+    }
+
+    :global(html.menu-open) {
+      overflow: hidden;
     }
   }
 
-  @media (max-width: 23.5rem) {
-    .header :global(.logo-word) {
-      font-size: 1.2rem;
+  @keyframes menu-item {
+    from {
+      opacity: 0;
+      translate: 0 22px;
+    }
+  }
+
+  @keyframes menu-trail {
+    from {
+      stroke-dashoffset: 1;
+    }
+  }
+
+  /* Celular: a cápsula leva só a marca e o menu; tema vai para o menu e o CTA para a base. */
+  @media (max-width: 39.99rem) {
+    .header-theme,
+    .header-cta {
+      display: none;
+    }
+
+    .header-pill {
+      padding-left: 0.95rem;
     }
   }
 </style>

@@ -2,7 +2,7 @@
 import Contact from "../../components/Contact.astro";
 import Icon from "../../components/Icon.astro";
 import KairosFlow from "../../components/KairosFlow.astro";
-import { type CaseStudy, detailCases } from "../../data/cases";
+import { type CaseStudy, detailCases, srcset } from "../../data/cases";
 import { site } from "../../data/site";
 import Base from "../../layouts/Base.astro";
 
@@ -65,7 +65,7 @@ const breadcrumb = {
           <Icon name="arrow-right" class="crumb-sep" />
           <span aria-current="page">{study.name}</span>
         </nav>
-        <h1 id="case-title">{study.name}</h1>
+        <h1 id="case-title" style={`view-transition-name: title-${study.slug}`}>{study.name}</h1>
         <div class="case-intro">
           <p class="case-summary">{study.summary}</p>
           <div class="case-side">
@@ -79,7 +79,7 @@ const breadcrumb = {
                 <dd>{study.proves}</dd>
               </div>
             </dl>
-            <div class="case-links">
+            <div class="case-links" data-cta-anchor>
               {
                 study.links.map((l, i) => (
                   <a class:list={["btn", i === 0 ? "btn-primary" : "btn-ghost"]} href={l.href}>
@@ -100,6 +100,8 @@ const breadcrumb = {
           <figure class="shot">
             <img
               src={study.image.src}
+              srcset={srcset(study.image.src, study.image.width)}
+              sizes="(min-width: 84rem) 80rem, 94vw"
               width={study.image.width}
               height={study.image.height}
               alt={study.image.alt}
@@ -114,7 +116,7 @@ const breadcrumb = {
     }
 
     <div class="wrap case-body">
-      <section class="problem" aria-labelledby="b-problema">
+      <section class="problem" aria-labelledby="b-problema" data-reveal>
         <h2 id="b-problema" class="block-title">O problema</h2>
         <p class="problem-text">{study.problem}</p>
       </section>
@@ -122,7 +124,7 @@ const breadcrumb = {
       {
         isKairos && (
           <section class="walk" aria-labelledby="b-pedido">
-            <div class="walk-head">
+            <div class="walk-head" data-reveal>
               <h2 id="b-pedido" class="block-title">Siga um pedido</h2>
               <p>
                 O caminho de um pedido feito a um agente de IA, do seu login à trilha de auditoria. Use os passos ou deixe
@@ -135,7 +137,7 @@ const breadcrumb = {
       }
 
       <div class="duo">
-        <section aria-labelledby="b-construido">
+        <section aria-labelledby="b-construido" data-reveal="left">
           <h2 id="b-construido" class="block-title">O que construí</h2>
           <ul role="list" class="dots">
             {study.built.map((b) => (
@@ -146,7 +148,7 @@ const breadcrumb = {
 
         {
           study.architecture && (
-            <section aria-labelledby="b-arquitetura">
+            <section aria-labelledby="b-arquitetura" data-reveal="right" style="--i:1">
               <h2 id="b-arquitetura" class="block-title">Arquitetura e decisões</h2>
               <ul role="list" class="dots dots-cool">
                 {study.architecture.map((a) => (
@@ -158,7 +160,7 @@ const breadcrumb = {
         }
       </div>
 
-      <section class="result" aria-labelledby="b-resultado">
+      <section class="result" aria-labelledby="b-resultado" data-reveal="stage">
         <h2 id="b-resultado" class="block-title">Resultado</h2>
         <ul role="list" class="outcomes">
           {
@@ -175,7 +177,7 @@ const breadcrumb = {
       <div class="duo duo-end">
         {
           study.limits && (
-            <section class="limits" aria-labelledby="b-limites">
+            <section class="limits" aria-labelledby="b-limites" data-reveal>
               <h2 id="b-limites" class="block-title">Limites conhecidos</h2>
               <ul role="list" class="dots dots-warm">
                 {study.limits.map((l) => (
@@ -186,7 +188,7 @@ const breadcrumb = {
           )
         }
 
-        <section aria-labelledby="b-stack">
+        <section aria-labelledby="b-stack" data-reveal style="--i:1">
           <h2 id="b-stack" class="block-title">Stack</h2>
           <ul role="list" class="chips">
             {study.stack.map((s) => (
@@ -202,8 +204,10 @@ const breadcrumb = {
       <div class="next-list">
         {
           others.map((o) => (
-            <a class="next" href={`/casos/${o.slug}/`}>
-              <span class="next-name">{o.name}</span>
+            <a class="next" href={`/casos/${o.slug}/`} data-reveal style={`--i:${others.indexOf(o)}`}>
+              <span class="next-name" style={`view-transition-name: title-${o.slug}`}>
+                {o.name}
+              </span>
               <span class="next-summary">{o.summary}</span>
               <span class="next-go" aria-hidden="true">
                 <Icon name="arrow-right" />

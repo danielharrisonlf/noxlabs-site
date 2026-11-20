@@ -18,8 +18,8 @@ const notes = [
 <section class="section kairos" id="kairos" aria-labelledby="kairos-title">
   <div class="wrap">
     <div class="k-head">
-      <h2 id="kairos-title" class="section-title">Siga um pedido pelo Kairos.</h2>
-      <div class="k-intro">
+      <h2 id="kairos-title" class="section-title" data-reveal="head">Siga um pedido pelo Kairos.</h2>
+      <div class="k-intro" data-reveal="right" style="--i:1">
         <p class="k-lede">
           O Kairos é a plataforma de gestão de projetos que construí e mantenho no ar. Pessoas e agentes de IA trabalham
           nos mesmos dados, com as mesmas regras. Avance os passos e veja o caminho de um pedido feito a um agente.
@@ -41,13 +41,13 @@ const notes = [
     <KairosFlow id="kf-home" />
 
     <div class="k-proof">
-      <div class="k-measure">
+      <div class="k-measure" data-reveal>
         <p class="k-kind">Em produção</p>
         <p class="k-measure-text">
           Sete serviços, PostgreSQL e Redis numa única VPS com Dokploy, com cadastro aberto de empresas e convites.
         </p>
       </div>
-      <dl class="k-notes">
+      <dl class="k-notes" data-reveal style="--i:1">
         {
           notes.map((n) => (
             <div>

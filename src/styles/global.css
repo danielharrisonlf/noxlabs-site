@@ -226,9 +226,26 @@
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
   scroll-padding-top: calc(var(--header-h) + 1rem);
   scrollbar-color: var(--line-2) var(--bg);
   interpolate-size: allow-keywords;
+}
+
+/*
+ * Telas muito largas: o sistema inteiro cresce um pouco, para 2560 px não
+ * virar um site miúdo no meio. Media queries em rem não mudam com isso.
+ */
+@media (min-width: 100rem) {
+  html {
+    font-size: calc(100% + 0.3vw - 4.8px);
+  }
+}
+
+@media (min-width: 120rem) {
+  :root {
+    --max: 88rem;
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -238,6 +255,52 @@ html {
 
   @view-transition {
     navigation: auto;
+  }
+
+  /* Navegação entre páginas: a página nova sobe um pouco enquanto aparece. */
+  ::view-transition-old(root) {
+    animation: vt-out 220ms var(--ease-out) both;
+  }
+
+  ::view-transition-new(root) {
+    animation: vt-in 420ms var(--ease-out) both;
+  }
+
+  ::view-transition-group(*) {
+    animation-duration: 480ms;
+    animation-timing-function: var(--ease-out);
+  }
+
+  /* Troca de tema: o tema novo se abre num círculo a partir do botão. */
+  html.theme-vt::view-transition-group(*),
+  html.theme-vt::view-transition-old(*) {
+    animation: none;
+  }
+
+  html.theme-vt::view-transition-new(*) {
+    animation: theme-reveal 620ms var(--ease-in-out) both;
+  }
+}
+
+@keyframes vt-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    translate: 0 14px;
+  }
+}
+
+@keyframes theme-reveal {
+  from {
+    clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 0));
+  }
+  to {
+    clip-path: circle(var(--vt-r, 150vmax) at var(--vt-x, 50%) var(--vt-y, 0));
   }
 }
 
@@ -250,9 +313,13 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  min-height: 100vh;
+  min-height: 100dvh;
   overflow-x: clip;
   caret-color: var(--sodio);
+}
+
+main {
+  position: relative;
 }
 
 img,
@@ -298,6 +365,13 @@ dd {
 :where(ul[role="list"], ol[role="list"]) {
   list-style: none;
   padding: 0;
+}
+
+/* Nenhum campo hoje; se entrar algum, o iOS não dá zoom ao focar. */
+input,
+select,
+textarea {
+  font-size: max(16px, 1em);
 }
 
 code {
@@ -350,7 +424,7 @@ code {
   width: 100%;
   max-width: calc(var(--max) + 2 * var(--gutter));
   margin-inline: auto;
-  padding-inline: var(--gutter);
+  padding-inline: max(var(--gutter), env(safe-area-inset-left)) max(var(--gutter), env(safe-area-inset-right));
 }
 
 .section {
@@ -490,17 +564,25 @@ code {
 }
 
 /* Link de texto com seta desenhada */
+/*
+ * Sublinhado em duas camadas: um traço fraco sempre e a luz que corre por cima
+ * no hover. Todo .text-link termina numa seta (1,45em com o espaço), que fica de fora.
+ */
 .text-link {
+  --line-w: calc(100% - 1.45em);
   display: inline-flex;
+  width: fit-content;
   align-items: center;
   gap: 0.4em;
   min-height: 2.75rem;
   color: var(--link);
   font-weight: 700;
-  text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
-  text-underline-offset: 0.3em;
-  transition: text-decoration-color 200ms var(--ease-out);
+  text-decoration: none;
+  background:
+    linear-gradient(currentColor, currentColor) 0 calc(50% + 0.75em) / 0 1.5px no-repeat,
+    linear-gradient(color-mix(in srgb, currentColor 35%, transparent), color-mix(in srgb, currentColor 35%, transparent))
+      0 calc(50% + 0.75em) / var(--line-w) 1px no-repeat;
+  transition: background-size 420ms var(--ease-out);
 }
 
 .text-link svg {
@@ -511,11 +593,13 @@ code {
 
 @media (hover: hover) {
   .text-link:hover {
-    text-decoration-color: currentColor;
+    background-size:
+      var(--line-w) 1.5px,
+      var(--line-w) 1px;
   }
 
   .text-link:hover svg {
-    transform: translate(2px, 0);
+    transform: translate(3px, 0);
   }
 }
 
@@ -588,6 +672,125 @@ code {
   border-radius: 50%;
   background: var(--sodio);
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--sodio) 18%, transparent);
+}
+
+/* ---------------------------------------------------------------------------
+ * Entradas por rolagem. Cada seção escolhe a sua coreografia com data-reveal;
+ * todas usam só transform e opacity. Com animation-timeline o progresso segue a
+ * rolagem; sem ele, um IntersectionObserver marca .is-in (html.reveal-io, posto
+ * no <head>) e há uma trava que mostra tudo após 4 s se o script não rodar.
+ * Sem preferência de movimento, nada disso existe: o conteúdo nasce visível.
+ * ------------------------------------------------------------------------- */
+@keyframes rv-head {
+  from {
+    opacity: 0;
+    translate: 0 0.45em;
+  }
+}
+
+@keyframes rv-rise {
+  from {
+    opacity: 0;
+    translate: 0 36px;
+  }
+}
+
+@keyframes rv-left {
+  from {
+    opacity: 0;
+    translate: -44px 0;
+  }
+}
+
+@keyframes rv-right {
+  from {
+    opacity: 0;
+    translate: 44px 0;
+  }
+}
+
+@keyframes rv-tilt {
+  from {
+    opacity: 0;
+    transform: perspective(1000px) rotateX(14deg) translateY(70px) scale(0.96);
+  }
+}
+
+@keyframes rv-stage {
+  from {
+    opacity: 0.15;
+    transform: translateY(56px) scale(0.94);
+  }
+}
+
+@keyframes rv-iris {
+  from {
+    opacity: 0;
+    transform: scale(0.82) rotate(-5deg);
+  }
+}
+
+@keyframes rv-failsafe {
+  to {
+    opacity: 1;
+    translate: none;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    [data-reveal] {
+      animation: var(--rv, rv-rise) both;
+      animation-timing-function: var(--ease-out);
+      animation-timeline: view();
+      animation-range: entry calc(4% + var(--i, 0) * 5%) cover calc(26% + var(--i, 0) * 5%);
+    }
+  }
+
+  html.reveal-io [data-reveal]:not(.is-in) {
+    opacity: 0;
+    translate: var(--rv-x, 0) var(--rv-y, 36px);
+    animation: rv-failsafe 1ms 4s forwards;
+  }
+
+  html.reveal-io [data-reveal] {
+    transition:
+      opacity 700ms var(--ease-out),
+      translate 900ms var(--ease-out);
+    transition-delay: calc(var(--i, 0) * 80ms);
+  }
+}
+
+[data-reveal="head"] {
+  --rv: rv-head;
+}
+
+[data-reveal="left"] {
+  --rv: rv-left;
+  --rv-x: -44px;
+  --rv-y: 0;
+}
+
+[data-reveal="right"] {
+  --rv: rv-right;
+  --rv-x: 44px;
+  --rv-y: 0;
+}
+
+[data-reveal="tilt"] {
+  --rv: rv-tilt;
+  --rv-y: 70px;
+}
+
+[data-reveal="stage"] {
+  --rv: rv-stage;
+  --rv-y: 56px;
+}
+
+[data-reveal="iris"] {
+  --rv: rv-iris;
+  --rv-y: 24px;
 }
 
 @media (prefers-reduced-motion: reduce) {
