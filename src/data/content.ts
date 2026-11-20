@@ -3,59 +3,53 @@ import type { IconName } from "./icons";
 
 export const steps = [
   {
-    title: "Conversa de 30 minutos",
-    text: "Você conta qual rotina toma mais tempo da equipe. Se automação não for o caminho, eu digo na hora.",
+    title: "Você me conta a rotina",
+    text: "Por e-mail ou numa conversa de 30 minutos: o que se repete, quem faz e onde trava. Se automação não for o caminho, eu digo.",
   },
   {
-    title: "Diagnóstico da rotina",
-    text: "Vejo como o trabalho é feito hoje, com quem faz: onde se digita duas vezes, onde se espera resposta, onde o erro aparece.",
+    title: "Eu olho de perto",
+    text: "Vejo como o trabalho é feito hoje, com quem faz, e mostro onde vai o tempo: o que vale automatizar primeiro e o que não vale.",
   },
   {
     title: "Proposta por escrito",
-    text: "O que será feito, o que fica de fora, prazo de cada etapa e preço. Numa página que você lê em cinco minutos.",
+    text: "O que será feito, o que fica de fora, prazos e preço, em linguagem simples.",
   },
   {
-    title: "Primeira rotina em uso",
-    text: "Começo pela rotina que mais devolve tempo. A equipe usa, a gente mede, ajusta e só então passa para a próxima.",
+    title: "Uma rotina funcionando",
+    text: "A primeira melhoria entra em uso cedo. Vocês usam, a gente ajusta e só então vem a próxima.",
   },
 ] as const;
 
+/**
+ * Segurança em português simples. Compromissos ainda não confirmados pelo
+ * Daniel estão escritos como intenção (ver PRODUCT.md, itens em aberto).
+ */
 export const security: { icon: IconName; title: string; text: string }[] = [
   {
     icon: "lock",
-    title: "Cada pessoa vê só o que deve",
+    title: "Cada pessoa vê só o que precisa",
     text: "Acesso por pessoa e por função, que você retira quando alguém sai da equipe.",
   },
   {
     icon: "eye",
     title: "Tudo fica registrado",
-    text: "Quem fez o quê e quando, inclusive o que o assistente de IA fez. Se alguém perguntar, há resposta.",
+    text: "Quem fez o quê e quando, inclusive o que o assistente de IA fez.",
   },
   {
     icon: "person",
     title: "Decisão importante passa por uma pessoa",
-    text: "O assistente prepara, a equipe aprova. Cobrança, envio de documento e resposta sensível não saem sem conferência, se for assim que você quiser.",
+    text: "O assistente prepara. Cobrança, envio de documento e resposta sensível podem exigir a aprovação de alguém da equipe.",
   },
   {
     icon: "shield",
-    title: "Dado do cliente sai só o necessário",
-    text: "A IA recebe apenas o que precisa para a tarefa, de preferência por fornecedores com contrato de tratamento de dados.",
+    title: "Só o necessário vai para a IA",
+    text: "O assistente recebe apenas o que a tarefa pede. A intenção é usar fornecedores com contrato de tratamento de dados.",
   },
   {
     icon: "doc",
-    title: "Os dados e o sistema são seus",
-    text: "Contas, acessos e documentação ficam no nome da sua empresa, para que nada dependa da Noxlabs.",
+    title: "Com a sua empresa",
+    text: "A intenção é que contas, acessos e documentação fiquem no nome da sua empresa. Isso é combinado na proposta.",
   },
-];
-
-/** O que muda na empresa, em uma linha cada. */
-export const outcomes: { icon: IconName; title: string; text: string }[] = [
-  { icon: "clock", title: "Horas de volta", text: "O repetitivo sai da mesa da equipe." },
-  { icon: "check", title: "Menos erro e retrabalho", text: "O que é digitado uma vez não é digitado de novo." },
-  { icon: "chat", title: "Atendimento mais rápido", text: "Resposta na hora para as perguntas de sempre." },
-  { icon: "chart", title: "Visão clara do negócio", text: "Atrasos, vendas e pendências numa tela." },
-  { icon: "users", title: "Crescer sem inchar a equipe", text: "Mais clientes sem contratar na mesma proporção." },
-  { icon: "shield", title: "Dados protegidos", text: "Acesso por pessoa, registro de tudo, LGPD desde o começo." },
 ];
 
 export const faq = [
@@ -90,7 +84,7 @@ export const faq = [
     q: "E os dados dos meus clientes?",
     a: [
       "O desenho prevê acesso controlado por pessoa, registro do que foi feito e só o necessário saindo para serviços de IA, de preferência por fornecedores com contrato de tratamento de dados.",
-      "Tudo é pensado para a LGPD desde o começo. Não substitui o seu jurídico, mas facilita o trabalho dele.",
+      "A LGPD entra na conversa desde o começo. A responsabilidade legal continua sendo da sua empresa, com o seu jurídico; o desenho ajuda a cumpri-la.",
     ],
   },
   {

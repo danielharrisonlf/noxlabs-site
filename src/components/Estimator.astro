@@ -1,8 +1,9 @@
 ---
 /**
- * Estimativa ilustrativa de horas liberadas. Sem JS, mostra a conta com os
- * valores iniciais; com JS, recalcula a cada ajuste e monta o e-mail com os
- * números. Nada é enviado a lugar nenhum: a conta roda no navegador.
+ * "Faça a conta": a estimativa é uma frase que a pessoa completa, com botões
+ * de menos e mais em cada número, e a resposta ao lado. Sem JS, mostra a conta
+ * com os valores iniciais; com JS, recalcula a cada ajuste e monta o e-mail
+ * com os números. Nada é enviado: a conta roda no navegador.
  */
 import {
   brl,
@@ -21,105 +22,63 @@ import { talkMailto } from "../data/site";
 import Icon from "./Icon.astro";
 
 const r = estimate(d);
-/** Quanto do trilho fica preenchido, em %. */
-const fill = (v: number, l: { min: number; max: number }) => Math.round(((v - l.min) / (l.max - l.min)) * 100);
 const freedPct = Math.round((r.freed / r.repetitive) * 100);
 const initialMail = talkMailto("Estimativa de horas liberadas", estimateMail(d));
+
+const stepper = (name: "people" | "hours" | "share", label: string) => ({ name, label, ...lim[name], value: d[name] });
+const people = stepper("people", "pessoas");
+const hours = stepper("hours", "horas por semana");
+const share = stepper("share", "por cento");
 ---
 
 <section class="section est" id="estimativa" aria-labelledby="est-title">
   <div class="wrap">
     <header class="section-head" data-reveal>
-      <h2 id="est-title" class="section-title">Quanto tempo a sua equipe pode recuperar?</h2>
-      <p class="section-lede">
-        Ajuste os números para a sua empresa. A conta é simples, as premissas estão logo abaixo e o cálculo é feito aqui na página: nada é enviado.
-      </p>
+      <h2 id="est-title" class="section-title">Faça a conta da sua equipe</h2>
+      <p class="section-lede">Complete a frase com os números da sua empresa. A conta é feita aqui na página; nada é enviado.</p>
     </header>
 
     <div class="est-grid" data-estimator>
-      <form class="est-form" aria-labelledby="est-title" data-est-form>
-        <div class="field">
-          <label for="est-people">Pessoas que fazem tarefas repetitivas</label>
-          <div class="range-row">
-            <button type="button" class="step" data-step="people" data-dir="-1" aria-label="Menos pessoa" tabindex="-1">−</button>
-            <input
-              id="est-people"
-              name="people"
-              type="range"
-              min={lim.people.min}
-              max={lim.people.max}
-              step={lim.people.step}
-              value={d.people}
-              style={`--fill:${fill(d.people, lim.people)}%`}
-              aria-describedby="est-people-hint"
-            />
-            <button type="button" class="step" data-step="people" data-dir="1" aria-label="Mais pessoa" tabindex="-1">+</button>
-            <output for="est-people" class="range-val tabular" data-out="people">{d.people}</output>
-          </div>
-          <p class="hint" id="est-people-hint">Quem digita, confere, cobra, responde ou organiza a mesma coisa toda semana.</p>
-        </div>
-
-        <div class="field">
-          <label for="est-hours">Horas por semana, por pessoa, nessas tarefas</label>
-          <div class="range-row">
-            <button type="button" class="step" data-step="hours" data-dir="-1" aria-label="Menos hora" tabindex="-1">−</button>
-            <input
-              id="est-hours"
-              name="hours"
-              type="range"
-              min={lim.hours.min}
-              max={lim.hours.max}
-              step={lim.hours.step}
-              value={d.hours}
-              style={`--fill:${fill(d.hours, lim.hours)}%`}
-              aria-describedby="est-hours-hint"
-            />
-            <button type="button" class="step" data-step="hours" data-dir="1" aria-label="Mais hora" tabindex="-1">+</button>
-            <output for="est-hours" class="range-val tabular" data-out="hours">{d.hours} h</output>
-          </div>
-          <p class="hint" id="est-hours-hint">Se não souber, pergunte à equipe quanto tempo vai em cópia, cobrança e conferência.</p>
-        </div>
-
-        <div class="field">
-          <label for="est-cost">Custo mensal de cada pessoa, com encargos</label>
-          <div class="money">
+      <form class="sentence" aria-labelledby="est-title" data-est-form>
+        <p>
+          Na minha empresa,
+          <span class="num" role="group" aria-labelledby="lbl-people">
+            <button type="button" class="step" data-step="people" data-dir="-1" aria-label="Menos uma pessoa">−</button>
+            <input id="est-people" name="people" type="number" inputmode="numeric" min={people.min} max={people.max} step={people.step} value={people.value} aria-describedby="hint-people" />
+            <button type="button" class="step" data-step="people" data-dir="1" aria-label="Mais uma pessoa">+</button>
+          </span>
+          <label for="est-people" id="lbl-people">pessoas</label> passam
+          <span class="num" role="group" aria-labelledby="lbl-hours">
+            <button type="button" class="step" data-step="hours" data-dir="-1" aria-label="Menos uma hora">−</button>
+            <input id="est-hours" name="hours" type="number" inputmode="numeric" min={hours.min} max={hours.max} step={hours.step} value={hours.value} aria-describedby="hint-hours" />
+            <button type="button" class="step" data-step="hours" data-dir="1" aria-label="Mais uma hora">+</button>
+          </span>
+          <label for="est-hours" id="lbl-hours">horas por semana</label>, cada uma, em tarefas repetitivas.
+        </p>
+        <p>
+          <label for="est-cost">Cada pessoa custa</label>
+          <span class="money">
             <span aria-hidden="true">R$</span>
-            <input
-              id="est-cost"
-              name="cost"
-              type="text"
-              inputmode="decimal"
-              autocomplete="off"
-              value={moneyInput(d.cost)}
-              data-min={lim.cost.min}
-              data-max={lim.cost.max}
-              aria-describedby="est-cost-hint est-cost-error"
-            />
-          </div>
-          <p class="hint" id="est-cost-hint">Salário mais encargos e benefícios. Uma média serve, por exemplo 4.000.</p>
-          <p class="field-error" id="est-cost-error" data-cost-error hidden></p>
-        </div>
-
-        <div class="field">
-          <label for="est-share">Parte dessas tarefas que dá para automatizar</label>
-          <div class="range-row">
-            <button type="button" class="step" data-step="share" data-dir="-1" aria-label="Menos 5 pontos" tabindex="-1">−</button>
-            <input
-              id="est-share"
-              name="share"
-              type="range"
-              min={lim.share.min}
-              max={lim.share.max}
-              step={lim.share.step}
-              value={d.share}
-              style={`--fill:${fill(d.share, lim.share)}%`}
-              aria-describedby="est-share-hint"
-            />
-            <button type="button" class="step" data-step="share" data-dir="1" aria-label="Mais 5 pontos" tabindex="-1">+</button>
-            <output for="est-share" class="range-val tabular" data-out="share">{d.share}%</output>
-          </div>
-          <p class="hint" id="est-share-hint">Uma hipótese sua. Começamos em 30% para não exagerar.</p>
-        </div>
+            <input id="est-cost" name="cost" type="text" inputmode="decimal" autocomplete="off" value={moneyInput(d.cost)} data-min={lim.cost.min} data-max={lim.cost.max} aria-describedby="est-cost-error hint-cost" />
+          </span>
+          por mês, com encargos.
+        </p>
+        <p>
+          Se
+          <span class="num" role="group" aria-labelledby="lbl-share">
+            <button type="button" class="step" data-step="share" data-dir="-1" aria-label="Menos 5 por cento">−</button>
+            <input id="est-share" name="share" type="number" inputmode="numeric" min={share.min} max={share.max} step={share.step} value={share.value} aria-describedby="hint-share" />
+            <button type="button" class="step" data-step="share" data-dir="1" aria-label="Mais 5 por cento">+</button>
+          </span>
+          <label for="est-share" id="lbl-share">% desse trabalho</label> fosse automático…
+        </p>
+        <p class="field-error" id="est-cost-error" data-cost-error hidden></p>
+        <ul role="list" class="hints">
+          <li id="hint-people">Pessoas: quem digita, confere, cobra, responde ou organiza a mesma coisa toda semana.</li>
+          <li id="hint-hours">Horas: se não souber, pergunte à equipe quanto tempo vai em cópia, cobrança e conferência.</li>
+          <li id="hint-cost">Custo: salário mais encargos e benefícios; uma média serve.</li>
+          <li id="hint-share">Parte automática: uma hipótese sua, de 10% a 60%. Começamos em 30% para não exagerar.</li>
+        </ul>
 
         <!-- Celular: o resultado fica longe dos campos, então um resumo acompanha a rolagem. -->
         <p class="est-mini tabular" aria-hidden="true">
@@ -128,19 +87,15 @@ const initialMail = talkMailto("Estimativa de horas liberadas", estimateMail(d))
         </p>
       </form>
 
-      <div class="est-result" data-est-result>
-        <p class="res-tag">Estimativa ilustrativa</p>
-        <p class="res-label">Horas que podem voltar para a equipe</p>
-        <p class="res-big tabular"><span data-res="freed">{num(r.freed)}</span> <span class="res-unit">horas por mês</span></p>
-
-        <div class="res-bar" aria-hidden="true">
-          <span class="res-bar-fill" data-res-bar style={`--p:${freedPct}%`}></span>
-        </div>
-        <p class="res-bar-legend">
-          de <strong class="tabular" data-res="repetitive">{num(r.repetitive)}</strong> horas por mês hoje em tarefas repetitivas
+      <div class="answer" data-est-result>
+        <p class="answer-tag">Estimativa ilustrativa</p>
+        <p class="answer-lead">…a equipe ganharia cerca de</p>
+        <p class="answer-big tabular"><span data-res="freed">{num(r.freed)}</span> <span class="answer-unit">horas por mês</span></p>
+        <div class="bar" aria-hidden="true"><span data-res-bar style={`--p:${freedPct}%`}></span></div>
+        <p class="answer-of">
+          de <strong class="tabular" data-res="repetitive">{num(r.repetitive)}</strong> horas por mês que hoje vão em tarefas repetitivas.
         </p>
-
-        <dl class="res-list">
+        <dl class="answer-list">
           <div>
             <dt>Equivale a</dt>
             <dd class="tabular" data-res-fte>{fteText(r.fte)}</dd>
@@ -154,38 +109,31 @@ const initialMail = talkMailto("Estimativa de horas liberadas", estimateMail(d))
             <dd class="tabular"><span data-res="year">{brl(r.year)}</span></dd>
           </div>
         </dl>
-
         <a class="btn btn-primary btn-block" href={initialMail} data-est-mail>
           <Icon name="mail" class="no-nudge" />
-          Enviar esta estimativa por e-mail
+          <span>Mandar esta conta por <span class="nowrap">e-mail</span></span>
         </a>
-        <p class="res-disclaimer">
-          Não é promessa de resultado. Horas liberadas viram capacidade para atender mais clientes ou fazer trabalho de mais
-          valor; não são economia automática de salário.
+        <p class="answer-note">
+          Não é promessa de resultado. Horas liberadas viram capacidade para atender mais ou fazer trabalho de mais valor; não
+          são economia automática de salário.
         </p>
         <p class="visually-hidden" aria-live="polite" data-est-live></p>
       </div>
     </div>
 
-    <div class="assumptions">
-      <h3>Como a conta é feita</h3>
+    <details class="how">
+      <summary>
+        <span>Como a conta é feita</span>
+        <Icon name="plus" class="no-nudge" />
+      </summary>
       <ul role="list" class="checks">
-        <li>
-          Horas repetitivas por mês = pessoas × horas por semana × {WEEKS_PER_MONTH} semanas. O mês tem cerca de 4,3 semanas;
-          usamos {WEEKS_PER_MONTH} para não inflar.
-        </li>
-        <li>Horas liberadas = horas repetitivas × a parte que você indicou como automatizável.</li>
-        <li>
-          Custo da hora = custo mensal ÷ {HOURS_PER_MONTH} horas, o divisor usado na CLT para a jornada de 44 horas semanais.
-          Um divisor maior deixa a hora mais barata e o resultado mais baixo.
-        </li>
-        <li>
-          Tempo integral = horas liberadas ÷ {FULL_TIME_HOURS} horas (44 horas por semana nas mesmas {WEEKS_PER_MONTH}
-          semanas).
-        </li>
-        <li>Não entram na conta: erros evitados, multas por atraso, clientes a mais atendidos nem o custo da automação.</li>
+        <li>Horas repetitivas por mês = pessoas × horas por semana × {WEEKS_PER_MONTH} semanas (o mês tem cerca de 4,3; usamos {WEEKS_PER_MONTH} para não inflar).</li>
+        <li>Horas liberadas = horas repetitivas × a parte que você indicou como automática.</li>
+        <li>Custo da hora = custo mensal ÷ {HOURS_PER_MONTH} horas, o divisor usado na CLT para 44 horas semanais. Um divisor maior deixa a hora mais barata e o resultado mais baixo.</li>
+        <li>Tempo integral = horas liberadas ÷ {FULL_TIME_HOURS} horas (44 horas por semana nas mesmas {WEEKS_PER_MONTH} semanas).</li>
+        <li>Fora da conta: erros evitados, multas por atraso, clientes a mais atendidos e o custo da automação.</li>
       </ul>
-    </div>
+    </details>
   </div>
 </section>
 
@@ -203,7 +151,6 @@ const initialMail = talkMailto("Estimativa de horas liberadas", estimateMail(d))
 
   if (form && result) {
     const field = (name: string) => form.elements.namedItem(name) as HTMLInputElement;
-    const out = (name: string) => form.querySelector<HTMLOutputElement>(`[data-out="${name}"]`);
     const res = (name: string) => result.querySelector<HTMLElement>(`[data-res="${name}"]`);
     const mini = (name: string) => form.querySelector<HTMLElement>(`[data-mini="${name}"]`);
     const shown = new Map<string, number>();
@@ -214,14 +161,19 @@ const initialMail = talkMailto("Estimativa de horas liberadas", estimateMail(d))
     let lastCost = parseMoney(cost.value) ?? costMin;
     let liveTimer: number | undefined;
 
-    const range = (input: HTMLInputElement) => Math.min(Math.max(Number(input.value), Number(input.min)), Number(input.max));
+    // Número fora do intervalo (ou campo vazio) usa o limite mais próximo; o campo é corrigido ao sair dele.
+    const clamp = (input: HTMLInputElement) => {
+      const v = Number(input.value);
+      const fallback = Number(input.defaultValue);
+      return Math.min(Math.max(Number.isFinite(v) && input.value !== "" ? v : fallback, Number(input.min)), Number(input.max));
+    };
 
     // Custo digitado: aceita "4000", "4.000" e "4.000,50"; fora do formato ou do intervalo, avisa e mantém o último válido.
     const readCost = () => {
       const value = parseMoney(cost.value);
       let message = "";
-      if (value === null) message = "Digite só números, por exemplo 4.000 ou 4.000,50.";
-      else if (value < costMin || value > costMax) message = `Use um valor entre ${brl(costMin)} e ${brl(costMax)}.`;
+      if (value === null) message = "Digite só números no custo, por exemplo 3.500 ou 3.500,50.";
+      else if (value < costMin || value > costMax) message = `Use um custo entre ${brl(costMin)} e ${brl(costMax)}.`;
       if (costError) {
         costError.textContent = message;
         costError.hidden = message === "";
@@ -252,23 +204,8 @@ const initialMail = talkMailto("Estimativa de horas liberadas", estimateMail(d))
     };
 
     const update = (announce = true) => {
-      const x = { people: range(field("people")), hours: range(field("hours")), cost: readCost(), share: range(field("share")) };
+      const x = { people: clamp(field("people")), hours: clamp(field("hours")), cost: readCost(), share: clamp(field("share")) };
       const r = estimate(x);
-      for (const name of ["people", "hours", "share"]) {
-        const input = field(name);
-        const pct = ((Number(input.value) - Number(input.min)) / (Number(input.max) - Number(input.min))) * 100;
-        input.style.setProperty("--fill", `${pct}%`);
-      }
-      const p = out("people");
-      const h = out("hours");
-      const s = out("share");
-      if (p) p.textContent = String(x.people);
-      if (h) h.textContent = `${x.hours} h`;
-      if (s) s.textContent = `${x.share}%`;
-      field("people").setAttribute("aria-valuetext", `${x.people} pessoas`);
-      field("hours").setAttribute("aria-valuetext", `${x.hours} horas por semana`);
-      field("share").setAttribute("aria-valuetext", `${x.share} por cento`);
-
       tween(res("freed"), "freed", r.freed, (n) => num(n));
       tween(res("repetitive"), "repetitive", r.repetitive, (n) => num(n));
       tween(res("month"), "month", r.month, brl);
@@ -286,17 +223,23 @@ const initialMail = talkMailto("Estimativa de horas liberadas", estimateMail(d))
     };
 
     form.addEventListener("input", () => update());
-    // Botões de menos e mais: o mesmo passo do controle deslizante.
+    form.addEventListener("submit", (event) => event.preventDefault());
+    for (const name of ["people", "hours", "share"]) {
+      const input = field(name);
+      input.addEventListener("change", () => {
+        input.value = String(clamp(input));
+        update();
+      });
+    }
+    // Botões de menos e mais: o mesmo passo do campo.
     for (const btn of form.querySelectorAll<HTMLButtonElement>("[data-step]")) {
       btn.addEventListener("click", () => {
         const input = field(btn.dataset.step ?? "");
         const step = Number(input.step) || 1;
-        const next = Math.min(Math.max(Number(input.value) + step * Number(btn.dataset.dir), Number(input.min)), Number(input.max));
-        input.value = String(next);
+        input.value = String(Math.min(Math.max(clamp(input) + step * Number(btn.dataset.dir), Number(input.min)), Number(input.max)));
         update();
       });
     }
-    form.addEventListener("submit", (event) => event.preventDefault());
     // Ao sair do campo de custo, o valor válido volta formatado ("4000" vira "4.000").
     cost.addEventListener("change", () => {
       if (cost.getAttribute("aria-invalid") !== "true") cost.value = num(lastCost, Number.isInteger(lastCost) ? 0 : 2);
@@ -312,169 +255,264 @@ const initialMail = talkMailto("Estimativa de horas liberadas", estimateMail(d))
 
   .est-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    gap: clamp(1.5rem, 1rem + 3vw, 4rem);
+    align-items: start;
+  }
+
+  /* ---- A frase ---- */
+  .sentence {
+    display: grid;
     gap: var(--s-5);
-    align-items: stretch;
-  }
-
-  .est-form {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--s-5);
-    padding: clamp(1.25rem, 1rem + 1.5vw, 2.25rem);
-    border: 1px solid var(--line);
-    border-radius: var(--r-xl);
-    background: var(--tint);
-  }
-
-  .field {
-    display: grid;
-    gap: var(--s-2);
-    padding: var(--s-4);
-    border-radius: var(--r-md);
-    background: var(--surface);
-    border: 1px solid var(--line);
-  }
-
-  .field label {
-    font-weight: 700;
-    line-height: 1.3;
-  }
-
-  .hint {
-    font-size: var(--t-xs);
-    color: var(--ink-3);
-  }
-
-  .range-row {
-    display: grid;
-    grid-template-columns: 2.75rem minmax(0, 1fr) 2.75rem 4.5rem;
-    gap: var(--s-2);
-    align-items: center;
-  }
-
-  .range-val {
-    justify-self: end;
-    min-width: 4.5rem;
-    padding: 0.35rem 0.5rem;
-    border-radius: var(--r-sm);
-    background: var(--goiaba-soft);
-    color: var(--ink);
     font-family: var(--font-display);
-    font-size: var(--t-md);
-    font-weight: 700;
-    text-align: center;
+    font-size: clamp(1.35rem, 1.1rem + 1vw, 2rem);
+    font-weight: 600;
+    line-height: 2.1;
+    letter-spacing: -0.012em;
   }
 
-  /* Controle deslizante: trilho fino, alça grande o bastante para o polegar. */
-  input[type="range"] {
-    --track: var(--line);
-    width: 100%;
-    height: 2.75rem;
-    margin: 0;
-    background: transparent;
-    appearance: none;
+  .sentence label {
     cursor: pointer;
   }
 
-  input[type="range"]::-webkit-slider-runnable-track {
-    height: 6px;
-    border-radius: 6px;
-    background: linear-gradient(90deg, var(--goiaba-ink) var(--fill, 0%), var(--track) var(--fill, 0%));
-  }
-
-  input[type="range"]::-moz-range-track {
-    height: 6px;
-    border-radius: 6px;
-    background: var(--track);
-  }
-
-  input[type="range"]::-moz-range-progress {
-    height: 6px;
-    border-radius: 6px;
-    background: var(--goiaba-ink);
-  }
-
-  input[type="range"]::-webkit-slider-thumb {
-    appearance: none;
-    width: 1.75rem;
-    height: 1.75rem;
-    margin-top: calc(3px - 0.875rem);
-    border: 3px solid #ffffff;
-    border-radius: 50%;
-    background: var(--goiaba-ink);
-    box-shadow: 0 2px 8px rgb(42 20 48 / 0.35);
-    transition: transform var(--d-fast) var(--ease-out);
-  }
-
-  input[type="range"]::-moz-range-thumb {
-    width: 1.75rem;
-    height: 1.75rem;
-    border: 3px solid #ffffff;
-    border-radius: 50%;
-    background: var(--goiaba-ink);
-    box-shadow: 0 2px 8px rgb(42 20 48 / 0.35);
-  }
-
-  input[type="range"]:active::-webkit-slider-thumb {
-    transform: scale(1.12);
-  }
-
-  input[type="range"]:focus-visible {
-    outline-offset: 2px;
-    border-radius: var(--r-sm);
-  }
-
+  .num,
   .money {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: var(--s-2);
-    min-height: 3rem;
-    padding-inline: var(--s-4);
-    border: 1.5px solid var(--line-2);
-    border-radius: var(--r-sm);
-    background: var(--surface);
-    font-weight: 700;
-    color: var(--ink-2);
+    gap: 0.15rem;
+    vertical-align: middle;
+    padding: 0.2rem;
+    border-radius: 999px;
+    background: var(--goiaba-soft);
+    line-height: 1;
   }
 
-  .money:focus-within {
-    border-color: var(--goiaba-ink);
-    box-shadow: 0 0 0 3px var(--goiaba-soft);
-  }
-
+  .num input,
   .money input {
-    flex: 1;
-    width: 100%;
-    min-width: 0;
-    min-height: 2.75rem;
+    width: 3.2ch;
+    min-height: 3rem;
+    padding: 0;
     border: 0;
     background: transparent;
-    color: var(--ink);
+    color: var(--jabu);
+    font: inherit;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
+    text-align: center;
+    appearance: textfield;
+    -moz-appearance: textfield;
   }
 
+  .num input::-webkit-outer-spin-button,
+  .num input::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+
+  .num:focus-within,
+  .money:focus-within {
+    box-shadow: 0 0 0 3px var(--goiaba-ink);
+  }
+
+  .num input:focus-visible,
   .money input:focus-visible {
     outline: none;
   }
 
-  .money:has(input[aria-invalid="true"]) {
-    border-color: var(--goiaba-ink);
-  }
-
-  .field-error {
-    font-size: var(--t-sm);
-    font-weight: 650;
+  .money {
+    padding-inline: 0.9rem;
+    gap: 0.3rem;
     color: var(--goiaba-ink);
   }
 
-  /* Resumo que acompanha os campos no celular. */
+  .money input {
+    width: 5.6ch;
+    text-align: left;
+  }
+
+  .money:has(input[aria-invalid="true"]) {
+    box-shadow: 0 0 0 3px var(--goiaba-ink);
+  }
+
+  .step {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--surface);
+    color: var(--jabu);
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 700;
+    line-height: 1;
+    box-shadow: var(--shadow-1);
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    transition: transform var(--d-fast) var(--ease-out);
+  }
+
+  .step:active {
+    transform: scale(0.92);
+  }
+
+  .field-error {
+    font-family: var(--font-body);
+    font-size: var(--t-sm);
+    font-weight: 650;
+    line-height: 1.5;
+    color: var(--goiaba-ink);
+  }
+
+  .hints {
+    display: grid;
+    gap: 0.35rem;
+    font-family: var(--font-body);
+    font-size: var(--t-sm);
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0;
+    color: var(--ink-3);
+  }
+
   .est-mini {
     display: none;
   }
 
-  @media (max-width: 56rem) {
+  /* ---- A resposta ---- */
+  .answer {
+    display: grid;
+    gap: var(--s-3);
+    padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    border-radius: var(--r-xl);
+    background: var(--goiaba-soft);
+    color: var(--jabu);
+  }
+
+  .answer-tag {
+    justify-self: start;
+    padding: 0.15rem 0.7rem;
+    border-radius: 999px;
+    background: var(--surface);
+    font-size: var(--t-xs);
+    font-weight: 700;
+  }
+
+  .answer-lead {
+    font-family: var(--font-display);
+    font-size: var(--t-lg);
+    font-weight: 600;
+  }
+
+  .answer-big {
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 2.4rem + 4vw, 6rem);
+    font-weight: 700;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+  }
+
+  .answer-unit {
+    display: inline-block;
+    font-size: 0.3em;
+    letter-spacing: -0.01em;
+  }
+
+  .bar {
+    height: 12px;
+    border-radius: 12px;
+    background: rgb(255 255 255 / 0.8);
+    overflow: hidden;
+  }
+
+  .bar span {
+    display: block;
+    height: 100%;
+    width: var(--p);
+    border-radius: inherit;
+    background: var(--goiaba-ink);
+    transition: width var(--d-slow) var(--ease-out);
+  }
+
+  .answer-of {
+    font-size: var(--t-sm);
+    color: var(--ink-2);
+  }
+
+  .answer-list {
+    display: grid;
+    margin-block: var(--s-2);
+    border-top: 1px solid rgb(42 20 48 / 0.14);
+  }
+
+  .answer-list div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--s-1) var(--s-4);
+    padding-block: var(--s-3);
+    border-bottom: 1px solid rgb(42 20 48 / 0.14);
+  }
+
+  .answer-list dt {
+    color: var(--ink-2);
+  }
+
+  .answer-list dd {
+    font-weight: 700;
+  }
+
+  .answer-note {
+    font-size: var(--t-xs);
+    color: var(--ink-2);
+  }
+
+  /* ---- Premissas ---- */
+  .how {
+    margin-top: var(--s-6);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .how summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-4);
+    min-height: 3.5rem;
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .how summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .how summary :global(svg) {
+    width: 1.25rem;
+    height: 1.25rem;
+    transition: transform var(--d-base) var(--ease-out);
+  }
+
+  .how[open] summary :global(svg) {
+    transform: rotate(45deg);
+  }
+
+  .how ul {
+    padding-bottom: var(--s-5);
+    font-size: var(--t-sm);
+    color: var(--ink-2);
+    max-width: 70ch;
+  }
+
+  @media (max-width: 63.99rem) {
+    .est-grid {
+      grid-template-columns: 1fr;
+    }
+
     .est-mini {
       position: sticky;
       bottom: calc(0.75rem + env(safe-area-inset-bottom));
@@ -487,193 +525,23 @@ const initialMail = talkMailto("Estimativa de horas liberadas", estimateMail(d))
       border-radius: var(--r-md);
       background: var(--jabu);
       color: #fbf3fb;
+      font-family: var(--font-body);
       font-size: var(--t-sm);
+      font-weight: 400;
+      line-height: 1.4;
+      letter-spacing: 0;
       box-shadow: 0 12px 28px -12px rgb(42 20 48 / 0.6);
     }
 
     .est-mini strong {
-      color: #fff;
       font-family: var(--font-display);
       font-size: var(--t-md);
     }
   }
 
-  /* ---- Resultado ---- */
-  .est-result {
-    display: grid;
-    align-content: start;
-    gap: var(--s-3);
-    padding: clamp(1.5rem, 1rem + 2vw, 2.75rem);
-    border-radius: var(--r-xl);
-    background: var(--surface);
-    border: 1px solid var(--line);
-    box-shadow: var(--shadow-2);
-  }
-
-  .res-tag {
-    justify-self: start;
-    padding: 0.15rem 0.6rem;
-    border-radius: var(--r-xs);
-    background: var(--lila);
-    color: var(--lila-ink);
-    font-size: var(--t-sm);
-    font-weight: 700;
-  }
-
-  .res-label {
-    font-weight: 650;
-    color: var(--ink-2);
-  }
-
-  .res-big {
-    font-family: var(--font-display);
-    font-size: clamp(3.25rem, 2.2rem + 4vw, 5.5rem);
-    font-weight: 700;
-    line-height: 1;
-    letter-spacing: -0.035em;
-    color: var(--jabu);
-  }
-
-  .res-unit {
-    display: inline-block;
-    font-size: 0.32em;
-    letter-spacing: -0.01em;
-    color: var(--ink-2);
-  }
-
-  .res-bar {
-    height: 12px;
-    margin-top: var(--s-2);
-    border-radius: 12px;
-    background: var(--tint);
-    overflow: hidden;
-  }
-
-  .res-bar-fill {
-    display: block;
-    height: 100%;
-    width: var(--p);
-    border-radius: inherit;
-    background: var(--goiaba);
-    transition: width var(--d-slow) var(--ease-out);
-  }
-
-  .res-bar-legend {
-    font-size: var(--t-sm);
-    color: var(--ink-2);
-  }
-
-  .res-bar-legend strong {
-    color: var(--ink);
-  }
-
-  .res-list {
-    display: grid;
-    gap: 0;
-    margin-block: var(--s-3);
-    border-top: 1px solid var(--line);
-  }
-
-  .res-list div {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: var(--s-1) var(--s-4);
-    padding-block: var(--s-3);
-    border-bottom: 1px solid var(--line);
-  }
-
-  .res-list dt {
-    color: var(--ink-2);
-  }
-
-  .res-list dd {
-    font-weight: 700;
-  }
-
-  .res-disclaimer {
-    font-size: var(--t-xs);
-    color: var(--ink-3);
-  }
-
-  .assumptions {
-    margin-top: var(--s-5);
-    padding: var(--s-5) clamp(1.25rem, 1rem + 1.5vw, 2.25rem);
-    border: 1px solid var(--line);
-    border-radius: var(--r-lg);
-    background: var(--tint);
-  }
-
-  .assumptions h3 {
-    margin-bottom: var(--s-4);
-    font-size: var(--t-md);
-  }
-
-  .assumptions ul {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--s-3) var(--s-6);
-    font-size: var(--t-sm);
-  }
-
-  .assumptions li + li {
-    margin-top: 0;
-  }
-
-  @media (max-width: 48rem) {
-    .assumptions ul {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  @media (max-width: 56rem) {
-    .est-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .step {
-    display: grid;
-    place-items: center;
-    width: 2.75rem;
-    height: 2.75rem;
-    padding: 0;
-    border: 1.5px solid var(--line-2);
-    border-radius: 50%;
-    background: var(--surface);
-    color: var(--ink);
-    font-family: var(--font-display);
-    font-size: 1.35rem;
-    font-weight: 700;
-    line-height: 1;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  }
-
-  .step:active {
-    background: var(--goiaba-soft);
-    border-color: var(--goiaba-ink);
-  }
-
-  @media (hover: hover) {
-    .step:hover {
-      border-color: var(--ink);
-    }
-  }
-
-  @media (max-width: 26rem) {
-    .range-row {
-      grid-template-columns: 2.75rem minmax(0, 1fr) 2.75rem 3.5rem;
-      gap: 0.35rem;
-    }
-
-    .range-val {
-      min-width: 3.5rem;
-      padding-inline: 0.25rem;
-    }
-
-    .field {
-      padding: var(--s-3);
+  @media (max-width: 30rem) {
+    .sentence {
+      line-height: 2.25;
     }
   }
 </style>

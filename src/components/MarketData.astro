@@ -1,5 +1,9 @@
 ---
-/** Números do mercado, cada um com fonte e ano. Nenhum é resultado da Noxlabs. */
+/**
+ * Números do mercado, cada um com fonte e ano. Nenhum é resultado da Noxlabs.
+ * Uma lista ao lado do título, separada por linhas: o número lidera a frase,
+ * a fonte fica logo embaixo.
+ */
 import { statById } from "../data/stats";
 import Stat from "./Stat.astro";
 
@@ -12,23 +16,21 @@ interface Props {
 
 const { ids, title, lede, id = "numeros" } = Astro.props;
 const items = ids.map(statById).filter((s) => s !== undefined);
-const tones = ["lila", "goiaba", "caju", "white"] as const;
-// A grade tem quatro colunas no desktop e duas no tablet: use 4 dados para ela fechar sem buraco.
 ---
 
 {
   items.length > 0 && (
     <section class="section market" id={id} aria-labelledby={`${id}-title`}>
-      <div class="wrap">
-        <header class="section-head" data-reveal>
+      <div class="wrap market-grid">
+        <header class="market-head" data-reveal>
           <h2 id={`${id}-title`} class="section-title">
             {title}
           </h2>
           <p class="section-lede">{lede}</p>
         </header>
-        <div class="market-grid">
+        <div class="market-list">
           {items.map((s, i) => (
-            <Stat stat={s} index={i} tone={tones[i % tones.length]} />
+            <Stat stat={s} index={i} />
           ))}
         </div>
       </div>
@@ -37,21 +39,36 @@ const tones = ["lila", "goiaba", "caju", "white"] as const;
 }
 
 <style>
+  .market {
+    background: var(--surface);
+  }
+
   .market-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--s-3);
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: var(--s-6) clamp(2rem, 6vw, 6rem);
+    align-items: start;
   }
 
-  @media (max-width: 75rem) {
-    .market-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+  .market-head {
+    display: grid;
+    gap: var(--s-4);
+    position: sticky;
+    top: calc(var(--header-h) + 2rem);
   }
 
-  @media (max-width: 39.99rem) {
+  .market-list {
+    display: grid;
+    border-top: 1px solid var(--line-2);
+  }
+
+  @media (max-width: 56rem) {
     .market-grid {
       grid-template-columns: 1fr;
+    }
+
+    .market-head {
+      position: static;
     }
   }
 </style>

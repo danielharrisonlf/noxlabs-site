@@ -41,8 +41,9 @@ const whats = whatsappHref();
     </nav>
 
     <div class="header-actions">
-      <a class="btn btn-primary btn-sm header-cta" href={mailto}>Pedir uma conversa</a>
+      <a class="btn btn-primary btn-sm header-cta" href={mailto}>Contar a minha rotina</a>
       <button class="menu-toggle" type="button" aria-controls="site-nav" aria-expanded="false" data-menu-toggle>
+        <span class="here-dot" aria-hidden="true"></span>
         <span data-menu-label>Menu</span>
         <span class="burger" aria-hidden="true"><span></span><span></span></span>
       </button>
@@ -54,57 +55,43 @@ const whats = whatsappHref();
 <div class="sheet" id="site-nav" role="dialog" aria-modal="true" aria-label="Menu" data-open="false" hidden>
   <div class="sheet-grip" aria-hidden="true"></div>
 
-  <div class="sheet-scroll">
-    <div class="sheet-extra">
-      <div class="sheet-group">
-        <p class="sheet-h">Outros contatos</p>
-        {
-          whats && (
-            <a class="sheet-row" href={whats}>
-              <Icon name="phone" class="no-nudge" />
-              <span>Chamar no WhatsApp</span>
-            </a>
-          )
-        }
-        <div class="sheet-row sheet-mail">
-          <a href={site.mailto}>{site.email}</a>
-          <button type="button" class="sheet-copy" data-copy={site.email} data-copy-scope="menu">
-            <Icon name="copy" class="no-nudge" />
-            <span data-copy-label>Copiar</span>
-          </button>
-        </div>
-      </div>
-      <div class="sheet-group">
-        <p class="sheet-h">Leia também</p>
-        <div class="sheet-ext">
-          <a href={site.links.blog}>Blog <Icon name="arrow-up-right" class="no-nudge" /></a>
-          <a href={site.links.portfolio}>Portfólio do Daniel <Icon name="arrow-up-right" class="no-nudge" /></a>
-        </div>
-      </div>
-    </div>
-
-    <ul role="list" class="sheet-nav" aria-label="Seções">
-      {
-        nav.map((item, i) => (
-          <li style={`--i:${nav.length - i}`}>
-            <a href={item.href} data-nav-link={item.id} data-sheet-link aria-current={item.href === here ? "page" : undefined}>
-              <span>{item.label}</span>
-              <span class="here" aria-hidden="true">
-                Você está aqui
-              </span>
-            </a>
-          </li>
-        ))
-      }
-    </ul>
-  </div>
+  <ul role="list" class="sheet-nav" aria-label="Seções">
+    {
+      nav.map((item, i) => (
+        <li style={`--i:${i}`}>
+          <a href={item.href} data-nav-link={item.id} data-sheet-link aria-current={item.href === here ? "page" : undefined}>
+            <span>{item.label}</span>
+            <span class="here" aria-hidden="true">
+              Você está aqui
+            </span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
 
   <div class="sheet-cta">
     <a class="btn btn-primary btn-block" href={mailto}>
       <Icon name="mail" class="no-nudge" />
-      Pedir uma conversa de 30&nbsp;min
+      Contar como é a minha rotina
     </a>
-    <p>Abre o seu e-mail com um roteiro pronto.</p>
+  </div>
+
+  <div class="sheet-extra" role="group" aria-label="Outros contatos e links">
+    {
+      whats && (
+        <a class="chip" href={whats}>
+          <Icon name="phone" class="no-nudge" />
+          WhatsApp
+        </a>
+      )
+    }
+    <button type="button" class="chip" data-copy={site.email} data-copy-done="E-mail copiado" aria-label={`Copiar o e-mail ${site.email}`}>
+      <Icon name="copy" class="no-nudge" />
+      <span data-copy-label>Copiar e-mail</span>
+    </button>
+    <a class="chip" href={site.links.blog}>Blog <Icon name="arrow-up-right" class="no-nudge" /></a>
+    <a class="chip" href={site.links.portfolio}>Portfólio <Icon name="arrow-up-right" class="no-nudge" /></a>
   </div>
 </div>
 
@@ -121,6 +108,13 @@ const whats = whatsappHref();
   let open = false;
   let closeTimer: number | undefined;
   let pending: string | null = null;
+  let currentName = "";
+  const setLabel = () => {
+    if (!toggle || !label) return;
+    label.textContent = open ? "Fechar" : currentName || "Menu";
+    toggle.toggleAttribute("data-here", !open && currentName !== "");
+    toggle.setAttribute("aria-label", open ? "Fechar menu" : currentName ? `Abrir menu. Seção atual: ${currentName}` : "Abrir menu");
+  };
   let nextHref: string | null = null;
 
   /* ---- Cabeçalho: fundo ao sair do topo; no celular, some ao descer e volta ao subir ---- */
@@ -150,7 +144,7 @@ const whats = whatsappHref();
     open = value;
     window.clearTimeout(closeTimer);
     toggle.setAttribute("aria-expanded", String(value));
-    if (label) label.textContent = value ? "Fechar" : "Menu";
+    setLabel();
     for (const el of outside()) if (el instanceof HTMLElement) el.inert = value;
     if (value) {
       sheet.hidden = false;
@@ -282,6 +276,8 @@ const whats = whatsappHref();
             else a.removeAttribute("aria-current");
           }
         }
+        currentName = (current && links.get(current)?.[0]?.textContent?.trim()) || "";
+        setLabel();
       },
       { rootMargin: "-40% 0px -55% 0px" },
     );
@@ -386,6 +382,18 @@ const whats = whatsappHref();
     font-size: 1rem;
     font-weight: 650;
     -webkit-tap-highlight-color: transparent;
+  }
+
+  .here-dot {
+    display: none;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--caju);
+  }
+
+  .menu-toggle[data-here] .here-dot {
+    display: block;
   }
 
   .burger {
@@ -494,6 +502,13 @@ const whats = whatsappHref();
     }
   }
 
+  /* Telas estreitas: com a seção atual no botão, a marca fica só com o símbolo. */
+  @media (max-width: 26rem) {
+    .header:has([data-here]) :global(.logo-word) {
+      display: none;
+    }
+  }
+
   .sheet-grip {
     flex: none;
     width: 2.75rem;
@@ -503,113 +518,15 @@ const whats = whatsappHref();
     background: rgb(255 255 255 / 0.28);
   }
 
-  .sheet-scroll {
+  .sheet-nav {
     flex: 1 1 auto;
     min-height: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-4);
-    padding: var(--s-3) max(var(--gutter), env(safe-area-inset-right)) var(--s-2) max(var(--gutter), env(safe-area-inset-left));
+    display: grid;
+    align-content: start;
+    gap: 2px;
+    padding: var(--s-2) max(var(--gutter), env(safe-area-inset-right)) 0 max(var(--gutter), env(safe-area-inset-left));
     overflow-y: auto;
     overscroll-behavior: contain;
-  }
-
-  .sheet-extra {
-    display: grid;
-    gap: var(--s-3);
-    padding: var(--s-3) var(--s-4);
-    border-radius: var(--r-md);
-    background: rgb(255 255 255 / 0.06);
-  }
-
-  .sheet-group {
-    display: grid;
-    gap: var(--s-1);
-  }
-
-  .sheet-h {
-    font-size: var(--t-xs);
-    font-weight: 650;
-    color: #d9c5df;
-  }
-
-  .sheet-row {
-    display: flex;
-    align-items: center;
-    gap: var(--s-3);
-    min-height: 3rem;
-    color: #fbf3fb;
-    font-size: var(--t-sm);
-    text-decoration: none;
-  }
-
-  .sheet-row svg {
-    width: 1.2rem;
-    height: 1.2rem;
-  }
-
-  .sheet-mail {
-    justify-content: space-between;
-  }
-
-  .sheet-mail a {
-    display: inline-flex;
-    align-items: center;
-    min-height: 3rem;
-    min-width: 0;
-    overflow-wrap: anywhere;
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .sheet-copy {
-    flex: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    min-height: 3rem;
-    padding: 0 1rem;
-    border: 0;
-    border-radius: 999px;
-    background: rgb(255 255 255 / 0.12);
-    color: var(--caju);
-    font-size: var(--t-sm);
-    font-weight: 650;
-  }
-
-  .sheet-copy svg {
-    width: 1.05rem;
-    height: 1.05rem;
-  }
-
-  .sheet-ext {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s-2);
-  }
-
-  .sheet-ext a {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    min-height: 3rem;
-    padding: 0 1rem;
-    border-radius: 999px;
-    background: rgb(255 255 255 / 0.1);
-    color: #fbf3fb;
-    font-size: var(--t-sm);
-    font-weight: 650;
-    text-decoration: none;
-  }
-
-  .sheet-ext svg {
-    width: 1rem;
-    height: 1rem;
-  }
-
-  .sheet-nav {
-    display: grid;
-    gap: 2px;
   }
 
   .sheet-nav a {
@@ -657,12 +574,7 @@ const whats = whatsappHref();
 
   .sheet-cta {
     flex: none;
-    display: grid;
-    gap: var(--s-2);
-    padding: var(--s-3) max(var(--gutter), env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom))
-      max(var(--gutter), env(safe-area-inset-left));
-    box-shadow: 0 -16px 20px -12px rgb(42 20 48 / 0.9);
-    position: relative;
+    padding: var(--s-3) max(var(--gutter), env(safe-area-inset-right)) var(--s-2) max(var(--gutter), env(safe-area-inset-left));
   }
 
   .sheet-cta .btn-primary {
@@ -671,10 +583,61 @@ const whats = whatsappHref();
     box-shadow: none;
   }
 
-  .sheet-cta p {
-    font-size: var(--t-xs);
-    text-align: center;
-    color: #d9c5df;
+  .sheet-extra {
+    flex: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+    padding: var(--s-2) max(var(--gutter), env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom))
+      max(var(--gutter), env(safe-area-inset-left));
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 3rem;
+    padding: 0 1rem;
+    border: 0;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.1);
+    color: #fbf3fb;
+    font-size: var(--t-sm);
+    font-weight: 650;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .chip svg {
+    width: 1.05rem;
+    height: 1.05rem;
+  }
+
+  .chip[data-copied="true"] {
+    color: var(--caju);
+  }
+
+  /* Telas estreitas e baixas (320×568): contatos numa linha que rola, sem os ícones, para as seções caberem sem rolagem. */
+  @media (max-width: 22.5rem) and (max-height: 37rem) {
+    .sheet-extra {
+      flex-wrap: nowrap;
+      gap: 0.375rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .sheet-extra .chip {
+      flex: none;
+    }
+
+    .chip {
+      padding: 0 0.7rem;
+      font-size: 0.875rem;
+    }
+
+    .chip svg {
+      display: none;
+    }
   }
 
   .sheet :focus-visible {
@@ -688,8 +651,8 @@ const whats = whatsappHref();
       font-size: 1.3rem;
     }
 
-    .sheet-cta p {
-      display: none;
+    .sheet-grip {
+      margin-block: 0.45rem 0;
     }
   }
 

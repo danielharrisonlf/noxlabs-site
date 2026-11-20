@@ -1,16 +1,16 @@
 ---
 /** O que já construí: histórias em linguagem de negócio, com link para a página de cada caso. */
-import { featuredCases, moreCases, srcset } from "../data/cases";
+import { featuredCases, moreCases } from "../data/cases";
 import Icon from "./Icon.astro";
 ---
 
 <section class="section work" id="casos" aria-labelledby="casos-title">
   <div class="wrap">
     <header class="section-head" data-reveal>
-      <h2 id="casos-title" class="section-title">O que eu já construí</h2>
+      <h2 id="casos-title" class="section-title">Feito por mim, do começo ao fim</h2>
       <p class="section-lede">
-        Sistemas que construí do começo ao fim, contados pelo problema que resolvem. Cada um começou por uma rotina, não por
-        uma tecnologia.
+        Sistemas que eu construí do começo ao fim, contados pelo problema que resolvem: atendimento, agenda, equipes, pátio,
+        câmeras.
       </p>
     </header>
 
@@ -19,14 +19,12 @@ import Icon from "./Icon.astro";
         featuredCases.map((c, i) => (
           <li class:list={["case", i % 2 ? "tone-goiaba" : "tone-lila"]} data-reveal style={`--i:${i % 2}`}>
             <a class="case-link" href={`/casos/${c.slug}/`} aria-label={`${c.name}: ${c.summary} Ver o caso.`}>
-              {c.image ? (
+              {c.thumb ? (
                 <span class="case-shot">
                   <img
-                    src={c.image.src}
-                    srcset={srcset(c.image.src, c.image.width)}
-                    sizes="(min-width: 64rem) 36rem, 92vw"
-                    width={c.image.width}
-                    height={c.image.height}
+                    src={c.thumb.src}
+                    width={c.thumb.width}
+                    height={c.thumb.height}
                     alt=""
                     loading="lazy"
                     decoding="async"
@@ -127,8 +125,11 @@ import Icon from "./Icon.astro";
 
   /* A captura assenta num azulejo de cor, como uma peça do mosaico. */
   .case-shot {
-    display: block;
-    padding: clamp(1rem, 0.6rem + 1.5vw, 2rem) clamp(1rem, 0.6rem + 1.5vw, 2rem) 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: clamp(15rem, 10rem + 12vw, 22rem);
+    padding: clamp(1rem, 0.6rem + 1.5vw, 2rem);
     background: var(--lila);
     overflow: hidden;
   }
@@ -138,19 +139,18 @@ import Icon from "./Icon.astro";
   }
 
   .case-shot img {
-    width: 100%;
-    aspect-ratio: 16 / 10;
-    object-fit: cover;
-    object-position: left top;
-    border-radius: 14px 14px 0 0;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 14px;
+    border: 6px solid #fff;
     box-shadow: var(--shadow-2);
     transition: transform var(--d-slow) var(--ease-out);
   }
 
   .case-shot-plain {
-    display: grid;
-    place-items: center;
-    aspect-ratio: 16 / 10;
     padding: 0;
   }
 
@@ -260,7 +260,7 @@ import Icon from "./Icon.astro";
 
   .more {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 13.5rem), 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: var(--s-3);
   }
 
@@ -335,6 +335,12 @@ import Icon from "./Icon.astro";
     font-size: var(--t-sm);
     color: var(--ink-3);
     max-width: 70ch;
+  }
+
+  @media (max-width: 75rem) {
+    .more {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
   @media (max-width: 52rem) {

@@ -1,28 +1,12 @@
 /**
- * Ramos atendidos e os cenários "Como funcionaria na sua empresa". Nenhum
- * ramo é o foco: todos têm o mesmo peso na página. Os cenários são
+ * Os cenários "Como funcionaria na sua empresa". Nenhum ramo é o foco: todos
+ * têm o mesmo peso, e a ordem começa por varejo e indústria. Os cenários são
  * ilustrações de como uma automação funcionaria, não casos de clientes; as
  * conversas são de exemplo, com nomes fictícios.
  */
 import type { IllustrationName } from "./illustrations";
 
-export type Sector = { name: string; ill: IllustrationName; tone: "lila" | "goiaba" | "caju" | "white" };
-
-/** A faixa "Para empresas de todo ramo", logo depois do topo. */
-export const sectors: Sector[] = [
-  { name: "Clínicas e consultórios", ill: "clinica", tone: "lila" },
-  { name: "Lojas e varejo", ill: "loja", tone: "goiaba" },
-  { name: "Escritórios de contabilidade", ill: "escritorio", tone: "white" },
-  { name: "Escritórios de advocacia", ill: "advocacia", tone: "lila" },
-  { name: "Indústrias", ill: "industria", tone: "caju" },
-  { name: "Distribuidoras", ill: "distribuidora", tone: "white" },
-  { name: "Imobiliárias", ill: "imobiliaria", tone: "goiaba" },
-  { name: "Escolas e cursos", ill: "escola", tone: "lila" },
-  { name: "Transportadoras", ill: "transportadora", tone: "caju" },
-  { name: "Agro", ill: "agro", tone: "white" },
-  { name: "E-commerce", ill: "ecommerce", tone: "goiaba" },
-  { name: "Agências", ill: "agencia", tone: "lila" },
-];
+type Tone = "lila" | "goiaba" | "caju" | "white";
 
 export type ChatLine =
   | { from: "client" | "bot" | "team"; text: string; who?: string }
@@ -33,7 +17,7 @@ export type Scenario = {
   /** Nome curto do chip. */
   label: string;
   ill: IllustrationName;
-  tone: Sector["tone"];
+  tone: Tone;
   /** Quem está na conversa de exemplo (topo do celular). */
   chatName: string;
   chatRole: string;
@@ -44,32 +28,6 @@ export type Scenario = {
 };
 
 export const scenarios: Scenario[] = [
-  {
-    id: "clinica",
-    label: "Clínica",
-    ill: "clinica",
-    tone: "lila",
-    chatName: "Clínica Bem Viver",
-    chatRole: "Confirmações",
-    chat: [
-      { from: "bot", text: "Oi, Ana! Sua consulta com a Dra. Lúcia é amanhã, às 9h. Você confirma?", who: "Assistente da clínica" },
-      { from: "client", text: "Não vou conseguir ir. Tem outro horário?" },
-      { from: "bot", text: "Tenho quinta às 14h ou sexta às 10h. Qual prefere?", who: "Assistente da clínica" },
-      { from: "client", text: "Quinta às 14h." },
-      { from: "note", text: "Remarcada. O horário de amanhã foi oferecido à lista de espera" },
-    ],
-    today: [
-      "A recepção liga e manda mensagem para cada paciente, um por um, para confirmar.",
-      "A falta só aparece na hora, com a cadeira vazia.",
-      "Retorno depende de alguém lembrar de chamar o paciente.",
-    ],
-    then: [
-      "Na véspera, cada paciente recebe a confirmação pelo WhatsApp e pode remarcar ali mesmo.",
-      "O horário que vagou é oferecido a quem está na lista de espera.",
-      "Retorno vira lembrete com data; quem não responde vai para a lista de ligação da recepção.",
-    ],
-    gain: "Menos cadeira vazia e uma recepção livre para quem está na frente dela.",
-  },
   {
     id: "loja",
     label: "Loja",
@@ -97,32 +55,6 @@ export const scenarios: Scenario[] = [
     gain: "Resposta em minutos, até à noite, sem vendedor preso no celular.",
   },
   {
-    id: "escritorio",
-    label: "Escritório",
-    ill: "escritorio",
-    tone: "white",
-    chatName: "Oliveira Contabilidade",
-    chatRole: "Documentos do mês",
-    chat: [
-      { from: "bot", text: "Bom dia, Carlos! Para fechar novembro, faltam o extrato do banco e duas notas de compra.", who: "Assistente do escritório" },
-      { from: "client", text: "Segue o extrato. As notas mando à tarde." },
-      { from: "bot", text: "Recebido e salvo na sua pasta. Te lembro das notas às 16h.", who: "Assistente do escritório" },
-      { from: "client", text: "Minha guia de imposto já saiu?" },
-      { from: "bot", text: "Saiu ontem e vence dia 20. Reenviei o arquivo para você.", who: "Assistente do escritório" },
-    ],
-    today: [
-      "Alguém da equipe cobra documento de cada cliente, um por um, todo mês.",
-      "O WhatsApp enche de perguntas como “meu processo andou?” e “a guia já saiu?”.",
-      "Arquivo chega solto e é salvo à mão, na pasta de cada cliente.",
-    ],
-    then: [
-      "No dia combinado, cada cliente recebe a lista do que falta, com o nome dele.",
-      "O que chega é salvo na pasta certa; quem não mandou recebe um lembrete educado.",
-      "Perguntas de andamento são respondidas com o que está registrado; o resto vai para a pessoa certa.",
-    ],
-    gain: "A equipe para de correr atrás de papel e volta para o trabalho que o cliente valoriza.",
-  },
-  {
     id: "industria",
     label: "Indústria e distribuidora",
     ill: "distribuidora",
@@ -147,6 +79,32 @@ export const scenarios: Scenario[] = [
       "Atraso de entrega é avisado ao cliente antes de ele perguntar.",
     ],
     gain: "Menos erro de digitação, pedido faturado mais cedo e cliente que confia no prazo.",
+  },
+  {
+    id: "clinica",
+    label: "Clínica",
+    ill: "clinica",
+    tone: "lila",
+    chatName: "Clínica Bem Viver",
+    chatRole: "Confirmações",
+    chat: [
+      { from: "bot", text: "Oi, Ana! Sua consulta com a Dra. Lúcia é amanhã, às 9h. Você confirma?", who: "Assistente da clínica" },
+      { from: "client", text: "Não vou conseguir ir. Tem outro horário?" },
+      { from: "bot", text: "Tenho quinta às 14h ou sexta às 10h. Qual prefere?", who: "Assistente da clínica" },
+      { from: "client", text: "Quinta às 14h." },
+      { from: "note", text: "Remarcada. O horário de amanhã foi oferecido à lista de espera" },
+    ],
+    today: [
+      "A recepção liga e manda mensagem para cada paciente, um por um, para confirmar.",
+      "A falta só aparece na hora, com a cadeira vazia.",
+      "Retorno depende de alguém lembrar de chamar o paciente.",
+    ],
+    then: [
+      "Na véspera, cada paciente recebe a confirmação pelo WhatsApp e pode remarcar ali mesmo.",
+      "O horário que vagou é oferecido a quem está na lista de espera.",
+      "Retorno vira lembrete com data; quem não responde vai para a lista de ligação da recepção.",
+    ],
+    gain: "Menos cadeira vazia e uma recepção livre para quem está na frente dela.",
   },
   {
     id: "imobiliaria",
@@ -199,5 +157,31 @@ export const scenarios: Scenario[] = [
       "Avisos chegam a cada família, com confirmação de leitura para a escola.",
     ],
     gain: "Uma secretaria que atende quem precisa de atenção, não a mesma pergunta pela vigésima vez.",
+  },
+  {
+    id: "escritorio",
+    label: "Escritório e serviços",
+    ill: "escritorio",
+    tone: "white",
+    chatName: "Moura & Lima Assessoria",
+    chatRole: "Atendimento",
+    chat: [
+      { from: "bot", text: "Bom dia, Carlos! Para seguir com o seu pedido, faltam o comprovante de endereço e o contrato assinado.", who: "Assistente do escritório" },
+      { from: "client", text: "Segue o comprovante. O contrato mando à tarde." },
+      { from: "bot", text: "Recebido e salvo na sua pasta. Te lembro do contrato às 16h.", who: "Assistente do escritório" },
+      { from: "client", text: "E o meu processo, já andou?" },
+      { from: "bot", text: "Andou: está em análise, com resposta prevista até sexta. Aviso assim que mudar.", who: "Assistente do escritório" },
+    ],
+    today: [
+      "Alguém da equipe cobra documento de cada cliente, um por um.",
+      "O WhatsApp enche de “meu processo andou?”, e quem está trabalhando para para responder.",
+      "Arquivo chega solto e é salvo à mão, na pasta de cada cliente.",
+    ],
+    then: [
+      "Cada cliente recebe a lista do que falta, com o nome dele, e um lembrete se esquecer.",
+      "O que chega vai para a pasta certa, sem ninguém arrastar arquivo.",
+      "Perguntas de andamento são respondidas com o que está registrado; o resto vai para a pessoa certa.",
+    ],
+    gain: "A equipe para de correr atrás de papel e volta para o trabalho que o cliente paga para ter.",
   },
 ];

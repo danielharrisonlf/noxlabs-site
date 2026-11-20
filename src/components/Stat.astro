@@ -1,71 +1,82 @@
 ---
 /**
- * Bloco de dado de mercado: número grande, frase curta e a fonte com o ano.
- * O número conta até o valor quando entra na tela (motion.ts), exceto faixas
- * como "60 a 70%", que ficam paradas para não mostrar valores falsos; o HTML já traz
- * o valor final, e o leitor de tela lê a frase completa, que não se mexe.
+ * Dado de mercado: número grande à esquerda, frase e fonte à direita, numa
+ * linha da lista. O número conta até o valor quando entra na tela (motion.ts),
+ * exceto faixas como "60 a 70%"; o HTML já traz o valor final, e o leitor de
+ * tela lê a frase completa, que não se mexe.
  */
 import { type Stat, formatStat } from "../data/stats";
 
 interface Props {
   stat: Stat;
   index?: number;
-  /** Fundo do azulejo; a cor não carrega significado, só ritmo. */
-  tone?: "lila" | "goiaba" | "caju" | "white";
 }
 
-const { stat, index = 0, tone = "white" } = Astro.props;
+const { stat, index = 0 } = Astro.props;
 const shown = formatStat(stat);
 ---
 
-<figure class:list={["stat", "tile", `tile-${tone}`]} data-reveal style={`--i:${index}`}>
+<figure class="stat" data-reveal style={`--i:${index}`}>
   <!-- Tudo numa linha: espaço entre os elementos apareceria entre o número e o "%". -->
   <p class="stat-value tabular" aria-hidden="true">{stat.prefix}{stat.prefix ? <span>{shown}</span> : <span data-count={stat.value} data-decimals={stat.decimals ?? 0}>{shown}</span>}{stat.suffix && <span class="stat-suffix">{stat.suffix}</span>}</p>
-  <p class="stat-text">
-    <span class="visually-hidden">{stat.prefix}{shown}{stat.suffix}: </span>
-    {stat.text}
-  </p>
-  <figcaption class="fonte">
-    Fonte: <a href={stat.source.url}>{stat.source.org}, {stat.source.title}</a> (publicação de {stat.source.year}).{
-      stat.note && ` ${stat.note}`
-    }
-  </figcaption>
+  <div class="stat-body">
+    <p class="stat-text">
+      <span class="visually-hidden">{stat.prefix}{shown}{stat.suffix}: </span>
+      {stat.text}
+    </p>
+    <figcaption class="fonte">
+      Fonte: <a href={stat.source.url}>{stat.source.org}, {stat.source.title}</a> (publicação de {stat.source.year}).{
+        stat.note && ` ${stat.note}`
+      }
+    </figcaption>
+  </div>
 </figure>
 
 <style>
   .stat {
     display: grid;
-    align-content: start;
-    gap: var(--s-3);
-    padding: clamp(1.35rem, 1rem + 1vw, 2rem);
+    grid-template-columns: 11rem minmax(0, 1fr);
+    gap: var(--s-3) var(--s-6);
+    align-items: start;
+    padding-block: clamp(1.5rem, 1rem + 1.5vw, 2.25rem);
+    border-bottom: 1px solid var(--line);
   }
 
   .stat-value {
     font-family: var(--font-display);
-    font-size: clamp(2.5rem, 1.9rem + 1.8vw, 3.5rem);
-    white-space: nowrap;
+    font-size: clamp(2.75rem, 2rem + 2.4vw, 4rem);
     font-weight: 700;
-    line-height: 1;
+    line-height: 0.95;
     letter-spacing: -0.035em;
-    color: var(--jabu);
+    color: var(--goiaba-ink);
+    white-space: nowrap;
   }
 
   .stat-suffix {
     font-size: 0.5em;
     letter-spacing: -0.01em;
-    margin-left: 0.1em;
+    margin-left: 0.08em;
+  }
+
+  .stat-body {
+    display: grid;
+    gap: var(--s-3);
   }
 
   .stat-text {
-    font-size: var(--t-base);
+    font-size: var(--t-md);
     line-height: 1.45;
-    max-width: 32ch;
+    max-width: 34ch;
   }
 
   .stat .fonte {
-    margin-top: auto;
-    padding-top: var(--s-3);
-    border-top: 1px solid rgb(42 20 48 / 0.12);
     color: var(--ink-2);
+    font-size: var(--t-sm);
+  }
+
+  @media (max-width: 30rem) {
+    .stat {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

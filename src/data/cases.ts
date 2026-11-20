@@ -23,6 +23,9 @@ export function srcset(src: string, width: number) {
   return `${base}-720.webp 720w, ${base}-1080.webp 1080w, ${src} ${width}w`;
 }
 
+/** Recorte legível para o cartão da página inicial. */
+export type CaseThumb = { src: string; width: number; height: number; alt: string };
+
 export type CaseStudy = {
   slug: string;
   name: string;
@@ -39,6 +42,7 @@ export type CaseStudy = {
   does: string[];
   gains: string[];
   image?: CaseImage;
+  thumb?: CaseThumb;
   /** Links opcionais e secundários. */
   links: CaseLink[];
   /** Rodapé técnico, recolhido, para quem quiser. */
@@ -73,6 +77,12 @@ export const clinicflow: CaseStudy = {
     alt: "Painel do dia do ClinicFlow: lista de consultas com horário, paciente, estado e botão do próximo passo; à direita, contadores, próxima chegada, sala de espera e retornos que vencem hoje.",
     caption: "Painel do dia, com dados de demonstração.",
   },
+  thumb: {
+    src: "/img/clinicflow-consultas.webp",
+    width: 770,
+    height: 440,
+    alt: "Consultas de hoje no ClinicFlow: horário, paciente, estado (em atendimento, aguardando 18 min, confirmada, a confirmar) e o botão do próximo passo.",
+  },
   links: [],
   tech: [
     "Aplicação web com API em NestJS 11 e interface em React 19, num monorepo pnpm e Turborepo.",
@@ -104,11 +114,17 @@ export const whatsapp: CaseStudy = {
     "Problema de envio aparece com a causa, não some em silêncio.",
   ],
   image: {
-    src: "/img/whatsapp-control-center.webp",
-    width: 1440,
-    height: 960,
+    src: "/img/whatsapp-editor.webp",
+    width: 1232,
+    height: 800,
     alt: "Editor de mensagem pronta do WhatsApp Control Center: formulário com conta, idioma, nome e categoria à esquerda, e prévia da mensagem num celular à direita.",
     caption: "Editor de mensagens prontas com prévia, em conta de demonstração.",
+  },
+  thumb: {
+    src: "/img/whatsapp-celular.webp",
+    width: 344,
+    height: 300,
+    alt: "Prévia no celular de uma mensagem pronta: “Olá! Seu pedido foi confirmado. Estamos preparando tudo para você.”",
   },
   links: [],
   tech: [
@@ -171,12 +187,6 @@ export const moreCases: CaseEntry[] = [
     name: "Omni, atendimento e vendas com IA",
     icon: "chat",
     summary: "Atendimento e vendas de vários canais num lugar só, com IA ajudando a responder e a organizar os contatos.",
-    status: "Projeto privado",
-  },
-  {
-    name: "FinFlow",
-    icon: "chart",
-    summary: "Finanças pessoais com um assistente de IA, acessíveis pela web e também pelo Telegram.",
     status: "Projeto privado",
   },
   {

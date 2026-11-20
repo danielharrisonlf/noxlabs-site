@@ -236,7 +236,12 @@ const browser = await chromium.launch();
       .filter((r) => r.width > 0 && (r.height < 47.5 || r.width < 47.5)).length,
   );
   if (small) fail(`menu: ${small} alvo(s) menores que 48 px`);
-  // Indicação da seção atual no menu (há uma seção marcada depois de rolar).
+  // Ordem: seções primeiro, depois a ação, e os contatos e links externos por último.
+  const order = await page.evaluate(() => {
+    const top = (sel) => document.querySelector(sel)?.getBoundingClientRect().top ?? -1;
+    return [top("#site-nav .sheet-nav"), top("#site-nav .sheet-cta"), top("#site-nav .sheet-extra")];
+  });
+  if (!(order[0] < order[1] && order[1] < order[2])) fail(`menu: ordem errada (seções ${order[0]}, ação ${order[1]}, contatos ${order[2]})`);
   // Esc fecha e devolve o foco ao botão.
   await page.keyboard.press("Escape");
   await page.waitForTimeout(500);
@@ -270,6 +275,14 @@ const browser = await chromium.launch();
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await page.waitForTimeout(300);
 
+  // Botão fechado mostra a seção atual depois de rolar até ela.
+  await page.evaluate(() => document.getElementById("casos")?.scrollIntoView({ behavior: "instant" }));
+  await page.waitForTimeout(700);
+  const toggleText = (await page.locator("[data-menu-label]").textContent())?.trim();
+  if (toggleText !== "Projetos") fail(`menu: botão fechado não mostra a seção atual ("${toggleText}")`);
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
+  await page.waitForTimeout(400);
+
   // Cabeçalho do celular: some ao descer e volta ao subir.
   await page.evaluate(() => window.scrollTo({ top: 1400, behavior: "instant" }));
   await page.waitForTimeout(150);
@@ -289,7 +302,7 @@ const browser = await chromium.launch();
   if (!(await page.locator("#panel-clinica").isVisible()) || (await page.locator("#panel-loja").isVisible())) fail("ramos: o chip não trocou o cenário");
   await page.keyboard.press("ArrowRight");
   await page.waitForTimeout(500);
-  if ((await page.locator("#tab-loja").getAttribute("aria-selected")) !== "true") fail("ramos: seta para a direita não andou");
+  if ((await page.locator("#tab-imobiliaria").getAttribute("aria-selected")) !== "true") fail("ramos: seta para a direita não andou");
   await page.evaluate(() => window.scrollTo({ top: 0, behavior: "instant" }));
   await page.waitForTimeout(300);
 
@@ -305,31 +318,33 @@ const browser = await chromium.launch();
   if ((await page.locator("[data-dock]").getAttribute("data-visible")) !== "false") fail("cta da base: cobre a calculadora");
   const freed = () => page.locator('[data-res="freed"]').textContent();
   const before = await freed();
+  // Teclado: seta para cima no campo de horas (6 → 7); depois o botão de mais (7 → 8).
   await page.locator("#est-hours").focus();
-  for (let i = 0; i < 2; i++) await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("ArrowUp");
+  await page.locator('[data-step="hours"][data-dir="1"]').tap();
   await page.waitForTimeout(600);
   const after = await freed();
-  // 5 pessoas × 10 h × 4 semanas × 30% = 60
-  if (after !== "60") fail(`calculadora: horas liberadas "${before}" → "${after}", esperado "60"`);
-  if ((await page.locator('[data-out="hours"]').textContent()) !== "10 h") fail("calculadora: valor das horas não atualizou");
+  // 6 pessoas × 8 h × 4 semanas × 30% = 57,6
+  if (after !== "58") fail(`calculadora: horas liberadas "${before}" → "${after}", esperado "58"`);
+  if ((await page.locator("#est-hours").inputValue()) !== "8") fail("calculadora: valor das horas não atualizou");
   // Custo como o brasileiro digita: "6.600" vale 6600.
   await page.locator("#est-cost").fill("6.600");
   await page.waitForTimeout(600);
   const month = (await page.locator('[data-res="month"]').textContent())?.replace(/\s/g, " ");
-  // 60 h × (6600 ÷ 220) = 1.800
-  if (month !== "R$ 1.800") fail(`calculadora: valor mensal "${month}", esperado "R$ 1.800"`);
+  // 57,6 h × (6600 ÷ 220) = 1.728
+  if (month !== "R$ 1.728") fail(`calculadora: valor mensal "${month}", esperado "R$ 1.728"`);
   // Valor inválido: avisa e mantém a última conta válida.
   await page.locator("#est-cost").fill("abc");
   await page.waitForTimeout(500);
   if (!(await page.locator("[data-cost-error]").isVisible())) fail("calculadora: custo inválido sem aviso");
   const kept = (await page.locator('[data-res="month"]').textContent())?.replace(/\s/g, " ");
-  if (kept !== "R$ 1.800") fail(`calculadora: custo inválido mudou a conta para "${kept}"`);
+  if (kept !== "R$ 1.728") fail(`calculadora: custo inválido mudou a conta para "${kept}"`);
   await page.locator("#est-cost").fill("6600");
   await page.locator("#est-cost").blur();
   await page.waitForTimeout(300);
   if ((await page.locator("#est-cost").inputValue()) !== "6.600") fail("calculadora: custo não foi formatado ao sair do campo");
   const mail = decodeURIComponent((await page.locator("[data-est-mail]").getAttribute("href")) ?? "");
-  if (!mail.includes("10 h por semana") || !mail.includes("60 horas por mês")) fail(`calculadora: e-mail sem os números (${mail.slice(0, 120)})`);
+  if (!mail.includes("8 h por semana") || !mail.includes("58 horas por mês")) fail(`calculadora: e-mail sem os números (${mail.slice(0, 120)})`);
 
   // Cópia de e-mail.
   await page.locator("#contato [data-copy]").scrollIntoViewIfNeeded();
@@ -340,6 +355,27 @@ const browser = await chromium.launch();
   if (label !== "E-mail copiado") fail(`cópia: rótulo "${label}", status "${status}"`);
   const clip = await page.evaluate(() => navigator.clipboard.readText());
   if (clip !== "daniel.harrisonlf@gmail.com") fail(`cópia: área de transferência "${clip}"`);
+  await context.close();
+}
+
+// Menu em telas baixas (360×640 e paisagem 844×390): tudo cabe sem rolagem interna.
+for (const [width, height] of [
+  [360, 640],
+  [320, 568],
+]) {
+  const context = await browser.newContext({ viewport: { width, height }, hasTouch: true, reducedMotion: "reduce" });
+  const page = await context.newPage();
+  await page.goto(`${base}/`, { waitUntil: "networkidle" });
+  await page.click("[data-menu-toggle]");
+  await page.waitForTimeout(400);
+  const fit = await page.evaluate(() => {
+    const sheet = document.getElementById("site-nav");
+    const nav = sheet?.querySelector(".sheet-nav");
+    const extra = sheet?.querySelector(".sheet-extra")?.getBoundingClientRect();
+    return { navScroll: nav ? nav.scrollHeight - nav.clientHeight : -1, bottom: extra?.bottom ?? 0, vh: window.innerHeight };
+  });
+  if (fit.navScroll > 1) fail(`menu ${width}x${height}: seções com rolagem interna (${fit.navScroll}px)`);
+  if (fit.bottom > fit.vh + 1) fail(`menu ${width}x${height}: contatos fora da tela`);
   await context.close();
 }
 
@@ -362,7 +398,7 @@ const browser = await chromium.launch();
   await page.goto(`${base}/`, { waitUntil: "networkidle" });
   await page.waitForTimeout(300);
   const hidden = await page.evaluate(() =>
-      [...document.querySelectorAll("[data-reveal], .mosaic-grid > .tile, .m-reply, .m-rows li")].filter((el) => Number(getComputedStyle(el).opacity) < 0.99).length,
+      [...document.querySelectorAll("[data-reveal], .piece, .message")].filter((el) => Number(getComputedStyle(el).opacity) < 0.99).length,
   );
   if (hidden) fail(`movimento reduzido: ${hidden} elementos com opacidade < 1`);
   await context.close();
@@ -378,7 +414,7 @@ const browser = await chromium.launch();
     [...document.querySelectorAll("[data-reveal]")].filter((el) => Number(getComputedStyle(el).opacity) < 0.99).length,
   );
   if (hidden) fail(`sem JS: ${hidden} blocos invisíveis`);
-  if ((await page.locator('[data-res="freed"]').textContent()) !== "48") fail("sem JS: calculadora sem a conta inicial");
+  if ((await page.locator('[data-res="freed"]').textContent()) !== "43") fail("sem JS: calculadora sem a conta inicial");
   const panels = await page.locator("[data-scen-panel]").evaluateAll((els) => els.filter((el) => el.getBoundingClientRect().height > 0).length);
   if (panels !== 6) fail(`sem JS: ${panels} de 6 cenários de ramo visíveis`);
   await context.close();

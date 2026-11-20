@@ -54,7 +54,7 @@ const og = `<!doctype html><html><head><meta charset="utf-8"><style>
   body { width: 1200px; height: 630px; position: relative; overflow: hidden; color: ${JABU}; font-family: Onest; background: ${PAPEL}; }
   .l { position: absolute; left: 72px; top: 64px; bottom: 60px; width: 560px; display: flex; flex-direction: column; justify-content: space-between; }
   .brand { display: flex; align-items: center; gap: 14px; font-family: Parkinsans; font-weight: 700; font-size: 40px; letter-spacing: -0.03em; }
-  h1 { font-family: Parkinsans; font-weight: 700; font-size: 62px; line-height: 1.03; letter-spacing: -0.03em; }
+  h1 { font-family: Parkinsans; font-weight: 700; font-size: 56px; line-height: 1.03; letter-spacing: -0.03em; }
   .sub { margin-top: 18px; font-size: 22px; line-height: 1.4; color: #57435d; }
   .url { font-size: 22px; font-weight: 700; color: #b42a40; }
   .m { position: absolute; right: 64px; top: 75px; display: grid; grid-template-columns: repeat(3, 150px); gap: 12px; }
@@ -65,7 +65,7 @@ const og = `<!doctype html><html><head><meta charset="utf-8"><style>
   <div class="l">
     <div class="brand">${mark(52)}noxlabs</div>
     <div>
-      <h1>Tire o trabalho repetitivo da rotina da sua empresa.</h1>
+      <h1>Cada negócio é de um jeito. O trabalho repetitivo é igual em todos.</h1>
       <p class="sub">Automações, atendimento pelo WhatsApp com IA e sistemas sob medida, para empresas de qualquer ramo.</p>
     </div>
     <div class="url">noxlabs.tech</div>

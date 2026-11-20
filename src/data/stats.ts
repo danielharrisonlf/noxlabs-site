@@ -2,7 +2,8 @@
  * Dados de mercado usados no site. Regra: todo número aparece com a fonte e o
  * ano ao lado, e está registrado em PRODUCT.md com a URL e a citação literal.
  * São dados de terceiros sobre o mercado, nunca resultados da Noxlabs.
- * Escolhidos para valer para qualquer ramo: nenhum é de um setor só.
+ * Escolhidos para valer para qualquer ramo e para o Brasil: pesquisas do
+ * Sebrae de 2026 com donos de pequenos negócios.
  */
 export type Stat = {
   id: string;
@@ -18,33 +19,6 @@ export type Stat = {
 };
 
 export const stats: Stat[] = [
-  {
-    id: "ms-sem-tempo",
-    value: 80,
-    suffix: "%",
-    text: "dos profissionais, entre funcionários e gestores, dizem que falta tempo ou energia para dar conta do trabalho.",
-    source: {
-      org: "Microsoft",
-      title: "Work Trend Index",
-      year: "2025",
-      url: "https://www.microsoft.com/en-us/worklab/work-trend-index/2025-the-year-the-frontier-firm-is-born",
-    },
-    note: "31 mil pessoas em 31 países, Brasil incluído.",
-  },
-  {
-    id: "mckinsey-potencial",
-    value: 70,
-    prefix: "60 a ",
-    suffix: "%",
-    text: "do tempo dos funcionários vai em atividades que a tecnologia atual já teria potencial para automatizar.",
-    source: {
-      org: "McKinsey",
-      title: "The economic potential of generative AI",
-      year: "2023",
-      url: "https://www.mckinsey.com/capabilities/tech-and-ai/our-insights/the-economic-potential-of-generative-ai-the-next-productivity-frontier",
-    },
-    note: "Potencial técnico, não previsão de corte de vagas.",
-  },
   {
     id: "sebrae-whatsapp",
     value: 8,
@@ -62,7 +36,7 @@ export const stats: Stat[] = [
     id: "sebrae-ia",
     value: 52,
     suffix: "%",
-    text: "dos donos de pequenos negócios no Brasil usaram IA no trabalho nas duas semanas antes da entrevista.",
+    text: "dos donos de pequenos negócios usaram IA no trabalho nas duas semanas antes da entrevista.",
     source: {
       org: "Sebrae",
       title: "Transformação Digital nos Pequenos Negócios",
@@ -70,6 +44,19 @@ export const stats: Stat[] = [
       url: "https://agenciasebrae.com.br/dados/pequenos-negocios-do-brasil-usam-mais-ia-que-os-norte-americanos-aponta-sebrae/",
     },
     note: "7.182 entrevistas, de março a maio de 2026. Usar não é o mesmo que ter IA na rotina.",
+  },
+  {
+    id: "sebrae-ia-intencao",
+    value: 60,
+    suffix: "%",
+    text: "pretendem começar a usar IA ou usar mais no próximo semestre.",
+    source: {
+      org: "Sebrae",
+      title: "Transformação Digital nos Pequenos Negócios",
+      year: "2026",
+      url: "https://agenciasebrae.com.br/dados/pequenos-negocios-do-brasil-usam-mais-ia-que-os-norte-americanos-aponta-sebrae/",
+    },
+    note: "Mesma pesquisa. Intenção declarada, não uso medido.",
   },
 ];
 

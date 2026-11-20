@@ -2,16 +2,15 @@
 
 const email = "daniel.harrisonlf@gmail.com";
 
-const talkSubject = "Conversa de 30 min com a Noxlabs";
+const talkSubject = "Uma rotina da minha empresa";
 
 /** Roteiro que já vem no corpo do e-mail: o visitante só preenche. */
 export const mailScript = [
   "Empresa e ramo:",
-  "Meu cargo:",
-  "Quantas pessoas trabalham na rotina que quero melhorar:",
-  "A tarefa que mais toma tempo hoje:",
-  "Sistemas e planilhas que usamos:",
-  "Horários bons para uma conversa de 30 min:",
+  "O que se repete toda semana:",
+  "Quantas pessoas fazem isso:",
+  "Sistemas, planilhas e canais que usamos:",
+  "Melhor horário para uma conversa de 30 minutos:",
 ] as const;
 
 function mailBody(context?: string, extra: string[] = []) {
@@ -63,7 +62,7 @@ export const site = {
 } as const;
 
 /** Link de WhatsApp com mensagem pronta, ou null se o número não estiver configurado. */
-export function whatsappHref(text = "Olá, Daniel. Quero conversar sobre automatizar uma rotina da minha empresa.") {
+export function whatsappHref(text = "Olá, Daniel. Quero contar uma rotina da minha empresa.") {
   return site.whatsapp ? `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(text)}` : null;
 }
 

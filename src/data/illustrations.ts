@@ -6,11 +6,14 @@
  * então a mesma peça funciona em qualquer fundo de azulejo.
  */
 export const illustrations = {
+  // Prancheta de atendimento com a cruz e a linha do pulso.
   clinica: `
-    <rect class="f-ink" x="12" y="50" width="40" height="4" rx="2"/>
-    <path class="f-ink" d="M19 51V29a13 13 0 0 1 26 0v22Z"/>
-    <rect class="f-goi" x="29" y="29" width="6" height="16" rx="1.5"/>
-    <rect class="f-goi" x="24" y="34" width="16" height="6" rx="1.5"/>`,
+    <rect class="f-ink" x="14" y="13" width="36" height="42" rx="6"/>
+    <rect class="f-paper" x="19" y="20" width="26" height="30" rx="3"/>
+    <rect class="f-caju" x="24" y="9" width="16" height="8" rx="3"/>
+    <rect class="f-goi" x="29.5" y="24" width="5" height="13" rx="1.25"/>
+    <rect class="f-goi" x="25.5" y="28" width="13" height="5" rx="1.25"/>
+    <path class="s-ink" style="stroke-width:2.5" d="M22.5 44h5l2-3.5 3 6 2-2.5h7"/>`,
   loja: `
     <rect class="f-paper" x="16" y="26" width="32" height="25"/>
     <rect class="f-caju" x="27" y="36" width="10" height="15" rx="2"/>

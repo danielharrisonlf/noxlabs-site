@@ -1,4 +1,10 @@
 ---
+/**
+ * Fecho da página: como começa (quatro passos) e o contato, lado a lado, na
+ * única faixa escura do site. O e-mail abre com um roteiro; WhatsApp e agenda
+ * aparecem sozinhos quando estiverem configurados em src/data/site.ts.
+ */
+import { steps } from "../data/content";
 import { mailScript, site, talkMailto, whatsappHref } from "../data/site";
 import Icon from "./Icon.astro";
 
@@ -8,110 +14,154 @@ interface Props {
   title?: string;
 }
 
-const { topic, title = "Conte qual rotina está tomando o tempo da sua equipe." } = Astro.props;
+const { topic, title = "Do primeiro e-mail à primeira rotina funcionando" } = Astro.props;
 const mailto = topic ? talkMailto(topic) : site.talkMailto;
 const whats = whatsappHref();
 const subject = topic ? `${site.talkSubject}: ${topic}` : site.talkSubject;
 ---
 
 <section class="contact dark" id="contato" aria-labelledby="contato-title" data-copy-scope>
-  <div class="wrap contact-grid">
-    <div class="contact-copy">
-      <h2 id="contato-title" data-reveal>{title}</h2>
-      <p class="contact-lede" data-reveal style="--i:1">
-        Escreva em poucas linhas como é a rotina hoje. Eu leio, respondo pessoalmente e marcamos uma conversa de 30 minutos
-        para ver se a automação compensa no seu caso.
-      </p>
+  <div class="wrap">
+    <h2 id="contato-title" class="contact-title" data-reveal>{title}</h2>
 
-      <div class="contact-actions" data-reveal style="--i:2" data-cta-anchor>
-        <a class="btn btn-primary" href={mailto}>
-          <Icon name="mail" class="no-nudge" />
-          Escrever o e-mail
-        </a>
+    <div class="contact-grid">
+      <ol role="list" class="steps">
         {
-          site.scheduleUrl && (
-            <a class="btn btn-secondary" href={site.scheduleUrl}>
-              <Icon name="calendar" class="no-nudge" />
-              Escolher horário na agenda
-            </a>
-          )
+          steps.map((step, i) => (
+            <li data-reveal style={`--i:${i}`}>
+              <span class="step-n tabular" aria-hidden="true">
+                {i + 1}
+              </span>
+              <div>
+                <h3>
+                  <span class="visually-hidden">Passo {i + 1}: </span>
+                  {step.title}
+                </h3>
+                <p>{step.text}</p>
+              </div>
+            </li>
+          ))
         }
-        {
-          whats && (
-            <a class="btn btn-secondary" href={whats}>
-              <Icon name="phone" class="no-nudge" />
-              Chamar no WhatsApp
-            </a>
-          )
-        }
-        <button class="btn btn-secondary" type="button" data-copy={site.email} data-copy-done="E-mail copiado">
-          <span class="copy-icon"><Icon name="copy" class="no-nudge" /></span>
-          <span class="check-icon"><Icon name="check" class="no-nudge" /></span>
-          <span data-copy-label>Copiar e-mail</span>
-        </button>
+      </ol>
+
+      <div class="start" data-reveal style="--i:1">
+        <h3 class="start-title">Comece pelo primeiro passo</h3>
+        <p class="start-lede">Escreva em poucas linhas como é a rotina hoje. Eu leio e respondo pessoalmente.</p>
+        <div class="start-actions" data-cta-anchor>
+          <a class="btn btn-primary btn-block" href={mailto}>
+            <Icon name="mail" class="no-nudge" />
+            Escrever o e-mail
+          </a>
+          {
+            whats && (
+              <a class="btn btn-secondary btn-block" href={whats}>
+                <Icon name="phone" class="no-nudge" />
+                Chamar no WhatsApp
+              </a>
+            )
+          }
+          {
+            site.scheduleUrl && (
+              <a class="btn btn-secondary btn-block" href={site.scheduleUrl}>
+                <Icon name="calendar" class="no-nudge" />
+                Escolher horário na agenda
+              </a>
+            )
+          }
+          <button class="btn btn-secondary btn-block" type="button" data-copy={site.email} data-copy-done="E-mail copiado">
+            <span class="copy-icon"><Icon name="copy" class="no-nudge" /></span>
+            <span class="check-icon"><Icon name="check" class="no-nudge" /></span>
+            <span data-copy-label>Copiar e-mail</span>
+          </button>
+        </div>
+        <p class="contact-email"><a href={site.mailto}>{site.email}</a></p>
+        <p class="contact-status" role="status" aria-live="polite" data-copy-status></p>
+
+        <div class="script">
+          <p class="script-h">O e-mail já abre com este roteiro</p>
+          <p class="script-subject"><span>Assunto:</span> {subject}</p>
+          <ul role="list">
+            {mailScript.map((line) => <li>{line}</li>)}
+          </ul>
+          <p class="script-note">Não precisa de nada pronto. Duas linhas bastam para começar.</p>
+        </div>
       </div>
-
-      <p class="contact-email">
-        <a href={site.mailto}>{site.email}</a>
-      </p>
-      <p class="contact-status" role="status" aria-live="polite" data-copy-status></p>
     </div>
-
-    <aside class="letter" aria-labelledby="letter-title" data-reveal style="--i:1">
-      <h3 id="letter-title">O e-mail já abre com este roteiro</h3>
-      <p class="letter-subject">
-        <span>Assunto</span>
-        {subject}
-      </p>
-      <ul role="list" class="letter-lines">
-        {mailScript.map((line) => <li>{line}</li>)}
-      </ul>
-      <p class="letter-note">Não precisa de nada pronto. Duas linhas já bastam para começar.</p>
-    </aside>
   </div>
 </section>
 
-
 <style>
   .contact {
-    position: relative;
-    overflow: hidden;
-    padding-block: clamp(4.5rem, 3rem + 6vw, 8rem);
+    padding-block: clamp(4rem, 3rem + 5vw, 7.5rem);
+  }
+
+  .contact-title {
+    max-width: 20ch;
+    margin-bottom: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+    font-size: var(--t-2xl);
   }
 
   .contact-grid {
-    position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
     gap: var(--s-7) clamp(2rem, 6vw, 6rem);
-    align-items: center;
+    align-items: start;
   }
 
-  .contact-copy {
+  .steps {
     display: grid;
-    gap: var(--s-5);
+    gap: var(--s-6);
   }
 
-  .contact h2 {
-    font-size: var(--t-2xl);
+  .steps li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--s-4);
+  }
+
+  .step-n {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 14px;
+    background: rgb(255 255 255 / 0.1);
+    color: var(--caju);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
     font-weight: 700;
-    line-height: 1.04;
-    letter-spacing: -0.022em;
-    max-width: 18ch;
   }
 
-  .contact-lede {
-    font-size: var(--t-md);
-    line-height: 1.5;
+  .steps h3 {
+    margin-bottom: var(--s-1);
+    font-size: var(--t-lg);
+  }
+
+  .steps p {
     color: var(--ink-2);
-    max-width: 48ch;
+    max-width: 44ch;
   }
 
-  .contact-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s-3);
-    margin-top: var(--s-2);
+  .start {
+    display: grid;
+    gap: var(--s-4);
+    padding: clamp(1.25rem, 1rem + 1.5vw, 2rem);
+    border-radius: var(--r-xl);
+    background: rgb(255 255 255 / 0.06);
+    border: 1px solid var(--line);
+  }
+
+  .start-title {
+    font-size: var(--t-xl);
+  }
+
+  .start-lede {
+    color: var(--ink-2);
+  }
+
+  .start-actions {
+    display: grid;
+    gap: var(--s-2);
   }
 
   .copy-icon,
@@ -129,39 +179,10 @@ const subject = topic ? `${site.talkSubject}: ${topic}` : site.talkSubject;
     color: var(--caju);
   }
 
-  @media (prefers-reduced-motion: no-preference) {
-    [data-copied="true"] .check-icon :global(path) {
-      stroke-dasharray: 22;
-      animation: check-draw 380ms var(--ease-out) both;
-    }
-
-    [data-copied="true"] [data-copy-label] {
-      display: inline-block;
-      animation: copy-label 300ms var(--ease-out);
-    }
-  }
-
-  @keyframes check-draw {
-    from {
-      stroke-dashoffset: 22;
-    }
-    to {
-      stroke-dashoffset: 0;
-    }
-  }
-
-  @keyframes copy-label {
-    from {
-      opacity: 0;
-      translate: 0 6px;
-    }
-  }
-
   .contact-email a {
     display: inline-flex;
     align-items: center;
     min-height: 2.75rem;
-    font-size: var(--t-md);
     font-weight: 700;
     color: var(--ink);
     text-decoration-color: var(--goiaba);
@@ -169,66 +190,48 @@ const subject = topic ? `${site.talkSubject}: ${topic}` : site.talkSubject;
     overflow-wrap: anywhere;
   }
 
+  .contact-status:empty {
+    display: none;
+  }
+
   .contact-status {
-    min-height: 1.5em;
     font-size: var(--t-sm);
   }
 
-  /* O roteiro do e-mail, como uma folha branca sobre a mesa verde. */
-  .letter {
-    padding: clamp(1.5rem, 1rem + 2vw, 2.25rem);
-    border-radius: var(--r-lg);
-    background: #ffffff;
-    color: var(--jabu);
-    box-shadow: 0 30px 60px -28px rgb(0 0 0 / 0.6);
-    rotate: -1.2deg;
+  .script {
+    padding-top: var(--s-4);
+    border-top: 1px solid var(--line);
+    font-size: var(--t-sm);
   }
 
-  .letter h3 {
-    font-size: var(--t-lg);
-    margin-bottom: var(--s-4);
-  }
-
-  .letter-subject {
-    display: grid;
-    padding-bottom: var(--s-3);
-    margin-bottom: var(--s-3);
-    border-bottom: 1px solid #efdfe2;
+  .script-h {
     font-weight: 700;
+    margin-bottom: var(--s-2);
   }
 
-  .letter-subject span {
-    font-size: var(--t-xs);
-    font-weight: 500;
-    color: #6c5a71;
+  .script-subject {
+    color: var(--ink-2);
+    margin-bottom: var(--s-2);
   }
 
-  .letter-lines li {
-    padding-block: 0.45rem;
-    border-bottom: 1px dashed #e2cdd3;
-    color: #57435d;
+  .script-subject span {
+    color: var(--ink-3);
   }
 
-  .letter-note {
-    margin-top: var(--s-4);
-    font-size: var(--t-sm);
-    color: #6c5a71;
+  .script li {
+    padding-block: 0.4rem;
+    border-bottom: 1px dashed var(--line-2);
+    color: var(--ink-2);
+  }
+
+  .script-note {
+    margin-top: var(--s-3);
+    color: var(--ink-3);
   }
 
   @media (max-width: 63.99rem) {
     .contact-grid {
       grid-template-columns: 1fr;
-    }
-
-    .letter {
-      max-width: 32rem;
-      rotate: none;
-    }
-  }
-
-  @media (max-width: 40rem) {
-    .contact-actions .btn {
-      width: 100%;
     }
   }
 </style>

@@ -1,16 +1,16 @@
 ---
+/** Segurança e LGPD em português simples: cinco pontos curtos numa grade. */
 import { security } from "../data/content";
 import Icon from "./Icon.astro";
 ---
 
 <section class="section sec" id="seguranca" aria-labelledby="seg-title">
-  <div class="wrap sec-grid">
-    <header class="sec-head" data-reveal>
-      <span class="sec-badge" aria-hidden="true"><Icon name="shield" /></span>
-      <h2 id="seg-title" class="section-title">Os dados da sua empresa e dos seus clientes, protegidos desde o primeiro dia.</h2>
+  <div class="wrap">
+    <header class="section-head" data-reveal>
+      <h2 id="seg-title" class="section-title">Seus dados e os dos seus clientes</h2>
       <p class="section-lede">
-        Automação e IA mexem com informação sensível: documentos, valores, dados pessoais. A segurança entra no desenho
-        desde o começo, pensada para a LGPD, e é explicada em português, sem letra miúda.
+        Automação e IA mexem com informação sensível. A LGPD entra no desenho desde a primeira conversa; a responsabilidade
+        legal continua sendo da sua empresa, com o seu jurídico.
       </p>
     </header>
 
@@ -21,10 +21,8 @@ import Icon from "./Icon.astro";
             <span class="sec-icon">
               <Icon name={item.icon} />
             </span>
-            <div>
-              <h3>{item.title}</h3>
-              <p>{item.text}</p>
-            </div>
+            <h3>{item.title}</h3>
+            <p>{item.text}</p>
           </li>
         ))
       }
@@ -33,82 +31,45 @@ import Icon from "./Icon.astro";
 </section>
 
 <style>
-  .sec-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: var(--s-7) clamp(2rem, 6vw, 6rem);
-    align-items: start;
-  }
-
-  .sec-head {
-    display: grid;
-    gap: var(--s-4);
-    position: sticky;
-    top: calc(var(--header-h) + 2rem);
-  }
-
-  .sec-badge {
-    display: grid;
-    place-items: center;
-    width: 3.5rem;
-    height: 3.5rem;
-    border-radius: var(--r-md);
-    background: var(--jabu);
-    color: var(--caju);
-  }
-
-  .sec-badge :global(svg) {
-    width: 1.75rem;
-    height: 1.75rem;
+  .sec {
+    background: var(--tint);
   }
 
   .sec-list {
     display: grid;
-    gap: var(--s-3);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13.5rem), 1fr));
+    gap: var(--s-6) var(--s-5);
   }
 
   .sec-list li {
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: var(--s-4);
-    padding: var(--s-5);
-    border: 1px solid var(--line);
-    border-radius: var(--r-lg);
-    background: var(--surface);
+    align-content: start;
+    gap: var(--s-2);
   }
 
   .sec-icon {
     display: grid;
     place-items: center;
-    width: 2.75rem;
-    height: 2.75rem;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: var(--s-2);
     border-radius: 14px;
-    background: var(--goiaba-soft);
+    background: var(--surface);
     color: var(--goiaba-ink);
   }
 
   .sec-icon :global(svg) {
-    width: 1.35rem;
-    height: 1.35rem;
+    width: 1.4rem;
+    height: 1.4rem;
   }
 
   .sec-list h3 {
     font-size: var(--t-md);
     line-height: 1.25;
-    margin-bottom: var(--s-1);
   }
 
   .sec-list p {
     color: var(--ink-2);
-  }
-
-  @media (max-width: 56rem) {
-    .sec-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .sec-head {
-      position: static;
-    }
+    font-size: var(--t-sm);
   }
 </style>

@@ -33,18 +33,16 @@ const sizes = [
 ];
 const sections = [
   ["01-topo", ".hero"],
-  ["02-ramos", ".strip"],
-  ["03-numeros", "#numeros"],
-  ["04-solucoes", "#solucoes"],
-  ["05-na-sua-empresa", "#na-sua-empresa"],
-  ["06-como-funciona", "#como-funciona"],
-  ["07-casos", "#casos"],
-  ["08-estimativa", "#estimativa"],
-  ["09-sobre", "#sobre"],
-  ["10-seguranca", "#seguranca"],
-  ["11-perguntas", "#perguntas"],
-  ["12-contato", "#contato"],
-  ["13-rodape", "footer"],
+  ["02-na-sua-empresa", "#na-sua-empresa"],
+  ["03-solucoes", "#solucoes"],
+  ["04-casos", "#casos"],
+  ["05-numeros", "#numeros"],
+  ["06-estimativa", "#estimativa"],
+  ["07-sobre", "#sobre"],
+  ["08-seguranca", "#seguranca"],
+  ["09-perguntas", "#perguntas"],
+  ["10-contato", "#contato"],
+  ["11-rodape", "footer"],
 ];
 const pages = [
   ["caso-clinicflow", "/casos/clinicflow/"],

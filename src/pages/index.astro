@@ -4,10 +4,8 @@ import Contact from "../components/Contact.astro";
 import Estimator from "../components/Estimator.astro";
 import Faq from "../components/Faq.astro";
 import Hero from "../components/Hero.astro";
-import HowItWorks from "../components/HowItWorks.astro";
 import MarketData from "../components/MarketData.astro";
 import Scenarios from "../components/Scenarios.astro";
-import SectorStrip from "../components/SectorStrip.astro";
 import Security from "../components/Security.astro";
 import Solutions from "../components/Solutions.astro";
 import Work from "../components/Work.astro";
@@ -27,16 +25,14 @@ const faqSchema = {
 
 <Base path="/" schema={[faqSchema]}>
   <Hero />
-  <SectorStrip />
-  <MarketData
-    ids={["ms-sem-tempo", "mckinsey-potencial", "sebrae-whatsapp", "sebrae-ia"]}
-    title="Falta tempo na equipe. Sobra tarefa que dava para automatizar."
-    lede="Quatro pesquisas sobre o tempo das equipes, o que já dá para automatizar e onde estão os clientes das pequenas empresas. São dados do mercado, não resultados da Noxlabs."
-  />
-  <Solutions />
   <Scenarios />
-  <HowItWorks />
+  <Solutions />
   <Work />
+  <MarketData
+    ids={["sebrae-whatsapp", "sebrae-ia", "sebrae-ia-intencao"]}
+    title="Os pequenos negócios já vendem pelo WhatsApp e começam a usar IA"
+    lede="Três números de pesquisas do Sebrae de 2026 com donos de pequenos negócios do Brasil. São dados do mercado, não resultados da Noxlabs."
+  />
   <Estimator />
   <About />
   <Security />

@@ -4,9 +4,9 @@
  * navegador.
  */
 export const estimatorDefaults = {
-  people: 5,
-  hours: 8,
-  cost: 4000,
+  people: 6,
+  hours: 6,
+  cost: 3500,
   share: 30,
 } as const;
 
