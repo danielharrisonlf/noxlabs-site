@@ -1,21 +1,31 @@
 ---
 /**
- * Marca Noxlabs: um quadrado de nanquim e um círculo anil sobreimpresso no
- * canto, como uma lua nascendo atrás de um bloco. Wordmark em Jost minúscula,
- * à maneira dos poemas concretos.
+ * Marca Noxlabs: um "n" desenhado por um único rastro de luz, como numa foto
+ * de longa exposição, com a fonte da luz acesa na ponta. Wordmark em
+ * Funnel Display minúscula.
  */
 interface Props {
   wordmark?: boolean;
   class?: string;
+  /** Prefixo único do gradiente quando há mais de uma marca na página. */
+  id?: string;
 }
 
-const { wordmark = true, class: className } = Astro.props;
+const { wordmark = true, class: className, id = "lg" } = Astro.props;
+const grad = `${id}-trail`;
 ---
 
 <span class:list={["logo", className]}>
   <svg class="logo-mark" viewBox="0 0 32 32" width="32" height="32" aria-hidden="true" focusable="false">
-    <rect x="1" y="11" width="20" height="20" fill="currentColor"></rect>
-    <circle cx="21" cy="11" r="10" class="logo-moon"></circle>
+    <defs>
+      <linearGradient id={grad} x1="7" y1="26" x2="25" y2="8" gradientUnits="userSpaceOnUse">
+        <stop offset="0" class="logo-stop-a"></stop>
+        <stop offset="1" class="logo-stop-b"></stop>
+      </linearGradient>
+    </defs>
+    <path class="logo-glow" d="M8 26V15.5a8 8 0 0 1 16 0V24" stroke={`url(#${grad})`}></path>
+    <path class="logo-trail" d="M8 26V15.5a8 8 0 0 1 16 0V24" stroke={`url(#${grad})`}></path>
+    <circle class="logo-source" cx="24" cy="25" r="2.6"></circle>
   </svg>
   {wordmark && <span class="logo-word">noxlabs</span>}
 </span>
@@ -24,38 +34,49 @@ const { wordmark = true, class: className } = Astro.props;
   .logo {
     display: inline-flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.55rem;
     color: var(--fg);
   }
 
   .logo-mark {
-    width: 1.75rem;
-    height: 1.75rem;
+    width: 1.875rem;
+    height: 1.875rem;
     flex: none;
+    overflow: visible;
   }
 
-  .logo-moon {
-    fill: var(--anil);
-    mix-blend-mode: multiply;
+  .logo-trail,
+  .logo-glow {
+    fill: none;
+    stroke-linecap: round;
   }
 
-  :global(:root[data-theme="dark"]) .logo-moon {
-    mix-blend-mode: normal;
-    opacity: 0.92;
+  .logo-trail {
+    stroke-width: 3.6;
   }
 
-  @media (prefers-color-scheme: dark) {
-    :global(:root:not([data-theme="light"])) .logo-moon {
-      mix-blend-mode: normal;
-      opacity: 0.92;
-    }
+  .logo-glow {
+    stroke-width: 8;
+    opacity: var(--trail-glow);
+  }
+
+  .logo-stop-a {
+    stop-color: var(--sodio);
+  }
+
+  .logo-stop-b {
+    stop-color: var(--freio);
+  }
+
+  .logo-source {
+    fill: var(--fg);
   }
 
   .logo-word {
     font-family: var(--font-display);
-    font-size: 1.375rem;
-    font-weight: 500;
-    letter-spacing: -0.01em;
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: -0.03em;
     line-height: 1;
   }
 </style>

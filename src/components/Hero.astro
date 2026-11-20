@@ -3,237 +3,393 @@ import { site } from "../data/site";
 import Icon from "./Icon.astro";
 
 /*
- * O processo como poema concreto: a repetição de "entrega" é o argumento.
- * Cada entrega ganha uma barra maior; a operação é o único ponto vermelho.
+ * Céu de longa exposição: rastros que chegam de fora da tela e terminam em
+ * três provas que se pode conferir. As coordenadas valem para a coluna de
+ * provas (520 x 620); o SVG transborda para a esquerda e passa sob o texto.
  */
-const poem = [
-  { word: "diagnóstico", shape: "ring" },
-  { word: "proposta", shape: "square" },
-  { word: "entrega", shape: "bar", step: 1 },
-  { word: "entrega", shape: "bar", step: 2 },
-  { word: "entrega", shape: "bar", step: 3 },
-  { word: "operação", shape: "live" },
+type Trail = { d: string; tone: "sodio" | "freio" | "mercurio"; lead?: boolean };
+
+const nodes = [
+  { x: 150, y: 120, tone: "freio" },
+  { x: 80, y: 310, tone: "mercurio" },
+  { x: 170, y: 500, tone: "sodio" },
 ] as const;
+
+/*
+ * Os rastros sobem da borda de baixo, à direita do texto, como faróis vindo
+ * pela avenida: nunca cruzam o título, o texto ou os botões.
+ */
+const trails: Trail[] = [
+  { d: "M -260 900 C -120 640, -40 260, 150 120", tone: "sodio", lead: true },
+  { d: "M -200 900 C -90 640, -10 280, 150 120", tone: "freio" },
+  { d: "M -300 900 C -150 700, -60 420, 80 310", tone: "mercurio", lead: true },
+  { d: "M -230 900 C -110 700, -30 430, 80 310", tone: "sodio" },
+  { d: "M -160 900 C -60 760, 40 560, 170 500", tone: "freio", lead: true },
+  { d: "M -340 900 C -170 780, 0 560, 170 500", tone: "mercurio" },
+];
+
+/* Rastros que atravessam o quadro sem parar: o resto da cidade em movimento. */
+const ambient: Trail[] = [
+  { d: "M -60 900 C 120 700, 400 640, 720 600", tone: "mercurio" },
+  { d: "M -200 900 C 0 780, 300 720, 720 700", tone: "sodio" },
+];
+
+const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(3)}%`;
 ---
 
-<section class="hero" aria-labelledby="hero-title">
-  <div class="hero-copy">
-    <h1 id="hero-title">Software e IA que entram em produção.</h1>
-    <p class="hero-lede">
-      A Noxlabs é a consultoria de Daniel Harrison. Desenho, construo e coloco no ar produtos, integrações e agentes de IA
-      para empresas que precisam de sistema funcionando, não de apresentação.
-    </p>
-    <p class="hero-own">Você fala direto com quem escreve o código. E o código é seu.</p>
-    <div class="hero-actions">
-      <a class="btn btn-primary" href={site.diagnosisMailto}>
-        Pedir diagnóstico de 30 min
-        <Icon name="arrow-right" />
-      </a>
-      <a class="btn btn-ghost" href="#kairos">Ver o Kairos, no ar</a>
+<section class="hero night-sky grain" aria-labelledby="hero-title">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <h1 id="hero-title">Software e IA que saem do papel e ficam no ar.</h1>
+      <p class="hero-lede">
+        A Noxlabs é a consultoria de Daniel Harrison. Desenho, construo e opero produtos, integrações e agentes de IA para
+        empresas que precisam de sistema funcionando, não de apresentação.
+      </p>
+      <p class="hero-own">Você fala direto com quem escreve o código. E o código é seu.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href={site.diagnosisMailto}>
+          Pedir diagnóstico de 30 min
+          <Icon name="arrow-right" />
+        </a>
+        <a class="btn btn-ghost" href="#kairos">Seguir um pedido no Kairos</a>
+      </div>
+      <p class="hero-note">Uma conversa de 30 minutos sobre o problema. Você sai com um próximo passo claro.</p>
     </div>
-    <p class="hero-note">
-      Uma conversa inicial de 30 minutos sobre o problema. Você sai com um próximo passo claro.
-    </p>
-  </div>
 
-  <div class="hero-field on-anil">
-    <ol class="poem" role="list" aria-label="Como um projeto anda">
-      {
-        poem.map((line, i) => (
-          <li class={`poem-line is-${line.shape}`} style={`--i:${i}`}>
-            <span class="poem-shape" aria-hidden="true" />
-            <span class="poem-word">
-              {line.word}
-              {"step" in line && <span class="visually-hidden"> {line.step} de 3</span>}
-            </span>
-            {"step" in line && <span class="poem-bar" aria-hidden="true" style={`--w:${line.step / 3}`} />}
-          </li>
-        ))
-      }
-    </ol>
-    <p class="poem-caption">
-      Um diagnóstico, uma proposta, entregas a cada ciclo e o sistema no ar. Você usa o software antes do fim do projeto.
-    </p>
+    <div class="exposure">
+      <svg class="trails" viewBox="0 0 520 620" aria-hidden="true" focusable="false">
+        <g class="ambient">
+          {ambient.map((t) => <path d={t.d} class={`tone-${t.tone}`} pathLength="1000" />)}
+        </g>
+        {
+          trails.map((t, i) => (
+            <g class={`trail tone-${t.tone}`} style={`--i:${i}`}>
+              <path class="glow-wide" d={t.d} pathLength="1000" />
+              <path class="glow" d={t.d} pathLength="1000" />
+              <path class="core" d={t.d} pathLength="1000" />
+              {t.lead && <path class="packet" d={t.d} pathLength="1000" />}
+            </g>
+          ))
+        }
+        {
+          nodes.map((n, i) => (
+            <g class={`node tone-${n.tone}`} style={`--i:${i}`}>
+              <circle class="node-halo" cx={n.x} cy={n.y} r="20" />
+              <circle class="node-core" cx={n.x} cy={n.y} r="6.5" />
+            </g>
+          ))
+        }
+      </svg>
+
+      <ul class="proofs" role="list" aria-label="Provas que você pode conferir">
+        <li style={`--x:${pct(nodes[0].x + 38, 520)};--y:${pct(nodes[0].y, 620)};--i:0`}>
+          <p class="proof-title live">Kairos no ar</p>
+          <p class="proof-text">Produto próprio em produção, com cadastro aberto de empresas.</p>
+          <a class="proof-link" href={site.links.kairos}>kairos.noxlabs.tech</a>
+        </li>
+        <li style={`--x:${pct(nodes[1].x + 38, 520)};--y:${pct(nodes[1].y, 620)};--i:1`}>
+          <p class="proof-title">49 ferramentas MCP</p>
+          <p class="proof-text">Agentes de IA entram com o login e o escopo de cada usuário.</p>
+        </li>
+        <li style={`--x:${pct(nodes[2].x + 38, 520)};--y:${pct(nodes[2].y, 620)};--i:2`}>
+          <p class="proof-title tabular">
+            1,9 s <Icon name="arrow-right" class="proof-arrow" /><span class="visually-hidden">para</span> 27 ms
+          </p>
+          <p class="proof-text">p50 de uma rota do Kairos num A/B local, ao ligar o keep-alive do gateway.</p>
+        </li>
+      </ul>
+    </div>
   </div>
 </section>
 
 <style>
   .hero {
+    margin: 0.5rem;
+    border-radius: var(--r-xl);
+    overflow: hidden;
+    padding-top: calc(var(--header-h) + clamp(1.5rem, 4vw, 4rem));
+    padding-bottom: clamp(2.5rem, 5vw, 5rem);
+    background:
+      radial-gradient(120% 75% at 0% 110%, var(--haze), transparent 62%),
+      radial-gradient(70% 60% at 100% 0%, var(--haze-2), transparent 60%),
+      linear-gradient(180deg, var(--sky-top), var(--sky-mid) 55%, var(--sky-low));
+  }
+
+  .hero-grid {
     display: grid;
-    grid-template-columns:
-      [full-start] minmax(var(--gutter), 1fr)
-      [content-start] calc(min(var(--max), 100% - 2 * var(--gutter)) * 0.67)
-      [split] calc(min(var(--max), 100% - 2 * var(--gutter)) * 0.33)
-      [content-end] minmax(var(--gutter), 1fr) [full-end];
-    min-height: min(calc(100svh - 4.5rem - 8.5rem), 48rem);
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    align-items: center;
+    gap: clamp(1.5rem, 4vw, 4rem);
+    min-height: min(calc(100svh - var(--header-h) - 6rem), 46rem);
   }
 
   .hero-copy {
-    grid-column: content-start / split;
-    padding-right: var(--col-gap);
-    align-self: center;
-    padding-block: clamp(2rem, 1rem + 2.5vw, 3rem);
+    position: relative;
+    z-index: 2;
   }
 
   .hero h1 {
     font-size: var(--t-display);
-    line-height: 0.98;
-    letter-spacing: -0.035em;
     font-weight: 500;
-    max-width: 11ch;
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+    max-width: 12ch;
   }
 
   .hero-lede {
-    margin-top: var(--s-5);
+    margin-top: var(--s-6);
     font-size: var(--t-md);
     line-height: 1.5;
     color: var(--fg-2);
-    max-width: 46ch;
+    max-width: 44ch;
   }
 
   .hero-own {
     margin-top: var(--s-3);
     font-size: var(--t-md);
     line-height: 1.5;
-    font-weight: 600;
-    max-width: 46ch;
+    font-weight: 700;
+    max-width: 44ch;
   }
 
   .hero-actions {
     display: flex;
     flex-wrap: wrap;
     gap: var(--s-3);
-    margin-top: var(--s-6);
+    margin-top: var(--s-7);
   }
 
   .hero-note {
-    margin-top: var(--s-3);
+    margin-top: var(--s-4);
     font-size: var(--t-sm);
-    color: var(--fg-2);
-    max-width: 72ch;
+    color: var(--fg-3);
+    max-width: 52ch;
   }
 
-  /* O campo anil sangra até a borda direita da janela. */
-  .hero-field {
-    grid-column: split / full-end;
-    background: var(--anil);
-    color: var(--anil-sobre);
-    display: grid;
-    align-content: center;
-    gap: var(--s-6);
-    padding: clamp(2.5rem, 2rem + 3vw, 5rem) var(--gutter) clamp(2.5rem, 2rem + 3vw, 5rem) clamp(1.5rem, 1rem + 2.5vw, 3.5rem);
+  /* Coluna de provas: proporção fixa, então os nós do SVG e os textos coincidem. */
+  .exposure {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 32.5rem;
+    aspect-ratio: 520 / 620;
+    justify-self: end;
   }
 
-  .poem {
-    display: grid;
-    gap: clamp(0.35rem, 0.2rem + 0.4vw, 0.6rem);
+  .trails {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    z-index: -1;
   }
 
-  .poem-line {
-    display: grid;
-    grid-template-columns: 1.5rem auto 1fr;
+  .trails path {
+    fill: none;
+    stroke-linecap: round;
+  }
+
+  .tone-sodio {
+    --c: var(--sodio);
+  }
+  .tone-freio {
+    --c: var(--freio);
+  }
+  .tone-mercurio {
+    --c: var(--mercurio);
+  }
+
+  .ambient path {
+    stroke: var(--c);
+    stroke-width: 1.25;
+    opacity: 0.35;
+  }
+
+  .trail path {
+    stroke: var(--c);
+  }
+
+  .glow-wide {
+    stroke-width: 16;
+    opacity: calc(var(--trail-glow) * 0.45);
+  }
+
+  .glow {
+    stroke-width: 6;
+    opacity: var(--trail-glow);
+  }
+
+  .core {
+    stroke-width: 1.75;
+  }
+
+  .trail .packet {
+    stroke: color-mix(in srgb, #fff calc(var(--packet-white) * 100%), var(--c));
+    stroke-width: 3.5;
+    stroke-dasharray: 60 1000;
+    stroke-dashoffset: 60;
+    opacity: 0;
+  }
+
+  .node-halo {
+    fill: var(--c);
+    opacity: 0.2;
+  }
+
+  .node-core {
+    fill: var(--c);
+    stroke: var(--bg-2);
+    stroke-width: 2.5;
+  }
+
+  .proofs li {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    right: 0;
+    transform: translateY(-1.05em);
+  }
+
+  .proof-title {
+    display: flex;
     align-items: center;
-    column-gap: var(--s-4);
+    gap: 0.45em;
     font-family: var(--font-display);
-    font-size: clamp(1.625rem, 1.1rem + 1.7vw, 2.75rem);
-    font-weight: 500;
-    line-height: 1.15;
-    letter-spacing: -0.015em;
+    font-size: var(--t-lg);
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
   }
 
-  .poem-shape {
-    width: 1.1rem;
-    height: 1.1rem;
-    justify-self: center;
+  .proof-title :global(.proof-arrow) {
+    width: 0.8em;
+    height: 0.8em;
+    color: var(--sodio);
   }
 
-  .is-ring .poem-shape {
-    border: 2px solid currentColor;
-    border-radius: 50%;
-  }
-
-  .is-square .poem-shape {
-    background: currentColor;
-  }
-
-  .is-bar .poem-shape {
-    width: 0.55rem;
-    height: 0.55rem;
-    background: currentColor;
-  }
-
-  .is-live .poem-shape {
-    width: 1.3rem;
-    height: 1.3rem;
-    border-radius: 50%;
-    background: radial-gradient(circle, var(--vermelhao) 0 34%, var(--anil-sobre) 36%);
-  }
-
-  .poem-bar {
-    height: 0.32em;
-    background: currentColor;
-    transform-origin: left center;
-    width: calc(var(--w) * 100%);
-    min-width: 0.5em;
-  }
-
-  .poem-caption {
-    max-width: 30ch;
+  .proof-text {
+    margin-top: var(--s-1);
     font-size: var(--t-sm);
-    line-height: 1.5;
-    color: var(--anil-sobre-2);
+    line-height: 1.45;
+    color: var(--fg-2);
+    max-width: 30ch;
   }
 
-  /* O único momento orquestrado do site: o poema se monta uma vez. */
+  .proof-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-size: var(--t-sm);
+    font-weight: 700;
+    color: var(--link);
+    text-underline-offset: 0.3em;
+  }
+
+  /* O único momento orquestrado: a exposição se forma uma vez. */
   @media (prefers-reduced-motion: no-preference) {
-    .poem-line {
-      animation: poem-in 700ms var(--ease-out) both;
-      animation-delay: calc(120ms + var(--i) * 110ms);
+    .trail path:not(.packet),
+    .ambient path {
+      stroke-dasharray: 1000;
+      animation: trail-draw 2.2s var(--ease-out) both;
+      animation-delay: calc(150ms + var(--i, 0) * 110ms);
     }
 
-    .poem-bar {
-      animation: bar-grow 900ms var(--ease-out) both;
-      animation-delay: calc(260ms + var(--i) * 110ms);
+    .ambient path {
+      animation-duration: 3.2s;
+    }
+
+    .packet {
+      animation: packet-run 1.7s var(--ease-in-out) both;
+      animation-delay: calc(1.2s + var(--i) * 140ms);
+    }
+
+    .node {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: node-on 900ms var(--ease-out) both;
+      animation-delay: calc(2.6s + var(--i) * 280ms);
+    }
+
+    .proofs li {
+      animation: proof-in 900ms var(--ease-out) both;
+      animation-delay: calc(2.5s + var(--i) * 280ms);
     }
   }
 
-  @keyframes poem-in {
+  @keyframes trail-draw {
     from {
-      opacity: 0.55;
-      transform: translateX(-0.3em);
+      stroke-dashoffset: 1000;
+    }
+    to {
+      stroke-dashoffset: 0;
     }
   }
 
-  @keyframes bar-grow {
+  @keyframes packet-run {
+    0% {
+      stroke-dashoffset: 60;
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      stroke-dashoffset: -1000;
+      opacity: 0;
+    }
+  }
+
+  @keyframes node-on {
     from {
-      transform: scaleX(0.25);
+      transform: scale(0.4);
+      opacity: 0.4;
+    }
+  }
+
+  @keyframes proof-in {
+    from {
+      opacity: 0.25;
+      translate: -8px 0;
     }
   }
 
   @media (max-width: 63.99rem) {
-    .hero {
+    .hero-grid {
+      grid-template-columns: 1fr;
       min-height: 0;
     }
 
-    .hero-copy {
-      grid-column: content-start / content-end;
-      padding-right: 0;
-      padding-bottom: var(--s-7);
-    }
-
-    .hero-field {
-      grid-column: full-start / full-end;
-      padding-inline: var(--gutter);
-    }
-
-    .poem {
-      max-width: 32rem;
+    .exposure {
+      justify-self: stretch;
+      max-width: 30rem;
+      margin-top: var(--s-4);
     }
   }
 
-  @media (max-width: 30rem) {
+  @media (max-width: 40rem) {
+    .hero {
+      margin: 0.375rem;
+      border-radius: var(--r-lg);
+    }
+
+    .hero h1 {
+      letter-spacing: -0.035em;
+    }
+
     .hero-actions .btn {
       width: 100%;
+    }
+
+    .proof-title {
+      font-size: 1.25rem;
+    }
+
+    .proof-text {
+      font-size: 0.875rem;
     }
   }
 </style>

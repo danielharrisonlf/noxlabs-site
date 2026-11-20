@@ -15,8 +15,8 @@ const widths = [390, 1440];
 const themes = ["light", "dark"];
 const sections = [
   ["01-hero", ".hero"],
-  ["02-provas", ".proof"],
-  ["03-servicos", "#servicos"],
+  ["02-servicos", "#servicos"],
+  ["03-kairos", "#kairos"],
   ["04-casos", "#casos"],
   ["05-processo", "#processo"],
   ["06-sobre", "#sobre"],
@@ -36,8 +36,22 @@ const problems = [];
 
 async function settle(page) {
   await page.evaluate(() => document.fonts.ready);
-  // Deixa a animação de entrada do poema terminar antes de capturar.
-  await page.waitForTimeout(1600);
+  // Deixa a exposição do topo se formar (rastros, pacotes e provas) antes de capturar.
+  await page.waitForTimeout(4200);
+}
+
+// Percorre a página para que as animações ligadas à rolagem e as que esperam a
+// seção aparecer cheguem ao estado final; depois volta ao topo.
+async function walk(page) {
+  await page.evaluate(async () => {
+    const step = Math.round(window.innerHeight * 0.6);
+    for (let y = 0; y < document.documentElement.scrollHeight; y += step) {
+      window.scrollTo({ top: y, behavior: "instant" });
+      await new Promise((r) => setTimeout(r, 120));
+    }
+    window.scrollTo({ top: 0, behavior: "instant" });
+  });
+  await page.waitForTimeout(400);
 }
 
 async function overflow(page, label) {
@@ -62,9 +76,10 @@ for (const width of widths) {
     await settle(page);
     await overflow(page, `/ ${tag}`);
     await page.screenshot({ path: `${out}/home-${tag}-fold.png` });
+    await walk(page);
     await page.screenshot({ path: `${out}/home-${tag}-full.png`, fullPage: true });
-    // O cabeçalho fixo atrapalha capturas de elemento; fica estático só aqui.
-    await page.addStyleTag({ content: ".header{position:static!important}" });
+    // O cabeçalho flutuante cobriria o topo das capturas de elemento; some só aqui.
+    await page.addStyleTag({ content: ".header{visibility:hidden!important}" });
     for (const [name, selector] of sections) {
       const el = page.locator(selector).first();
       await el.scrollIntoViewIfNeeded();
@@ -75,6 +90,7 @@ for (const width of widths) {
       await page.goto(`${base}${path}`, { waitUntil: "networkidle" });
       await settle(page);
       await overflow(page, `${path} ${tag}`);
+      await walk(page);
       await page.screenshot({ path: `${out}/${name}-${tag}-full.png`, fullPage: true });
     }
     await context.close();

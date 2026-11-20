@@ -1,93 +1,116 @@
-# Design: Noxlabs "Concreto"
+# Design: Noxlabs "Longa exposição"
 
-Registrado a partir do site construído (`src/styles/global.css` e componentes), não do plano. Fonte das decisões de
-direção: `.impeccable/surfaces/src-pages-index-astro.md`.
+Registrado a partir do site construído (`src/styles/global.css` e componentes). Substitui inteiramente o sistema
+"Concreto" (grade de 12 colunas à mostra, régua de marcas, formas com significado fixo, cantos retos), que deixou de
+valer. Referências e o que se tirou de cada uma: `docs/references.md`.
 
-## Mundo
+## Conceito
 
-Poesia concreta e programas de identidade do modernismo brasileiro: palavra e forma geométrica num grid rígido, com a
-estrutura à mostra. Três formas com significado fixo em todo o site, do poema do hero ao diagrama do Kairos:
+A fotografia de longa exposição transforma movimento invisível em linhas de luz. A Noxlabs faz o mesmo com sistemas:
+torna visível o caminho de um pedido, de um evento, de um agente. Nox é noite; o Kairos é o momento certo; a hora azul
+é quando as luzes da cidade acendem, e o site trata "entrar no ar" desse jeito.
 
-| Forma | Significa |
-| --- | --- |
-| Círculo vazado | interface, diagnóstico, algo que olha para fora |
-| Círculo anil cheio | serviço, agente, processamento |
-| Quadrado | dado, proposta, algo que fica |
-| Barra | entrega, fila, progresso |
-| Ponto vermelhão | **no ar**. Único uso do vermelho |
+Isso responde ao "engessado" da versão anterior: a linha reta da grade deu lugar à curva do rastro, o bloco chapado ao
+céu com profundidade, o texto parado a peças que se movem quando a pessoa age.
 
-Onde as formas se cruzam, a tinta sobreimprime (`mix-blend-mode: multiply` no claro; `screen` ou opacidade no escuro).
+## Dois planos, não uma inversão
 
-## Cor
-
-Estratégia comprometida: o anil é campo, não acento. Ocupa a metade direita do hero, o bloco de contato e os
-serviços do diagrama.
-
-| Token | Claro | Escuro | Uso |
+| Papel | Manhã (claro) | Noite (escuro) | Uso |
 | --- | --- | --- | --- |
-| `--papel` / `--bg` | `#ffffff` | `#0e0f12` | fundo |
-| `--papel-2` / `--bg-2` | `#eef0f3` | `#16181d` | faixa do processo, fundo do diagrama, molduras de captura |
-| `--nanquim` / `--fg` | `#0e0f12` | `#eceef2` | texto, linhas fortes, quadrados |
-| `--grafite` / `--fg-2` | `#4a4e57` | `#a6abb6` | texto secundário (≥ 7:1) |
-| `--linha` / `--rule` | `#d5d8de` | `#2b2e36` | divisórias |
-| `--anil` | `#2433c9` | `#2f3fe0` | campos, botão primário, formas |
-| `--anil-tinta` / `--link` | `#2433c9` | `#9aa4ff` | links e texto anil sobre o fundo |
-| `--anil-sobre-2` | `#d6daff` | `#d6daff` | texto secundário sobre anil (6,3:1) |
-| `--vermelhao` | `#e2401c` | `#ff5a33` | só o sinal "no ar" e "operação" |
+| `--bg` | `#f5f6fc` | `#0d1438` | fundo da página |
+| `--bg-2` | `#ffffff` | `#141c4b` | superfícies elevadas: painel de serviço, carta, FAQ |
+| `--bg-3` | `#e8ebf8` | `#0a1030` | superfícies afundadas: princípios, resultado, botões redondos |
+| `--line` / `--line-2` | `#d6dbef` / `#aeb6d8` | `#26306b` / `#3b478c` | divisórias e contornos |
+| `--fg` | `#111a45` | `#eef0ff` | texto |
+| `--fg-2` | `#3e4777` | `#b8bfe8` | texto secundário |
+| `--fg-3` | `#565e8a` | `#98a2d4` | metadados (≥ 4,5:1 nos dois) |
+| `--link` | `#2a43c6` | `#ffc56e` | links |
+| `--accent` / `--accent-fg` | `#111a45` / branco | `#ffb547` / `#0a1030` | botão primário: tinta de dia, luz de sódio à noite |
+| `--sodio` | `#c46a00` | `#ffb547` | luz principal: rastro ativo, pontos, CTA noturno |
+| `--freio` | `#d43c2a` | `#ff7a5c` | lanterna; também o sinal "no ar" (`--live`) |
+| `--mercurio` | `#1f6fd1` | `#8fd3ff` | luz fria: trechos já percorridos, código público |
 
-Regras: vermelho nunca é decoração nem texto. Amarelo não existe. Texto sobre anil é branco ou `--anil-sobre-2`.
+Céus (`--sky-top`, `--sky-mid`, `--sky-low`, `--haze`, `--haze-2`) desenham o topo, o contato, a abertura dos casos e o
+404: manhã vai de azul-claro a pêssego; noite vai de índigo profundo a um horizonte violeta com névoa âmbar.
+
+`.night` força o plano noturno num trecho, nos dois temas. É o caso do palco do Kairos: uma ilha de noite dentro da
+página de manhã.
+
+Regras: nenhum preto puro, nenhum gradiente em texto. A cor forte é luz (traço, ponto, botão), não fundo de seção.
+Texto sobre âmbar é sempre `#0a1030`.
 
 ## Tipografia
 
-- **Jost** (variável, OFL, herdeira da Futura dos poetas concretos) para display, títulos e o poema. Peso 500.
-- **Archivo** (variável, OFL, Omnibus-Type) para texto, rótulos e interface. 400 no corpo, 600 em rótulos.
-- Ambas hospedadas em `/fonts/`, subconjunto latino, `font-display: swap` com fallback de métricas ajustadas.
+- **Funnel Display** (variável 300–800, OFL, Dicotype/NORD ID) para títulos, nomes e números de prova. Curvas largas e
+  terminais que lembram o rastro. Peso 500 nos títulos, 600 em nomes curtos.
+- **Atkinson Hyperlegible Next** (variável 200–800, OFL, Braille Institute) para texto e interface. 400 no corpo,
+  700 em rótulos e botões. O zero cortado é dela e fica.
+- Hospedadas em `/fonts/`, subconjunto latino, `font-display: swap`, fallback com métricas ajustadas, licenças ao lado.
 
 | Token | Valor | Uso |
 | --- | --- | --- |
 | `--t-xs` | 13px | legendas, rodapé legal |
 | `--t-sm` | 15px | rótulos, botões, metadados |
-| `--t-base` | 17–18px | corpo, entrelinha 1.6 |
-| `--t-md` | 19–21px | lede, respostas destacadas |
-| `--t-lg` | 22–26px | perguntas do FAQ, títulos de etapa |
-| `--t-xl` | 28–40px | títulos de serviço e de bloco |
-| `--t-2xl` | 36–60px | títulos de seção |
-| `--t-display` | 44–92px | hero e contato, entrelinha 0.98, tracking -0.035em |
-| nome do caso | 56–136px | "Kairos" e títulos das páginas de caso, entrelinha 0.85–0.88 |
+| `--t-base` | 17–19px | corpo, entrelinha 1.6 |
+| `--t-md` | 19–23px | lede, texto do passo |
+| `--t-lg` | 22–30px | perguntas, títulos de etapa, provas |
+| `--t-xl` | 28–48px | títulos de painel e de bloco |
+| `--t-2xl` | 38–72px | títulos de seção |
+| `--t-display` | 44–96px | topo, contato e 404; entrelinha 0.98, tracking -0.04em |
 
-Títulos com `text-wrap: balance`; corpo com medida de 40 a 62ch. Sem caixa-alta, sem rótulo acima de título.
+Títulos com `text-wrap: balance`; corpo entre 40 e 62ch. Sem caixa-alta, sem rótulo acima de título.
 
-## Espaço e grid
+## Forma e espaço
 
-- Base 4px: `--s-1` 4 até `--s-10` 128. Seções com `--section-y` de 72 a 144px.
-- Grid de 12 colunas, largura máxima 84rem (1344px), calha `--gutter` de 16 a 48px, intervalo `--col-gap` de 16 a 32px.
-- Texto alinhado à esquerda. Títulos de seção ocupam 7 colunas; a introdução fica nas colunas 8–12, alinhada à base.
-- O hero sangra o campo anil até a borda direita da janela; abaixo de 64rem o campo vira faixa inteira sob o texto.
+- Cantos: `--r-sm` 10, `--r-md` 18, `--r-lg` 28, `--r-xl` 40, cápsula 999. Céus e o palco usam 40; painéis 28;
+  itens de lista e FAQ 18; botões e chips são cápsulas.
+- Céus são objetos: o topo, o contato e a abertura dos casos ficam a 8px da borda da janela (6px no celular), com
+  cantos de 40px, e a navegação flutua por cima.
+- Largura máxima 80rem, calha de 16 a 48px, seções de 80 a 160px. Composições variam por seção: título e lede
+  empilhados (serviços, casos, processo), título e texto lado a lado (Kairos), retrato e texto (sobre), cabeçalho fixo
+  e lista (perguntas), texto e carta (contato).
+- Profundidade com sombra de deslocamento e desfoque (`--shadow-1`, `--shadow-2`), névoa radial nos céus e
+  granulação de filme (`.grain`, SVG de 1 KB em `overlay`).
 
-## Estrutura à mostra
+## Rastro de luz
 
-O único ornamento é a régua do grid: cada seção abre com uma linha de nanquim e uma marca de 7px em cada uma das 12
-colunas (`.seam`). Divisórias internas são linhas de 1px; cartões com sombra não existem.
+O único ornamento, sempre em três camadas: brilho largo (16px, opacidade baixa), brilho (6–10px) e núcleo (1,75–2,25px),
+pontas arredondadas. Pontos de luz: núcleo cheio com anel da cor do fundo e halo de 20%.
+
+- Topo: seis rastros sobem da borda de baixo à direita do texto e terminam nas três provas. Nunca cruzam texto.
+- Seletor de serviços: um rastro liga o problema escolhido ao painel da resposta.
+- Kairos: linha-chave tracejada do caminho inteiro; o trecho atual acende em âmbar; os já percorridos ficam em
+  mercúrio, como numa exposição acumulada.
+- Processo: onda que passa pelas quatro etapas e se desenha com a rolagem.
+- Contato: faixa de rastros ao pé do bloco. 404: um rastro que se apaga no meio.
+- Marca: um "n" desenhado por um único rastro (âmbar para coral) com a fonte da luz acesa na ponta.
 
 ## Componentes
 
-- **Botões**: arestas retas, altura mínima 52px (44px no cabeçalho). Primário anil; fantasma com contorno de nanquim
-  que inverte no hover; sobre anil, papel ou contorno branco. Foco com contorno de 3px e afastamento de 3px.
-- **Linha de serviço**: glifo concreto 56px, título Jost, e um `<dl>` com "Quando faz sentido", "O que entrego"
-  (marcadores quadrados anil) e "Resultado".
-- **Diagrama do Kairos**: SVG desenhado, duas composições (horizontal a partir de 75rem, vertical com espinha
-  central abaixo), rótulos com halo da cor do fundo, legenda em HTML.
-- **Linhas de índice**: nome em Jost, resumo, stack e link ou "Código privado", separados por regra de 1px.
-- **FAQ**: `<details>` nativo; sinal de mais que vira barra.
-- **Ícones**: traço de 1,75px com pontas retas, desenhados no projeto (`Icon.astro`).
+- **Navegação**: cápsula flutuante com desfoque, links com ponto de luz na seção atual, progresso de leitura na borda
+  de baixo (rolagem), tema e CTA fixo "Pedir diagnóstico". Abaixo de 70rem, menu em cartão sob a cápsula.
+- **Botões**: cápsula de 52px (44px no cabeçalho). Primário com reflexo que atravessa no hover; fantasma com
+  contorno. Seta desliza 3px. Foco: contorno de 2px com afastamento.
+- **Seletor de problemas**: abas verticais (WAI-ARIA, setas, Home, End) a partir de links âncora; sem script, todos os
+  painéis aparecem. O botão de cada painel abre o e-mail com o problema no assunto.
+- **Palco do Kairos**: dois desenhos (largo a partir de 64rem, zigue-zague abaixo), trilho de seis passos em abas,
+  painel de altura fixa, anterior, próximo e reproduzir/pausar/repetir. Reproduz sozinho uma vez ao aparecer; parado
+  com movimento reduzido.
+- **Casos**: molduras com céu atrás da captura, deslocadas em altura; no hover a moldura sobe e uma faixa de luz passa.
+  A captura usa `view-transition-name` e continua na página do caso.
+- **FAQ**: `<details>` em cartões, sinal de mais que gira para xis, altura animada onde o navegador sabe.
+- **Contato**: mailto com assunto e roteiro preenchidos, copiar e-mail com confirmação no botão, carta que mostra o
+  roteiro. Botão de agenda aparece só se `scheduleUrl` existir.
 
 ## Movimento
 
-Um único momento orquestrado: o poema do hero entra linha a linha e as barras de entrega crescem, partindo de estado
-visível (opacidade 0,55 e barra a 25%). Interações ficam abaixo de 200ms. `prefers-reduced-motion` desliga tudo.
+Um momento orquestrado no carregamento: a exposição do topo se forma (rastros em 2,2s, um pacote de luz por prova,
+provas acendendo), uma vez, sem laço. Depois disso, movimento só responde à pessoa ou à rolagem: passos do Kairos,
+rastro do seletor, onda do processo, hover. Curva padrão `--ease-out`; mola leve (`--ease-spring`) só em transições de
+hover e seta. Troca de tema e navegação entre páginas usam transição de visão. `prefers-reduced-motion` desliga
+desenhos, pacotes, autoplay e transições; tudo começa visível.
 
 ## Não canonizado
 
-O detector apontou `cramped-padding` em seções e linhas com régua no topo: o espaçamento vem de custom properties
-que a análise estática não resolve, e as capturas mostram o respiro correto. O `radial-halo` apontado é o ponto
-"no ar" do poema, desenhado com gradiente radial de dois tons; não é brilho decorativo.
+O detector aponta `bounce-easing` quando uma animação usa `--ease-spring`; ela fica restrita a transições de hover, sem
+animações de entrada.

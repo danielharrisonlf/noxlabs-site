@@ -14,6 +14,7 @@
     "preview": "astro preview --port 4321",
     "og": "node scripts/og-image.mjs",
     "shots": "node scripts/screenshots.mjs",
+    "frames": "node scripts/frames.mjs",
     "check:a11y": "node scripts/check-page.mjs"
   },
   "dependencies": {

@@ -1,0 +1,829 @@
+---
+/**
+ * Palco noturno do Kairos: o caminho real de um pedido feito a um agente de
+ * IA, passo a passo. Cada passo acende os trechos que percorre; os trechos já
+ * percorridos ficam acesos, como numa longa exposição. A linha-chave de todo o
+ * caminho aparece antes, tracejada e fraca.
+ *
+ * Sem JavaScript: diagrama inteiro aceso e os seis passos visíveis em lista.
+ */
+import { kairosFlow } from "../data/cases";
+import Icon from "./Icon.astro";
+
+interface Props {
+  /** Prefixo de ids, para mais de um palco por página. */
+  id?: string;
+}
+
+const { id = "kf" } = Astro.props;
+
+type Kind = "person" | "agent" | "service" | "data";
+type Node = { key: string; name: string; sub: string; step: number; kind: Kind };
+type Placement = { x: number; y: number; lx: number; ly: number; anchor: "start" | "middle" | "end" };
+
+const nodes: Node[] = [
+  { key: "voce", name: "Você", sub: "seu login", step: 1, kind: "person" },
+  { key: "agente", name: "Agente de IA", sub: "Claude, ChatGPT, Cursor", step: 1, kind: "agent" },
+  { key: "gateway", name: "Gateway", sub: "rota /mcp", step: 2, kind: "service" },
+  { key: "mcp", name: "Servidor MCP", sub: "49 ferramentas", step: 2, kind: "service" },
+  { key: "projetos", name: "Projetos", sub: "confere o token", step: 3, kind: "service" },
+  { key: "banco", name: "PostgreSQL", sub: "tarefa e evento", step: 4, kind: "data" },
+  { key: "relay", name: "Relay", sub: "outbox", step: 5, kind: "service" },
+  { key: "filas", name: "Filas", sub: "Redis, BullMQ", step: 5, kind: "data" },
+  { key: "realtime", name: "Tempo real", sub: "WebSocket", step: 6, kind: "service" },
+  { key: "notif", name: "Notificações", sub: "3 canais", step: 6, kind: "service" },
+  { key: "audit", name: "Auditoria", sub: "append-only", step: 6, kind: "service" },
+];
+
+/* Composição larga (>= 64rem): serpente em três faixas. */
+const wide: Record<string, Placement> = {
+  voce: { x: 90, y: 100, lx: 90, ly: 56, anchor: "middle" },
+  agente: { x: 300, y: 100, lx: 300, ly: 56, anchor: "middle" },
+  gateway: { x: 520, y: 100, lx: 520, ly: 56, anchor: "middle" },
+  mcp: { x: 740, y: 100, lx: 740, ly: 56, anchor: "middle" },
+  projetos: { x: 890, y: 245, lx: 916, ly: 242, anchor: "start" },
+  banco: { x: 650, y: 245, lx: 650, ly: 291, anchor: "middle" },
+  relay: { x: 420, y: 245, lx: 420, ly: 291, anchor: "middle" },
+  filas: { x: 180, y: 245, lx: 152, ly: 242, anchor: "end" },
+  realtime: { x: 300, y: 385, lx: 300, ly: 431, anchor: "middle" },
+  notif: { x: 560, y: 385, lx: 560, ly: 431, anchor: "middle" },
+  audit: { x: 820, y: 385, lx: 820, ly: 431, anchor: "middle" },
+};
+
+const wideEdges = [
+  { step: 1, d: "M 90 100 C 170 64, 220 64, 300 100" },
+  { step: 2, d: "M 300 100 C 380 136, 440 136, 520 100" },
+  { step: 2, d: "M 520 100 C 600 64, 660 64, 740 100" },
+  { step: 3, d: "M 740 100 C 860 100, 890 170, 890 245" },
+  { step: 4, d: "M 890 245 C 810 281, 730 281, 650 245" },
+  { step: 5, d: "M 650 245 C 570 209, 500 209, 420 245" },
+  { step: 5, d: "M 420 245 C 340 281, 260 281, 180 245" },
+  { step: 6, d: "M 180 245 C 180 335, 220 385, 300 385" },
+  { step: 6, d: "M 180 245 C 220 360, 420 385, 560 385" },
+  { step: 6, d: "M 180 245 C 250 375, 640 385, 820 385" },
+];
+
+/* Composição estreita: zigue-zague em duas colunas, rótulos para fora. */
+const tall: Record<string, Placement> = {
+  voce: { x: 50, y: 50, lx: 36, ly: 86, anchor: "start" },
+  agente: { x: 290, y: 50, lx: 306, ly: 86, anchor: "end" },
+  gateway: { x: 290, y: 150, lx: 306, ly: 186, anchor: "end" },
+  mcp: { x: 50, y: 150, lx: 36, ly: 186, anchor: "start" },
+  projetos: { x: 50, y: 250, lx: 36, ly: 286, anchor: "start" },
+  banco: { x: 290, y: 250, lx: 306, ly: 286, anchor: "end" },
+  relay: { x: 290, y: 350, lx: 266, ly: 347, anchor: "end" },
+  filas: { x: 170, y: 430, lx: 148, ly: 427, anchor: "end" },
+  realtime: { x: 50, y: 520, lx: 50, ly: 556, anchor: "middle" },
+  notif: { x: 170, y: 520, lx: 170, ly: 556, anchor: "middle" },
+  audit: { x: 290, y: 520, lx: 290, ly: 556, anchor: "middle" },
+};
+
+const tallEdges = [
+  { step: 1, d: "M 50 50 C 130 15, 210 15, 290 50" },
+  { step: 2, d: "M 290 50 C 340 50, 340 150, 290 150" },
+  { step: 2, d: "M 290 150 C 210 115, 130 115, 50 150" },
+  { step: 3, d: "M 50 150 C 0 150, 0 250, 50 250" },
+  { step: 4, d: "M 50 250 C 130 215, 210 215, 290 250" },
+  { step: 5, d: "M 290 250 C 340 250, 340 350, 290 350" },
+  { step: 5, d: "M 290 350 C 290 400, 220 430, 170 430" },
+  { step: 6, d: "M 170 430 C 170 480, 50 470, 50 520" },
+  { step: 6, d: "M 170 430 L 170 520" },
+  { step: 6, d: "M 170 430 C 170 480, 290 470, 290 520" },
+];
+
+const layouts = [
+  { cls: "kf-wide", viewBox: "0 0 1040 462", place: wide, edges: wideEdges, r: 15 },
+  { cls: "kf-tall", viewBox: "0 0 352 590", place: tall, edges: tallEdges, r: 13 },
+] as const;
+
+const total = kairosFlow.length;
+---
+
+<div class="kf night grain" data-flow id={id}>
+  <div class="kf-canvas">
+    {
+      layouts.map((layout, li) => (
+        <svg
+          class={`kf-svg ${layout.cls}`}
+          viewBox={layout.viewBox}
+          role="img"
+          aria-labelledby={`${id}-t${li} ${id}-d${li}`}
+        >
+          <title id={`${id}-t${li}`}>Caminho de um pedido de agente no Kairos</title>
+          <desc id={`${id}-d${li}`}>
+            Você pede a um agente de IA. O agente entra pelo gateway no servidor MCP com o seu token. O MCP repassa o token
+            ao serviço de projetos, que grava a tarefa e o evento no PostgreSQL na mesma transação. Um relay publica o
+            evento nas filas Redis e BullMQ, e os serviços de tempo real, notificações e auditoria consomem o evento.
+          </desc>
+
+          <g class="kf-keys">
+            {layout.edges.map((e) => (
+              <path d={e.d} />
+            ))}
+          </g>
+
+          {layout.edges.map((e) => (
+            <g class="kf-edge" data-s={e.step}>
+              <path class="kf-glow" d={e.d} />
+              <path class="kf-core" d={e.d} pathLength="1000" />
+              <path class="kf-packet" d={e.d} pathLength="1000" />
+            </g>
+          ))}
+
+          {nodes.map((n) => {
+            const p = layout.place[n.key];
+            return (
+              <g class={`kf-node is-${n.kind}`} data-s={n.step}>
+                <circle class="kf-halo" cx={p.x} cy={p.y} r={layout.r + 11} />
+                {n.kind === "data" ? (
+                  <rect
+                    class="kf-dot"
+                    x={p.x - layout.r + 2}
+                    y={p.y - layout.r + 2}
+                    width={(layout.r - 2) * 2}
+                    height={(layout.r - 2) * 2}
+                    rx="6"
+                  />
+                ) : (
+                  <circle class="kf-dot" cx={p.x} cy={p.y} r={layout.r} />
+                )}
+                <text class="kf-name" x={p.lx} y={p.ly} text-anchor={p.anchor}>
+                  {n.name}
+                </text>
+                <text class="kf-sub" x={p.lx} y={p.ly + 18} text-anchor={p.anchor}>
+                  {n.sub}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+      ))
+    }
+  </div>
+
+  <div class="kf-console">
+    <ol class="kf-rail" role="list" data-tablist aria-label="Passos do pedido">
+      {
+        kairosFlow.map((s, i) => (
+          <li>
+            <a class="kf-tab" href={`#${id}-p-${s.id}`} data-tab={s.id}>
+              <span class="kf-num tabular" aria-hidden="true">
+                {i + 1}
+              </span>
+              <span class="kf-tab-title">
+                <span class="visually-hidden">Passo {i + 1}: </span>
+                {s.title}
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+    <span class="kf-track" aria-hidden="true"><span class="kf-track-fill"></span></span>
+
+    <div class="kf-body">
+      <div class="kf-panels">
+        {
+          kairosFlow.map((s, i) => (
+            <section class="kf-panel" id={`${id}-p-${s.id}`} data-panel={s.id} aria-labelledby={`${id}-h-${s.id}`}>
+              <p class="kf-count tabular" aria-hidden="true">
+                {i + 1} de {total}
+              </p>
+              <h3 id={`${id}-h-${s.id}`}>{s.title}</h3>
+              <p class="kf-text">{s.text}</p>
+              <p class="kf-detail">{s.detail}</p>
+            </section>
+          ))
+        }
+      </div>
+
+      <div class="kf-controls" data-controls hidden>
+        <button class="kf-btn" type="button" data-prev aria-label="Passo anterior">
+          <Icon name="arrow-left" />
+        </button>
+        <button class="kf-btn kf-play" type="button" data-play data-state="paused" aria-label="Reproduzir o caminho">
+          <span class="i-play"><Icon name="play" /></span>
+          <span class="i-pause"><Icon name="pause" /></span>
+          <span class="i-replay"><Icon name="replay" /></span>
+          <span class="kf-play-label" data-play-label>Reproduzir</span>
+        </button>
+        <button class="kf-btn" type="button" data-next aria-label="Próximo passo">
+          <Icon name="arrow-right" />
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { type TabsController, enhanceTabs } from "../scripts/tabs";
+
+  const STEP_MS = 5200;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  for (const root of document.querySelectorAll<HTMLElement>("[data-flow]")) {
+    const parts = [...root.querySelectorAll<SVGGElement>("[data-s]")];
+    const controls = root.querySelector<HTMLElement>("[data-controls]");
+    const prev = root.querySelector<HTMLButtonElement>("[data-prev]");
+    const next = root.querySelector<HTMLButtonElement>("[data-next]");
+    const play = root.querySelector<HTMLButtonElement>("[data-play]");
+    const playLabel = root.querySelector<HTMLElement>("[data-play-label]");
+    const total = root.querySelectorAll("[data-tab]").length;
+    let tabs: TabsController | null = null;
+    let timer: number | undefined;
+    let playing = false;
+
+    const runPackets = (step: number) => {
+      if (reduce.matches) return;
+      for (const edge of root.querySelectorAll<SVGGElement>(`.kf-edge[data-s="${step}"]`)) {
+        const core = edge.querySelector<SVGPathElement>(".kf-core");
+        const packet = edge.querySelector<SVGPathElement>(".kf-packet");
+        core?.animate([{ strokeDashoffset: "1000" }, { strokeDashoffset: "0" }], {
+          duration: 900,
+          easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+        });
+        packet?.animate(
+          [
+            { strokeDashoffset: "70", opacity: 0 },
+            { opacity: 1, offset: 0.12 },
+            { opacity: 1, offset: 0.85 },
+            { strokeDashoffset: "-1000", opacity: 0 },
+          ],
+          { duration: 1100, easing: "cubic-bezier(0.65, 0, 0.35, 1)" },
+        );
+      }
+    };
+
+    const paint = (index: number) => {
+      const step = index + 1;
+      root.dataset.step = String(step);
+      root.style.setProperty("--progress", String(index / Math.max(total - 1, 1)));
+      for (const part of parts) {
+        const s = Number(part.dataset.s);
+        part.classList.toggle("is-past", s < step);
+        part.classList.toggle("is-now", s === step);
+      }
+    };
+
+    const setPlaying = (on: boolean, finished = false) => {
+      playing = on;
+      window.clearTimeout(timer);
+      if (!play || !playLabel) return;
+      play.dataset.state = on ? "playing" : finished ? "done" : "paused";
+      const label = on ? "Pausar" : finished ? "Repetir" : "Reproduzir";
+      playLabel.textContent = label;
+      play.setAttribute("aria-label", on ? "Pausar o caminho" : finished ? "Repetir o caminho" : "Reproduzir o caminho");
+    };
+
+    const tick = () => {
+      if (!tabs || !playing) return;
+      const last = tabs.count - 1;
+      if (tabs.current() >= last) {
+        setPlaying(false, true);
+        return;
+      }
+      tabs.select(tabs.current() + 1, "api");
+      timer = window.setTimeout(tick, STEP_MS);
+    };
+
+    tabs = enhanceTabs(root, {
+      orientation: "horizontal",
+      onChange: (_id, index, source) => {
+        paint(index);
+        if (source !== "init") runPackets(index + 1);
+        if (source === "user") setPlaying(false);
+        if (index === total - 1 && !playing) setPlaying(false, true);
+        else if (!playing && play?.dataset.state === "done") setPlaying(false);
+      },
+    });
+    if (!tabs) continue;
+    const ctl = tabs;
+    if (controls) controls.hidden = false;
+
+    prev?.addEventListener("click", () => {
+      setPlaying(false);
+      ctl.select(ctl.current() - 1 < 0 ? 0 : ctl.current() - 1, "api");
+    });
+    next?.addEventListener("click", () => {
+      setPlaying(false);
+      ctl.select(Math.min(ctl.current() + 1, ctl.count - 1), "api");
+    });
+    play?.addEventListener("click", () => {
+      if (playing) {
+        setPlaying(false);
+        return;
+      }
+      if (ctl.current() >= ctl.count - 1) ctl.select(0, "api");
+      else runPackets(ctl.current() + 1);
+      setPlaying(true);
+      timer = window.setTimeout(tick, STEP_MS);
+    });
+
+    // Na primeira vez que o palco aparece inteiro, o caminho se reproduz sozinho
+    // (com pausa à mão). Com movimento reduzido, fica parado no primeiro passo.
+    if (!reduce.matches && "IntersectionObserver" in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((e) => e.isIntersecting)) return;
+          io.disconnect();
+          if (ctl.current() !== 0) return;
+          runPackets(1);
+          setPlaying(true);
+          timer = window.setTimeout(tick, STEP_MS);
+        },
+        { threshold: 0.55 },
+      );
+      io.observe(root.querySelector(".kf-canvas") ?? root);
+    }
+  }
+</script>
+
+<style>
+  .kf {
+    --kf-r: var(--r-xl);
+    position: relative;
+    border-radius: var(--kf-r);
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background:
+      radial-gradient(80% 60% at 15% 0%, rgb(255 170 90 / 0.1), transparent 60%),
+      radial-gradient(70% 70% at 100% 100%, rgb(110 140 255 / 0.16), transparent 60%),
+      linear-gradient(180deg, #0b1236, #0d1540 60%, #111a4c);
+    background-color: #0d1540;
+    box-shadow: var(--shadow-2);
+  }
+
+  .kf-canvas {
+    padding: clamp(1rem, 0.5rem + 2vw, 2.25rem) clamp(0.5rem, 0.25rem + 2.5vw, 3rem) var(--s-3);
+  }
+
+  @media (min-width: 64rem) {
+    .kf-canvas {
+      padding-inline: clamp(2rem, 6vw, 6rem);
+    }
+  }
+
+  .kf-svg {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .kf-tall {
+    max-width: 26rem;
+    margin-inline: auto;
+  }
+
+  .kf-wide {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .kf-wide {
+      display: block;
+    }
+    .kf-tall {
+      display: none;
+    }
+  }
+
+  /* Linha-chave: o caminho inteiro, fraco, antes de qualquer luz. */
+  .kf-keys path {
+    fill: none;
+    stroke: var(--line-2);
+    stroke-width: 1.25;
+    stroke-dasharray: 2 6;
+    stroke-linecap: round;
+  }
+
+  .kf-edge path {
+    fill: none;
+    stroke-linecap: round;
+    transition:
+      opacity 500ms var(--ease-out),
+      stroke 500ms var(--ease-out);
+  }
+
+  .kf-glow {
+    stroke: var(--sodio);
+    stroke-width: 9;
+    opacity: 0;
+  }
+
+  .kf-core {
+    stroke: var(--sodio);
+    stroke-width: 2.25;
+    opacity: 0;
+  }
+
+  .kf-packet {
+    stroke: #fff;
+    stroke-width: 4;
+    stroke-dasharray: 70 1000;
+    stroke-dashoffset: 70;
+    opacity: 0;
+  }
+
+  /* Trechos já percorridos ficam acesos, mais frios; o trecho atual é âmbar. */
+  .kf-edge.is-past .kf-core {
+    stroke: var(--mercurio);
+    opacity: 0.75;
+  }
+
+  .kf-edge.is-past .kf-glow {
+    stroke: var(--mercurio);
+    opacity: 0.12;
+  }
+
+  .kf-edge.is-now .kf-core {
+    opacity: 1;
+  }
+
+  .kf-edge.is-now .kf-glow {
+    opacity: 0.28;
+  }
+
+  .kf-halo {
+    fill: var(--sodio);
+    opacity: 0;
+    transition: opacity 500ms var(--ease-out);
+  }
+
+  .kf-dot {
+    fill: var(--bg-3);
+    stroke: var(--line-2);
+    stroke-width: 2;
+    transition:
+      fill 500ms var(--ease-out),
+      stroke 500ms var(--ease-out);
+  }
+
+  .kf-node.is-past .kf-dot {
+    fill: color-mix(in srgb, var(--mercurio) 35%, var(--bg-3));
+    stroke: var(--mercurio);
+  }
+
+  .kf-node.is-now .kf-dot {
+    fill: var(--sodio);
+    stroke: #ffe2b0;
+  }
+
+  .kf-node.is-now .kf-halo {
+    opacity: 0.22;
+  }
+
+  .kf-node.is-person .kf-dot {
+    fill: var(--bg-3);
+  }
+
+  .kf-node.is-person.is-now .kf-dot,
+  .kf-node.is-person.is-past .kf-dot {
+    fill: var(--bg-3);
+    stroke-width: 3;
+  }
+
+  .kf :global(text) {
+    font-family: var(--font-text);
+  }
+
+  .kf-name {
+    fill: var(--fg-2);
+    font-size: 16px;
+    font-weight: 700;
+    transition: fill 400ms var(--ease-out);
+  }
+
+  .kf-sub {
+    fill: var(--fg-3);
+    font-size: 14px;
+  }
+
+  .kf-node.is-now .kf-name,
+  .kf-node.is-past .kf-name {
+    fill: var(--fg);
+  }
+
+  /* Sem script: tudo aceso. */
+  .kf:not([data-enhanced="true"]) .kf-core {
+    opacity: 1;
+  }
+  .kf:not([data-enhanced="true"]) .kf-dot {
+    fill: var(--sodio);
+    stroke: #ffe2b0;
+  }
+  .kf:not([data-enhanced="true"]) .kf-name {
+    fill: var(--fg);
+  }
+
+  /* Console: trilho de passos, painel e controles. */
+  .kf-console {
+    position: relative;
+    padding: var(--s-5) clamp(1rem, 0.5rem + 2.5vw, 3rem) clamp(1.5rem, 1rem + 2vw, 2.75rem);
+    border-top: 1px solid var(--line);
+    background: color-mix(in srgb, var(--bg-3) 60%, transparent);
+  }
+
+  .kf-rail {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: var(--s-2);
+  }
+
+  .kf-tab {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    min-height: 3rem;
+    padding: 0.4rem 0.75rem 0.4rem 0.4rem;
+    border-radius: var(--r-pill);
+    color: var(--fg-2);
+    font-size: var(--t-sm);
+    font-weight: 700;
+    line-height: 1.2;
+    text-decoration: none;
+    transition:
+      color 220ms var(--ease-out),
+      background-color 220ms var(--ease-out);
+  }
+
+  .kf-num {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    border: 1.5px solid var(--line-2);
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    transition:
+      background-color 300ms var(--ease-out),
+      border-color 300ms var(--ease-out),
+      color 300ms var(--ease-out),
+      box-shadow 300ms var(--ease-out);
+  }
+
+  @media (hover: hover) {
+    .kf-tab:hover {
+      color: var(--fg);
+      background: color-mix(in srgb, var(--fg) 6%, transparent);
+    }
+  }
+
+  .kf-tab[aria-selected="true"] {
+    color: var(--fg);
+  }
+
+  .kf-tab[aria-selected="true"] .kf-num {
+    background: var(--sodio);
+    border-color: var(--sodio);
+    color: var(--accent-fg);
+    box-shadow: 0 0 18px color-mix(in srgb, var(--sodio) 60%, transparent);
+  }
+
+  .kf-track {
+    display: block;
+    position: relative;
+    height: 2px;
+    margin-top: var(--s-3);
+    border-radius: 2px;
+    background: var(--line);
+  }
+
+  .kf-track-fill {
+    position: absolute;
+    inset: 0;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--mercurio), var(--sodio));
+    transform-origin: left center;
+    transform: scaleX(var(--progress, 1));
+    transition: transform 700ms var(--ease-out);
+  }
+
+  .kf-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: var(--s-6);
+    margin-top: var(--s-6);
+  }
+
+  .kf-panels {
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  /* Com script, os seis passos ocupam a mesma célula: o palco não muda de
+     altura ao avançar. Os passos inativos ficam invisíveis e fora da árvore
+     de acessibilidade. */
+  .kf[data-enhanced="true"] .kf-panel {
+    grid-area: 1 / 1;
+  }
+
+  .kf[data-enhanced="true"] .kf-panel[hidden] {
+    display: grid !important;
+    visibility: hidden;
+  }
+
+  .kf-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 15rem) minmax(0, 1fr);
+    column-gap: var(--s-6);
+    align-items: start;
+  }
+
+  .kf-panel:focus-visible {
+    outline-offset: 6px;
+    border-radius: var(--r-sm);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .kf[data-enhanced="true"] .kf-panel:not([hidden]) > * {
+      animation: kf-in 520ms var(--ease-out) both;
+    }
+    .kf[data-enhanced="true"] .kf-panel:not([hidden]) > .kf-text {
+      animation-delay: 60ms;
+    }
+    .kf[data-enhanced="true"] .kf-panel:not([hidden]) > .kf-detail {
+      animation-delay: 120ms;
+    }
+  }
+
+  @keyframes kf-in {
+    from {
+      opacity: 0.2;
+      translate: 0 6px;
+    }
+  }
+
+  .kf-count {
+    grid-column: 1;
+    font-size: var(--t-sm);
+    color: var(--fg-3);
+  }
+
+  .kf-panel h3 {
+    grid-column: 1;
+    margin-top: var(--s-1);
+    font-size: var(--t-xl);
+    line-height: 1.05;
+  }
+
+  .kf-text {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    font-size: var(--t-md);
+    line-height: 1.5;
+    color: var(--fg);
+    max-width: 52ch;
+  }
+
+  .kf-detail {
+    grid-column: 2;
+    justify-self: start;
+    margin-top: var(--s-4);
+    padding: 0.35rem 0.85rem;
+    border: 1px solid var(--line-2);
+    border-radius: var(--r-md);
+    font-size: var(--t-sm);
+    color: var(--fg-2);
+  }
+
+  .kf-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .kf-controls[hidden] {
+    display: none;
+  }
+
+  .kf-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-2);
+    min-width: 3rem;
+    min-height: 3rem;
+    padding: 0 0.85rem;
+    border: 1.5px solid var(--line-2);
+    border-radius: var(--r-pill);
+    background: transparent;
+    color: var(--fg);
+    font: 700 var(--t-sm) / 1 var(--font-text);
+    cursor: pointer;
+    transition:
+      background-color 200ms var(--ease-out),
+      border-color 200ms var(--ease-out),
+      transform 300ms var(--ease-spring);
+  }
+
+  .kf-btn :global(svg) {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  .kf-btn:active {
+    transform: scale(0.96);
+  }
+
+  @media (hover: hover) {
+    .kf-btn:hover {
+      border-color: var(--fg);
+      background: color-mix(in srgb, var(--fg) 8%, transparent);
+    }
+  }
+
+  .kf-play {
+    min-width: 8.5rem;
+    background: var(--sodio);
+    border-color: var(--sodio);
+    color: var(--accent-fg);
+  }
+
+  @media (hover: hover) {
+    .kf-play:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+  }
+
+  .kf-play .i-play,
+  .kf-play .i-pause,
+  .kf-play .i-replay {
+    display: none;
+  }
+
+  .kf-play:not([data-state="playing"], [data-state="done"]) .i-play,
+  .kf-play[data-state="playing"] .i-pause,
+  .kf-play[data-state="done"] .i-replay {
+    display: inline-flex;
+  }
+
+  @media (max-width: 63.99rem) {
+    .kf-rail {
+      grid-template-columns: repeat(6, auto);
+      justify-content: space-between;
+      gap: var(--s-1);
+    }
+
+    .kf-tab {
+      padding: 0.2rem;
+      min-width: 2.75rem;
+      justify-content: center;
+    }
+
+    .kf-num {
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+
+    /* No estreito, o título vive no painel; o trilho mostra só os números. */
+    .kf-tab-title {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    .kf-body {
+      grid-template-columns: 1fr;
+    }
+
+    .kf-panel {
+      grid-template-columns: 1fr;
+    }
+
+    .kf-panel h3,
+    .kf-text,
+    .kf-detail,
+    .kf-count {
+      grid-column: 1;
+      grid-row: auto;
+    }
+
+    .kf-text {
+      margin-top: var(--s-3);
+    }
+
+    .kf-controls {
+      order: -1;
+    }
+  }
+
+  @media (max-width: 30rem) {
+    .kf {
+      --kf-r: var(--r-lg);
+    }
+
+    .kf-console {
+      padding-inline: 0.75rem;
+    }
+  }
+</style>

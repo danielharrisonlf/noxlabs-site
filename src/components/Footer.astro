@@ -9,8 +9,9 @@ const groups = [
     title: "Noxlabs",
     links: [
       { label: "Serviços", href: "/#servicos" },
+      { label: "Kairos", href: "/#kairos" },
       { label: "Casos", href: "/#casos" },
-      { label: "Como trabalho", href: "/#processo" },
+      { label: "Processo", href: "/#processo" },
       { label: "Perguntas", href: "/#perguntas" },
     ],
   },
@@ -33,10 +34,10 @@ const groups = [
 ];
 ---
 
-<footer class="footer seam">
-  <div class="wrap grid footer-grid">
+<footer class="footer">
+  <div class="wrap footer-grid">
     <div class="footer-brand">
-      <Logo />
+      <Logo id="lg-f" />
       <p>Software e IA aplicada, do diagnóstico à operação.</p>
     </div>
     {
@@ -59,15 +60,16 @@ const groups = [
 
 <style>
   .footer {
-    padding-block: var(--s-8) var(--s-6);
+    padding-block: clamp(3.5rem, 2.5rem + 4vw, 6rem) var(--s-6);
   }
 
   .footer-grid {
-    row-gap: var(--s-6);
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr));
+    gap: var(--s-7) var(--s-6);
   }
 
   .footer-brand {
-    grid-column: 1 / span 4;
     display: grid;
     gap: var(--s-4);
     align-content: start;
@@ -78,62 +80,49 @@ const groups = [
     max-width: 28ch;
   }
 
-  .footer-group:nth-of-type(1) {
-    grid-column: 6 / span 2;
-  }
-
-  .footer-group:nth-of-type(2) {
-    grid-column: 8 / span 2;
-  }
-
-  .footer-group:nth-of-type(3) {
-    grid-column: 10 / span 3;
-  }
-
   .footer-group h2 {
+    margin-bottom: var(--s-3);
     font-family: var(--font-text);
     font-size: var(--t-sm);
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0;
-    margin-bottom: var(--s-3);
   }
 
   .footer-group li a {
     display: inline-flex;
     align-items: center;
-    min-height: 2.25rem;
+    min-height: 2.5rem;
     color: var(--fg-2);
     font-size: var(--t-sm);
     text-decoration: none;
     overflow-wrap: anywhere;
+    transition: color 200ms var(--ease-out);
   }
 
   @media (hover: hover) {
     .footer-group li a:hover {
       color: var(--fg);
       text-decoration: underline;
+      text-decoration-color: var(--sodio);
+      text-decoration-thickness: 2px;
     }
   }
 
   .footer-legal {
     grid-column: 1 / -1;
     padding-top: var(--s-5);
-    border-top: 1px solid var(--rule);
-    color: var(--fg-2);
+    border-top: 1px solid var(--line);
+    color: var(--fg-3);
     font-size: var(--t-xs);
   }
 
   @media (max-width: 60rem) {
-    .footer-brand {
-      grid-column: 1 / -1;
+    .footer-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-    .footer-group:nth-of-type(1) {
-      grid-column: 1 / span 6;
-    }
-    .footer-group:nth-of-type(2) {
-      grid-column: 7 / span 6;
-    }
-    .footer-group:nth-of-type(3) {
+
+    .footer-brand,
+    .footer-group:last-of-type {
       grid-column: 1 / -1;
     }
   }

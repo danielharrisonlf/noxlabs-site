@@ -3,8 +3,11 @@
 Site institucional da Noxlabs, consultoria de software e IA de Daniel Harrison. Página única com serviços, casos,
 processo, sobre e perguntas frequentes, mais três páginas de caso (Kairos, ClinicFlow e WhatsApp Control Center).
 
-Astro com saída estática, CSS próprio, fontes hospedadas no próprio site e quase nenhum JavaScript (tema, menu mobile
-e cópia de e-mail). Sem rastreadores, sem cookies e sem integrações de terceiros.
+Astro com saída estática, CSS próprio, fontes hospedadas no próprio site e JavaScript pequeno, sem biblioteca, carregado
+como módulo: tema, menu, seção atual na navegação, seletor de problemas, o caminho de um pedido no Kairos e cópia de
+e-mail. Todo o conteúdo aparece sem script. Sem rastreadores, sem cookies e sem integrações de terceiros.
+
+Direção visual em `DESIGN.md` ("Longa exposição"); referências em `docs/references.md`.
 
 ## Rodar
 
@@ -23,7 +26,8 @@ pnpm preview        # serve o dist/
 pnpm exec playwright install chromium   # uma vez
 pnpm build
 pnpm shots          # capturas de cada seção em 390 e 1440 px, claro e escuro, em docs/screenshots/
-node scripts/check-page.mjs             # transbordo 360–1920, contraste, títulos, alvos, tema, menu, cópia
+pnpm frames         # quadros do movimento (topo, caminho do Kairos, onda do processo) em docs/screenshots/frames/
+node scripts/check-page.mjs             # transbordo 360–1920, contraste, títulos, alvos, tema, menu, abas, Kairos, cópia
 BASE_URL=http://localhost:8088 node scripts/check-page.mjs   # o mesmo contra o contêiner
 ```
 
@@ -48,11 +52,12 @@ gerado no build por `scripts/csp.mjs`, então não usa `'unsafe-inline'` para sc
 ```text
 src/
   data/          conteúdo: contato e links, serviços, casos, processo e FAQ
-  components/    seções da home, diagrama do Kairos, marca e ícones
+  components/    seções da home, palco do Kairos (KairosFlow), marca e ícones
+  scripts/       abas acessíveis compartilhadas (tabs.ts)
   layouts/       Base.astro: head, SEO, JSON-LD, cabeçalho e rodapé
   pages/         index, casos/[slug] e 404
   styles/        tokens e base (global.css)
-public/          fontes (OFL), imagens dos casos, ícones, og.png, robots.txt
+public/          fontes Funnel Display e Atkinson Hyperlegible Next (OFL), imagens dos casos, ícones, og.png, robots.txt
 scripts/         capturas, verificações, CSP e geração de imagens
 deploy/          nginx.conf
 docs/screenshots capturas de referência
@@ -64,7 +69,8 @@ O conteúdo mora em `src/data/`. Trocar e-mail, links ou textos de serviço não
 
 - `src/data/site.ts` → `scheduleUrl`: link de agenda (Cal.com ou similar). Enquanto for `null`, o diagnóstico é
   pedido por e-mail e o botão de agenda não aparece.
-- Captura atual do Kairos (as do repositório ainda mostram a marca antiga). Hoje o caso usa só o diagrama.
+- Captura atual do Kairos (as do repositório ainda mostram a marca antiga, e o produto pede login). Hoje o caso usa o
+  diagrama do caminho de um pedido.
 - Confirmar se a conversa inicial de 30 min é gratuita. O site hoje diz só "conversa inicial de 30 minutos";
   formato e preço de contratação aparecem como "sob proposta".
 - Confirmar o resumo semanal por escrito (vem do brief, não do portfólio).

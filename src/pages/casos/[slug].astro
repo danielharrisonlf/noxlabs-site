@@ -1,7 +1,7 @@
 ---
 import Contact from "../../components/Contact.astro";
 import Icon from "../../components/Icon.astro";
-import KairosDiagram from "../../components/KairosDiagram.astro";
+import KairosFlow from "../../components/KairosFlow.astro";
 import { type CaseStudy, detailCases } from "../../data/cases";
 import { site } from "../../data/site";
 import Base from "../../layouts/Base.astro";
@@ -19,14 +19,11 @@ const path = `/casos/${study.slug}/`;
 const others = detailCases.filter((c) => c.slug !== study.slug);
 const isKairos = study.slug === "kairos";
 
-/* Caminho de um evento no Kairos: é uma sequência real, por isso numerada. */
-const eventFlow = [
-  { title: "Comando", text: "Uma pessoa ou um agente altera uma tarefa com o próprio token." },
-  { title: "Transação", text: "A alteração e o evento entram no PostgreSQL juntos, ou nenhum dos dois entra." },
-  { title: "Relay", text: "Um processo reivindica os eventos pendentes, com prazo de posse e nova tentativa." },
-  { title: "Filas", text: "Cada evento segue para tempo real, notificações e auditoria, com o próprio ID como chave." },
-  { title: "Consumidores", text: "Cada serviço deduplica pelo ID e atualiza a tela, avisa as pessoas ou grava a trilha." },
-];
+/* "Medido: ..." e "Qualitativo: ..." viram um rótulo e o texto. */
+const outcomes = study.outcome.map((o) => {
+  const match = o.match(/^(Medido|Qualitativo):\s*(.+)$/);
+  return match ? { kind: match[1], text: match[2] } : { kind: null, text: o };
+});
 
 const article = {
   "@context": "https://schema.org",
@@ -59,40 +56,45 @@ const breadcrumb = {
   schema={[article, breadcrumb]}
 >
   <article class="case" aria-labelledby="case-title">
-    <header class="wrap grid case-head">
-      <nav class="crumbs" aria-label="Trilha">
-        <a href="/#casos">Casos</a>
-        <span aria-hidden="true">/</span>
-        <span aria-current="page">{study.name}</span>
-      </nav>
-      <h1 id="case-title">{study.name}</h1>
-      <p class="case-summary">{study.summary}</p>
-      <dl class="case-facts">
-        <div>
-          <dt>Situação</dt>
-          <dd class:list={{ live: study.status.live }}>{study.status.label}</dd>
+    <header class="case-sky grain">
+      <div class="wrap case-head">
+        <nav class="crumbs" aria-label="Trilha">
+          <a href="/#casos">Casos</a>
+          <Icon name="arrow-right" class="crumb-sep" />
+          <span aria-current="page">{study.name}</span>
+        </nav>
+        <h1 id="case-title">{study.name}</h1>
+        <div class="case-intro">
+          <p class="case-summary">{study.summary}</p>
+          <div class="case-side">
+            <dl class="case-facts">
+              <div>
+                <dt>Situação</dt>
+                <dd class:list={{ live: study.status.live }}>{study.status.label}</dd>
+              </div>
+              <div>
+                <dt>Serviço relacionado</dt>
+                <dd>{study.proves}</dd>
+              </div>
+            </dl>
+            <div class="case-links">
+              {
+                study.links.map((l, i) => (
+                  <a class:list={["btn", i === 0 ? "btn-primary" : "btn-ghost"]} href={l.href}>
+                    {l.label}
+                    <Icon name="arrow-up-right" />
+                  </a>
+                ))
+              }
+            </div>
+          </div>
         </div>
-        <div>
-          <dt>O que comprova</dt>
-          <dd>{study.proves}</dd>
-        </div>
-      </dl>
-      <div class="case-links">
-        {
-          study.links.map((l, i) => (
-            <a class:list={["btn", i === 0 ? "btn-primary" : "btn-ghost"]} href={l.href}>
-              {l.label}
-              <Icon name="arrow-up-right" />
-            </a>
-          ))
-        }
       </div>
     </header>
 
-    <div class="wrap case-visual">
-      {isKairos && <KairosDiagram id="kd-case" />}
-      {
-        study.image && (
+    {
+      study.image && (
+        <div class="wrap case-visual">
           <figure class="shot">
             <img
               src={study.image.src}
@@ -101,110 +103,113 @@ const breadcrumb = {
               alt={study.image.alt}
               decoding="async"
               fetchpriority="high"
+              style={`view-transition-name: shot-${study.slug}`}
             />
             <figcaption>{study.image.caption}</figcaption>
           </figure>
-        )
-      }
-    </div>
-
-    <div class="wrap grid case-body">
-      <section class="block" aria-labelledby="b-problema">
-        <h2 id="b-problema">O problema</h2>
-        <div class="block-content">
-          <p class="block-lede">{study.problem}</p>
         </div>
-      </section>
+      )
+    }
 
-      <section class="block" aria-labelledby="b-construido">
-        <h2 id="b-construido">O que construí</h2>
-        <div class="block-content">
-          <ul role="list" class="squares">
-            {study.built.map((b) => <li>{b}</li>)}
-          </ul>
-        </div>
+    <div class="wrap case-body">
+      <section class="problem" aria-labelledby="b-problema">
+        <h2 id="b-problema" class="block-title">O problema</h2>
+        <p class="problem-text">{study.problem}</p>
       </section>
 
       {
         isKairos && (
-          <section class="block" aria-labelledby="b-evento">
-            <h2 id="b-evento">O caminho de um evento</h2>
-            <div class="block-content">
-              <ol role="list" class="flow">
-                {eventFlow.map((s, i) => (
-                  <li>
-                    <span class="flow-num tabular" aria-hidden="true">
-                      {i + 1}
-                    </span>
-                    <h3>{s.title}</h3>
-                    <p>{s.text}</p>
-                  </li>
-                ))}
-              </ol>
+          <section class="walk" aria-labelledby="b-pedido">
+            <div class="walk-head">
+              <h2 id="b-pedido" class="block-title">Siga um pedido</h2>
+              <p>
+                O caminho de um pedido feito a um agente de IA, do seu login à trilha de auditoria. Use os passos ou deixe
+                reproduzir.
+              </p>
             </div>
+            <KairosFlow id="kf-case" />
           </section>
         )
       }
 
-      {
-        study.architecture && (
-          <section class="block" aria-labelledby="b-arquitetura">
-            <h2 id="b-arquitetura">Arquitetura e decisões</h2>
-            <div class="block-content">
-              <ul role="list" class="squares">
+      <div class="duo">
+        <section aria-labelledby="b-construido">
+          <h2 id="b-construido" class="block-title">O que construí</h2>
+          <ul role="list" class="dots">
+            {study.built.map((b) => (
+              <li>{b}</li>
+            ))}
+          </ul>
+        </section>
+
+        {
+          study.architecture && (
+            <section aria-labelledby="b-arquitetura">
+              <h2 id="b-arquitetura" class="block-title">Arquitetura e decisões</h2>
+              <ul role="list" class="dots dots-cool">
                 {study.architecture.map((a) => (
                   <li>{a}</li>
                 ))}
               </ul>
-            </div>
-          </section>
-        )
-      }
+            </section>
+          )
+        }
+      </div>
 
-      <section class="block" aria-labelledby="b-resultado">
-        <h2 id="b-resultado">Resultado</h2>
-        <div class="block-content">
-          <ul role="list" class="outcomes">
-            {study.outcome.map((o) => <li>{o}</li>)}
-          </ul>
-        </div>
+      <section class="result" aria-labelledby="b-resultado">
+        <h2 id="b-resultado" class="block-title">Resultado</h2>
+        <ul role="list" class="outcomes">
+          {
+            outcomes.map((o) => (
+              <li class:list={{ "is-measured": o.kind === "Medido" }}>
+                {o.kind && <span class="outcome-kind">{o.kind}</span>}
+                <p>{o.text}</p>
+              </li>
+            ))
+          }
+        </ul>
       </section>
 
-      {
-        study.limits && (
-          <section class="block" aria-labelledby="b-limites">
-            <h2 id="b-limites">Limites conhecidos</h2>
-            <div class="block-content">
-              <ul role="list" class="squares squares-ink">
+      <div class="duo duo-end">
+        {
+          study.limits && (
+            <section class="limits" aria-labelledby="b-limites">
+              <h2 id="b-limites" class="block-title">Limites conhecidos</h2>
+              <ul role="list" class="dots dots-warm">
                 {study.limits.map((l) => (
                   <li>{l}</li>
                 ))}
               </ul>
-            </div>
-          </section>
-        )
-      }
+            </section>
+          )
+        }
 
-      <section class="block" aria-labelledby="b-stack">
-        <h2 id="b-stack">Stack</h2>
-        <div class="block-content">
-          <ul role="list" class="stack">
-            {study.stack.map((s) => <li>{s}</li>)}
+        <section aria-labelledby="b-stack">
+          <h2 id="b-stack" class="block-title">Stack</h2>
+          <ul role="list" class="chips">
+            {study.stack.map((s) => (
+              <li>{s}</li>
+            ))}
           </ul>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
 
-    <nav class="wrap grid case-next" aria-label="Outros casos">
-      {
-        others.map((o) => (
-          <a class="next" href={`/casos/${o.slug}/`} aria-label={`Próximo caso: ${o.name}`}>
-            <span class="next-name">{o.name}</span>
-            <span class="next-summary">{o.summary}</span>
-            <Icon name="arrow-right" class="next-icon" />
-          </a>
-        ))
-      }
+    <nav class="wrap case-next" aria-labelledby="next-title">
+      <h2 id="next-title" class="block-title">Outros casos</h2>
+      <div class="next-list">
+        {
+          others.map((o) => (
+            <a class="next" href={`/casos/${o.slug}/`}>
+              <span class="next-name">{o.name}</span>
+              <span class="next-summary">{o.summary}</span>
+              <span class="next-go" aria-hidden="true">
+                <Icon name="arrow-right" />
+              </span>
+            </a>
+          ))
+        }
+      </div>
     </nav>
   </article>
 
@@ -212,79 +217,99 @@ const breadcrumb = {
 </Base>
 
 <style>
-  .case-head {
-    padding-block: clamp(3rem, 2rem + 4vw, 6rem) var(--s-7);
-    row-gap: var(--s-5);
-    align-items: end;
+  .case-sky {
+    margin: 0.5rem;
+    border-radius: var(--r-xl);
+    overflow: hidden;
+    padding: calc(var(--header-h) + clamp(2rem, 5vw, 5rem)) 0 clamp(3rem, 6vw, 6rem);
+    background:
+      radial-gradient(110% 80% at 0% 110%, var(--haze), transparent 62%),
+      radial-gradient(70% 60% at 100% 0%, var(--haze-2), transparent 60%),
+      linear-gradient(180deg, var(--sky-top), var(--sky-mid) 55%, var(--sky-low));
+  }
+
+  .case-sky:has(+ .case-visual) {
+    padding-bottom: clamp(7rem, 14vw, 13rem);
   }
 
   .crumbs {
-    grid-column: 1 / -1;
     display: flex;
+    align-items: center;
     gap: var(--s-2);
     font-size: var(--t-sm);
     color: var(--fg-2);
   }
 
   .crumbs a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
     color: var(--link);
-    font-weight: 600;
+    font-weight: 700;
+  }
+
+  .crumbs :global(.crumb-sep) {
+    width: 1rem;
+    height: 1rem;
   }
 
   .case-head h1 {
-    grid-column: 1 / -1;
-    font-size: clamp(3.25rem, 1.8rem + 7vw, 9rem);
-    line-height: 0.88;
+    margin-top: var(--s-4);
+    font-size: clamp(3.25rem, 1.6rem + 7vw, 8.5rem);
+    font-weight: 500;
+    line-height: 0.92;
     letter-spacing: -0.045em;
   }
 
+  .case-intro {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: var(--s-6) clamp(2rem, 5vw, 5rem);
+    margin-top: var(--s-7);
+    align-items: start;
+  }
+
   .case-summary {
-    grid-column: 1 / span 7;
     font-family: var(--font-display);
     font-size: var(--t-xl);
-    line-height: 1.2;
-    letter-spacing: -0.01em;
-    max-width: 26ch;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    max-width: 24ch;
   }
 
   .case-facts {
-    grid-column: 8 / -1;
     display: grid;
-    gap: var(--s-3);
-    font-size: var(--t-sm);
-  }
-
-  .case-facts div {
-    display: grid;
-    grid-template-columns: 9rem 1fr;
-    gap: var(--s-3);
-    padding-top: var(--s-3);
-    border-top: 1px solid var(--rule);
+    gap: var(--s-4);
   }
 
   .case-facts dt {
-    color: var(--fg-2);
+    font-size: var(--t-sm);
+    color: var(--fg-3);
   }
 
   .case-facts dd {
-    font-weight: 600;
+    font-weight: 700;
   }
 
   .case-links {
-    grid-column: 1 / -1;
     display: flex;
     flex-wrap: wrap;
     gap: var(--s-3);
-    margin-top: var(--s-3);
+    margin-top: var(--s-6);
   }
 
+  /* A captura sobe sobre a borda do céu: duas camadas, profundidade real. */
   .case-visual {
-    margin-bottom: var(--section-y);
+    position: relative;
+    margin-top: calc(-1 * clamp(5rem, 11vw, 10rem));
   }
 
   .shot {
-    border: 1px solid var(--rule-strong);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    overflow: hidden;
     background: var(--bg-2);
+    box-shadow: var(--shadow-2);
   }
 
   .shot img {
@@ -292,156 +317,142 @@ const breadcrumb = {
   }
 
   .shot figcaption {
-    padding: var(--s-3) var(--s-4);
-    border-top: 1px solid var(--rule);
-    font-size: var(--t-xs);
-    color: var(--fg-2);
+    padding: var(--s-3) var(--s-5);
+    border-top: 1px solid var(--line);
+    font-size: var(--t-sm);
+    color: var(--fg-3);
   }
 
   .case-body {
-    row-gap: 0;
-  }
-
-  .block {
-    grid-column: 1 / -1;
     display: grid;
-    grid-template-columns: subgrid;
-    row-gap: var(--s-4);
-    padding-block: var(--s-7);
-    border-top: 1px solid var(--rule-strong);
+    gap: clamp(4rem, 8vw, 7rem);
+    padding-block: clamp(4rem, 8vw, 7rem);
   }
 
-  .block h2 {
-    grid-column: 1 / span 4;
+  .block-title {
     font-size: var(--t-xl);
+    margin-bottom: var(--s-5);
   }
 
-  .block-content {
-    grid-column: 6 / -1;
-    max-width: 62ch;
-  }
-
-  .block-lede {
-    font-size: var(--t-md);
-    line-height: 1.55;
-  }
-
-  .squares li,
-  .outcomes li {
-    position: relative;
-    padding-left: 1.4rem;
-    color: var(--fg-2);
-  }
-
-  .squares li + li,
-  .outcomes li + li {
-    margin-top: var(--s-3);
-  }
-
-  .squares li::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0.62em;
-    width: 0.5rem;
-    height: 0.5rem;
-    background: var(--anil);
-  }
-
-  .squares-ink li::before {
-    background: var(--fg);
-  }
-
-  .outcomes li::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0.5em;
-    width: 0.65rem;
-    height: 0.65rem;
-    border: 1.5px solid var(--fg);
-    border-radius: 50%;
-  }
-
-  .outcomes li:first-child {
-    color: var(--fg);
-    font-weight: 500;
-  }
-
-  .flow {
-    display: grid;
-    gap: 0;
-  }
-
-  .flow li {
-    display: grid;
-    grid-template-columns: 3rem 1fr;
-    column-gap: var(--s-4);
-    padding-block: var(--s-4);
-    border-bottom: 1px solid var(--rule);
-  }
-
-  .flow li:first-child {
-    padding-top: 0;
-  }
-
-  .flow-num {
-    grid-row: span 2;
+  .problem-text {
     font-family: var(--font-display);
-    font-size: var(--t-xl);
-    font-weight: 500;
-    line-height: 1;
-    color: var(--link);
+    font-size: var(--t-lg);
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    max-width: 44ch;
   }
 
-  .flow h3 {
-    font-family: var(--font-text);
-    font-size: var(--t-base);
-    font-weight: 600;
-    letter-spacing: 0;
-    line-height: 1.4;
+  .walk-head {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: var(--s-4) clamp(2rem, 5vw, 5rem);
+    align-items: end;
+    margin-bottom: var(--s-6);
   }
 
-  .flow p {
+  .walk-head .block-title {
+    margin-bottom: 0;
+  }
+
+  .walk-head p {
+    color: var(--fg-2);
+    max-width: 50ch;
+  }
+
+  .duo {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-8) clamp(2rem, 5vw, 5rem);
+    align-items: start;
+  }
+
+  .dots-cool li::before {
+    background: var(--mercurio);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--mercurio) 18%, transparent);
+  }
+
+  .dots-warm li::before {
+    background: var(--freio);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--freio) 18%, transparent);
+  }
+
+  .result {
+    padding: clamp(1.5rem, 1rem + 3vw, 3.5rem);
+    border-radius: var(--r-xl);
+    background: var(--bg-3);
+  }
+
+  .outcomes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+    gap: var(--s-6) clamp(1.5rem, 3vw, 3rem);
+  }
+
+  .outcomes li {
+    display: grid;
+    align-content: start;
+    gap: var(--s-3);
+  }
+
+  .outcomes li p {
     color: var(--fg-2);
   }
 
-  .stack {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s-2);
+  .outcomes li.is-measured p {
+    font-family: var(--font-display);
+    font-size: var(--t-md);
+    line-height: 1.35;
+    color: var(--fg);
   }
 
-  .stack li {
-    padding: 0.35rem 0.75rem;
-    border: 1px solid var(--rule-strong);
-    font-size: var(--t-sm);
-    font-weight: 500;
+  .outcome-kind {
+    justify-self: start;
+    padding: 0.2rem 0.75rem;
+    border-radius: var(--r-pill);
+    border: 1px solid var(--line-2);
+    font-size: var(--t-xs);
+    font-weight: 700;
+    color: var(--fg-2);
+  }
+
+  .is-measured .outcome-kind {
+    border-color: transparent;
+    background: var(--accent);
+    color: var(--accent-fg);
   }
 
   .case-next {
-    padding-block: var(--s-8) var(--section-y);
-    row-gap: var(--col-gap);
+    padding-bottom: var(--section-y);
+  }
+
+  .next-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-5);
   }
 
   .next {
-    grid-column: span 6;
     position: relative;
     display: grid;
     gap: var(--s-2);
-    padding: var(--s-6) var(--s-8) var(--s-6) var(--s-6);
-    border: 1px solid var(--rule-strong);
+    padding: var(--s-6) 5rem var(--s-6) var(--s-6);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--bg-2);
     text-decoration: none;
+    box-shadow: var(--shadow-1);
     transition:
-      background-color 160ms var(--ease-out),
-      color 160ms var(--ease-out);
+      transform 500ms var(--ease-spring),
+      box-shadow 400ms var(--ease-out),
+      border-color 300ms var(--ease-out);
   }
 
   .next-name {
     font-family: var(--font-display);
     font-size: var(--t-xl);
     font-weight: 500;
-    line-height: 1.1;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
   }
 
   .next-summary {
@@ -450,43 +461,62 @@ const breadcrumb = {
     max-width: 44ch;
   }
 
-  .next :global(.next-icon) {
+  .next-go {
     position: absolute;
-    right: var(--s-6);
-    top: var(--s-6);
-    width: 1.5rem;
-    height: 1.5rem;
+    right: var(--s-5);
+    top: var(--s-5);
+    display: inline-grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: var(--bg-3);
+    transition:
+      background-color 300ms var(--ease-out),
+      color 300ms var(--ease-out),
+      transform 500ms var(--ease-spring);
+  }
+
+  .next-go :global(svg) {
+    width: 1.2rem;
+    height: 1.2rem;
   }
 
   @media (hover: hover) {
     .next:hover {
-      background: var(--fg);
-      color: var(--bg);
+      transform: translateY(-4px);
+      border-color: var(--line-2);
+      box-shadow: var(--shadow-2);
     }
-    .next:hover .next-summary {
-      color: var(--bg);
+    .next:hover .next-go {
+      background: var(--accent);
+      color: var(--accent-fg);
+      transform: translateX(3px);
     }
   }
 
   @media (max-width: 63.99rem) {
-    .case-summary,
-    .case-facts,
-    .block h2,
-    .block-content {
-      grid-column: 1 / -1;
-    }
-    .next {
-      grid-column: 1 / -1;
+    .case-intro,
+    .walk-head,
+    .duo,
+    .next-list {
+      grid-template-columns: 1fr;
     }
   }
 
-  @media (max-width: 30rem) {
-    .case-facts div {
-      grid-template-columns: 1fr;
-      gap: var(--s-1);
+  @media (max-width: 40rem) {
+    .case-sky {
+      margin: 0.375rem;
+      border-radius: var(--r-lg);
     }
+
     .case-links .btn {
       width: 100%;
+    }
+
+    .next {
+      padding-right: var(--s-6);
+      padding-top: 4.5rem;
     }
   }
 </style>

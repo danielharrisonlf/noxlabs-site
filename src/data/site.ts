@@ -3,28 +3,37 @@
 const email = "daniel.harrisonlf@gmail.com";
 
 const diagnosisSubject = "Diagnóstico de 30 min com a Noxlabs";
-const diagnosisBody = [
-  "Olá, Daniel.",
-  "",
+
+/** Roteiro que já vem no corpo do e-mail: o visitante só preenche. */
+export const mailScript = [
   "Empresa:",
   "Meu cargo:",
   "O problema, em poucas linhas:",
   "O que já tentamos:",
   "Prazo ou data que importa:",
-  "",
   "Horários bons para uma conversa de 30 min:",
-].join("\n");
+] as const;
+
+function mailBody(context?: string) {
+  return ["Olá, Daniel.", "", ...(context ? [`Contexto: ${context}`, ""] : []), ...mailScript].join("\n");
+}
+
+/** mailto com assunto e roteiro preenchidos; `topic` entra no assunto e no corpo. */
+export function diagnosisMailto(topic?: string) {
+  const subject = topic ? `${diagnosisSubject}: ${topic}` : diagnosisSubject;
+  return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(mailBody(topic))}`;
+}
 
 export const site = {
   name: "Noxlabs",
   url: "https://noxlabs.tech",
-  title: "Noxlabs — software e IA aplicada, do diagnóstico à operação",
+  title: "Noxlabs — software e IA que saem do papel e ficam no ar",
   description:
     "Consultoria de software e IA de Daniel Harrison. Produtos sob medida, agentes de IA via MCP, integrações, arquitetura e redução de custo de nuvem. Comece por uma conversa de 30 minutos.",
   locale: "pt_BR",
   email,
   mailto: `mailto:${email}`,
-  diagnosisMailto: `mailto:${email}?subject=${encodeURIComponent(diagnosisSubject)}&body=${encodeURIComponent(diagnosisBody)}`,
+  diagnosisMailto: diagnosisMailto(),
   /**
    * PENDENTE: link de agendamento (Cal.com ou similar) ainda não existe.
    * Enquanto for null, o site não mostra botão de agenda e o diagnóstico
@@ -45,9 +54,10 @@ export const site = {
 } as const;
 
 export const nav = [
-  { label: "Serviços", href: "/#servicos" },
-  { label: "Casos", href: "/#casos" },
-  { label: "Como trabalho", href: "/#processo" },
-  { label: "Sobre", href: "/#sobre" },
-  { label: "Perguntas", href: "/#perguntas" },
+  { label: "Serviços", href: "/#servicos", id: "servicos" },
+  { label: "Kairos", href: "/#kairos", id: "kairos" },
+  { label: "Casos", href: "/#casos", id: "casos" },
+  { label: "Processo", href: "/#processo", id: "processo" },
+  { label: "Sobre", href: "/#sobre", id: "sobre" },
+  { label: "Perguntas", href: "/#perguntas", id: "perguntas" },
 ] as const;

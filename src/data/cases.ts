@@ -74,6 +74,57 @@ export const kairos: CaseStudy = {
   proves: "IA aplicada, arquitetura e infraestrutura",
 };
 
+/**
+ * O caminho de um pedido de agente pelo Kairos, na ordem real.
+ * Fontes: axial/docs/architecture.md e axial/apps/mcp-server/README.md.
+ * O pedido em si é um exemplo ilustrativo; a ferramenta e o escopo existem.
+ */
+export type FlowStep = {
+  id: string;
+  title: string;
+  text: string;
+  detail: string;
+};
+
+export const kairosFlow: FlowStep[] = [
+  {
+    id: "pedido",
+    title: "Você pede",
+    text: "Você escreve para o seu agente de IA, no Claude, no ChatGPT ou no Cursor: “crie a tarefa Revisar contrato no projeto Onboarding e atribua para mim”.",
+    detail: "Exemplo ilustrativo de pedido",
+  },
+  {
+    id: "mcp",
+    title: "O agente entra com o seu login",
+    text: "O agente chega pelo gateway ao servidor MCP com o token do seu login, emitido via OAuth 2.1. Para criar tarefa, o token precisa do escopo de escrita. O agente não tem credencial própria.",
+    detail: "Ferramenta create-task, escopo projects:write",
+  },
+  {
+    id: "projetos",
+    title: "Projetos decide",
+    text: "O MCP repassa o seu token ao serviço de projetos, que confere organização, papel e projeto num JWT verificado. O gateway só roteia; cabeçalho ou corpo da requisição não elevam acesso.",
+    detail: "JWT RS256 verificado em cada serviço",
+  },
+  {
+    id: "transacao",
+    title: "Uma transação",
+    text: "A tarefa e o evento que conta o que aconteceu entram juntos no PostgreSQL, ou nenhum dos dois entra. Versão do recurso e bloqueio da linha do projeto barram escritas concorrentes.",
+    detail: "Outbox transacional no PostgreSQL",
+  },
+  {
+    id: "relay",
+    title: "O relay publica",
+    text: "Um relay reivindica os eventos pendentes, publica nas filas usando o ID do evento como ID do job e tenta de novo se algo falhar. Nada é descartado.",
+    detail: "FOR UPDATE SKIP LOCKED, Redis e BullMQ",
+  },
+  {
+    id: "consumidores",
+    title: "Todo mundo fica sabendo",
+    text: "A tela de quem está no projeto atualiza na hora, as pessoas certas são avisadas e a auditoria grava uma trilha que o banco não deixa editar. Cada serviço descarta evento repetido pelo ID.",
+    detail: "Tempo real, notificações e auditoria append-only",
+  },
+];
+
 export const clinicflow: CaseStudy = {
   slug: "clinicflow",
   name: "ClinicFlow",

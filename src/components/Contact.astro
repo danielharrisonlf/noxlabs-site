@@ -1,45 +1,72 @@
 ---
-import { site } from "../data/site";
+import { mailScript, site } from "../data/site";
 import Icon from "./Icon.astro";
+
+/* Faixa de rastros ao pé do bloco: entram pela esquerda e sobem em direção ao roteiro. */
+const trails = [
+  { d: "M -20 250 C 360 250, 760 190, 1220 40", tone: "sodio" },
+  { d: "M -20 220 C 420 215, 820 150, 1220 60", tone: "mercurio" },
+  { d: "M -20 275 C 480 270, 860 210, 1220 90", tone: "freio" },
+  { d: "M -20 200 C 300 190, 700 120, 1220 20", tone: "sodio" },
+] as const;
 ---
 
-<section class="contact on-anil" id="contato" aria-labelledby="contato-title">
-  <div class="wrap grid contact-grid">
+<section class="contact grain" id="contato" aria-labelledby="contato-title">
+  <svg class="contact-trails" viewBox="0 0 1200 280" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+    {
+      trails.map((t) => (
+        <g class={`tone-${t.tone}`}>
+          <path class="ct-glow" d={t.d} />
+          <path class="ct-core" d={t.d} />
+        </g>
+      ))
+    }
+  </svg>
+
+  <div class="wrap contact-grid">
     <div class="contact-copy">
       <h2 id="contato-title">Traga o problema. Saia com um próximo passo.</h2>
-      <p>
+      <p class="contact-lede">
         Escreva em poucas linhas o que está travando: um processo manual, um sistema lento, uma ideia de produto, uma conta
         de nuvem alta. Eu leio e respondo pessoalmente para marcarmos os 30 minutos.
       </p>
+
       <div class="contact-actions">
-        <a class="btn btn-paper" href={site.diagnosisMailto}>
-          <Icon name="mail" />
-          Escrever e pedir diagnóstico
+        <a class="btn btn-primary" href={site.diagnosisMailto}>
+          Escrever o e-mail
+          <Icon name="mail" class="no-nudge" />
         </a>
         {
           site.scheduleUrl && (
-            <a class="btn btn-outline-light" href={site.scheduleUrl}>
+            <a class="btn btn-ghost" href={site.scheduleUrl}>
               Escolher horário na agenda
             </a>
           )
         }
-        <button class="btn btn-outline-light" type="button" data-copy={site.email}>
-          <span class="copy-icon"><Icon name="copy" /></span>
-          <span class="check-icon"><Icon name="check" /></span>
+        <button class="btn btn-ghost" type="button" data-copy={site.email}>
+          <span class="copy-icon"><Icon name="copy" class="no-nudge" /></span>
+          <span class="check-icon"><Icon name="check" class="no-nudge" /></span>
           <span data-copy-label>Copiar e-mail</span>
         </button>
       </div>
+
       <p class="contact-email">
         <a href={site.mailto}>{site.email}</a>
       </p>
       <p class="contact-status" role="status" aria-live="polite" data-copy-status></p>
     </div>
 
-    <!-- Fecho da composição: o círculo vazado do diagnóstico e o quadrado da proposta. -->
-    <div class="contact-art" aria-hidden="true">
-      <span class="art-ring"></span>
-      <span class="art-dot"></span>
-    </div>
+    <aside class="letter" aria-labelledby="letter-title">
+      <h3 id="letter-title">O e-mail já abre com este roteiro</h3>
+      <p class="letter-subject">
+        <span>Assunto</span>
+        Diagnóstico de 30 min com a Noxlabs
+      </p>
+      <ul role="list" class="letter-lines">
+        {mailScript.map((line) => <li>{line}</li>)}
+      </ul>
+      <p class="letter-note">Não precisa de apresentação pronta. Rascunho serve.</p>
+    </aside>
   </div>
 </section>
 
@@ -70,36 +97,78 @@ import Icon from "./Icon.astro";
 
 <style>
   .contact {
-    background: var(--anil);
-    color: var(--anil-sobre);
-    padding-block: var(--section-y);
+    --band: clamp(7rem, 4rem + 12vw, 15rem);
+    position: relative;
+    margin: 0.5rem;
+    border-radius: var(--r-xl);
     overflow: hidden;
+    padding-block: clamp(4.5rem, 3rem + 7vw, 9rem) calc(var(--band) + 1.5rem);
+    background:
+      radial-gradient(90% 80% at 75% 40%, var(--haze), transparent 60%),
+      radial-gradient(60% 60% at 0% 100%, var(--haze-2), transparent 60%),
+      linear-gradient(180deg, var(--sky-low), var(--sky-mid) 45%, var(--sky-top));
+  }
+
+  .contact-trails {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: var(--band);
+    pointer-events: none;
+  }
+
+  .contact-trails path {
+    fill: none;
+    stroke: var(--c);
+    stroke-linecap: round;
+  }
+
+  .tone-sodio {
+    --c: var(--sodio);
+  }
+  .tone-freio {
+    --c: var(--freio);
+  }
+  .tone-mercurio {
+    --c: var(--mercurio);
+  }
+
+  .ct-glow {
+    stroke-width: 10;
+    opacity: calc(var(--trail-glow) * 0.6);
+  }
+
+  .ct-core {
+    stroke-width: 1.5;
+    opacity: 0.7;
   }
 
   .contact-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: var(--s-7) clamp(2rem, 6vw, 6rem);
     align-items: center;
-    row-gap: var(--s-7);
   }
 
   .contact-copy {
-    grid-column: 1 / span 8;
     display: grid;
     gap: var(--s-5);
-    position: relative;
-    z-index: 1;
   }
 
   .contact h2 {
     font-size: var(--t-display);
     line-height: 0.98;
-    letter-spacing: -0.035em;
-    max-width: 13ch;
+    letter-spacing: -0.04em;
+    max-width: 12ch;
   }
 
-  .contact-copy > p:not(.contact-email):not(.contact-status) {
+  .contact-lede {
     font-size: var(--t-md);
     line-height: 1.5;
-    color: var(--anil-sobre-2);
+    color: var(--fg-2);
     max-width: 46ch;
   }
 
@@ -110,7 +179,8 @@ import Icon from "./Icon.astro";
     margin-top: var(--s-3);
   }
 
-  .copy-icon {
+  .copy-icon,
+  .check-icon {
     display: inline-flex;
   }
 
@@ -121,54 +191,80 @@ import Icon from "./Icon.astro";
 
   [data-copied="true"] .check-icon {
     display: inline-flex;
+    color: var(--sodio);
   }
 
   .contact-email a {
     font-size: var(--t-md);
-    font-weight: 600;
-    color: var(--anil-sobre);
-    text-decoration-color: color-mix(in srgb, var(--anil-sobre) 50%, transparent);
+    font-weight: 700;
+    color: var(--fg);
+    text-decoration-color: color-mix(in srgb, var(--fg) 40%, transparent);
     overflow-wrap: anywhere;
   }
 
   .contact-status {
     min-height: 1.5em;
     font-size: var(--t-sm);
-    color: var(--anil-sobre);
   }
 
-  .contact-art {
-    grid-column: 9 / -1;
+  .letter {
     position: relative;
-    justify-self: end;
-    width: min(100%, 26rem);
-    aspect-ratio: 1;
-    margin-right: calc(-1 * var(--gutter) - 6rem);
+    padding: clamp(1.5rem, 1rem + 2vw, 2.25rem);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background: var(--bg-2);
+    box-shadow: var(--shadow-2);
+    rotate: 1.5deg;
   }
 
-  .art-ring {
-    position: absolute;
-    inset: 0;
-    border: clamp(1.25rem, 2vw, 2rem) solid var(--anil-sobre);
-    border-radius: 50%;
+  .letter h3 {
+    font-size: var(--t-lg);
+    margin-bottom: var(--s-4);
   }
 
-  .art-dot {
-    position: absolute;
-    inset: 34%;
-    background: #0e0f12;
+  .letter-subject {
+    display: grid;
+    padding-bottom: var(--s-3);
+    margin-bottom: var(--s-3);
+    border-bottom: 1px solid var(--line);
+    font-weight: 700;
+  }
+
+  .letter-subject span {
+    font-size: var(--t-xs);
+    font-weight: 400;
+    color: var(--fg-3);
+  }
+
+  .letter-lines li {
+    padding-block: 0.45rem;
+    border-bottom: 1px dashed var(--line);
+    color: var(--fg-2);
+  }
+
+  .letter-note {
+    margin-top: var(--s-4);
+    font-size: var(--t-sm);
+    color: var(--fg-3);
   }
 
   @media (max-width: 63.99rem) {
-    .contact-copy {
-      grid-column: 1 / -1;
+    .contact-grid {
+      grid-template-columns: 1fr;
     }
-    .contact-art {
-      display: none;
+
+    .letter {
+      rotate: 0deg;
+      max-width: 32rem;
     }
   }
 
-  @media (max-width: 30rem) {
+  @media (max-width: 40rem) {
+    .contact {
+      margin: 0.375rem;
+      border-radius: var(--r-lg);
+    }
+
     .contact-actions .btn {
       width: 100%;
     }

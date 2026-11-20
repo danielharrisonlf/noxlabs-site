@@ -1,172 +1,418 @@
 ---
 import { services } from "../data/services";
-import ServiceGlyph from "./ServiceGlyph.astro";
+import { diagnosisMailto } from "../data/site";
+import Icon from "./Icon.astro";
 ---
 
-<section class="section seam" id="servicos" aria-labelledby="servicos-title">
-  <div class="wrap grid">
-    <header class="section-head">
-      <h2 id="servicos-title">Seis frentes de trabalho.</h2>
-      <p>Cada trabalho começa pelo problema do seu negócio; a tecnologia vem depois, explicada em português. Escopo e formato de contratação saem da proposta.</p>
+<section class="section services" id="servicos" aria-labelledby="servicos-title">
+  <div class="wrap">
+    <header class="svc-head">
+      <h2 id="servicos-title" class="section-title">Qual destes problemas é o seu?</h2>
+      <p class="section-lede">
+        Seis frentes de trabalho, do agente de IA à conta da nuvem. Escolha o que mais parece com o seu caso e veja o que
+        eu entregaria, com uma prova que você pode abrir.
+      </p>
     </header>
 
-    <ol class="svc-list" role="list">
-      {
-        services.map((s) => (
-          <li class="svc" id={`servico-${s.id}`}>
-            <div class="svc-id">
-              <ServiceGlyph glyph={s.glyph} />
-              <h3>{s.title}</h3>
-            </div>
-            <dl class="svc-body">
-              <div class="svc-when">
-                <dt>Quando faz sentido</dt>
-                <dd>{s.when}</dd>
-              </div>
-              <div class="svc-deliver">
-                <dt>O que entrego</dt>
-                <dd>
-                  <ul role="list">
+    <div class="svc" data-svc>
+      <ul class="svc-list" role="list" data-tablist aria-label="Problemas">
+        {
+          services.map((s, i) => (
+            <li style={`--i:${i}`}>
+              <a class="svc-tab" href={`#svc-${s.id}`} data-tab={s.id}>
+                <span class="svc-dot" aria-hidden="true" />
+                <span class="svc-problem">{s.problem}</span>
+                <Icon name="arrow-right" class="svc-arrow" />
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+
+      <svg class="svc-link" aria-hidden="true" focusable="false">
+        <path class="svc-link-glow" d=""></path>
+        <path class="svc-link-core" d=""></path>
+      </svg>
+
+      <div class="svc-panels">
+        {
+          services.map((s) => (
+            <article class="svc-panel" id={`svc-${s.id}`} data-panel={s.id} aria-labelledby={`svc-${s.id}-title`}>
+              <h3 id={`svc-${s.id}-title`}>{s.title}</h3>
+              <p class="svc-when">{s.when}</p>
+              <div class="svc-cols">
+                <div>
+                  <h4>O que você recebe</h4>
+                  <ul role="list" class="dots">
                     {s.deliver.map((d) => (
                       <li>{d}</li>
                     ))}
                   </ul>
-                </dd>
+                </div>
+                <div>
+                  <h4>Resultado</h4>
+                  <p class="svc-outcome">{s.outcome}</p>
+                </div>
               </div>
-              <div class="svc-outcome">
-                <dt>Resultado</dt>
-                <dd>{s.outcome}</dd>
+              <div class="svc-foot">
+                <p class="svc-proof">
+                  {s.proof.text}{" "}
+                  <a class="text-link" href={s.proof.href}>
+                    {s.proof.label}
+                    <Icon name={s.proof.href.startsWith("http") ? "arrow-up-right" : "arrow-right"} />
+                  </a>
+                </p>
+                <a class="btn btn-primary" href={diagnosisMailto(s.problem)}>
+                  Falar sobre isso
+                  <Icon name="mail" class="no-nudge" />
+                </a>
               </div>
-            </dl>
-          </li>
-        ))
-      }
-    </ol>
+            </article>
+          ))
+        }
+      </div>
+    </div>
   </div>
 </section>
 
+<script>
+  import { enhanceTabs } from "../scripts/tabs";
+
+  const root = document.querySelector<HTMLElement>("[data-svc]");
+  if (root) {
+    const svg = root.querySelector<SVGSVGElement>(".svc-link");
+    const paths = svg ? [...svg.querySelectorAll<SVGPathElement>("path")] : [];
+    const wide = window.matchMedia("(min-width: 64rem)");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    // Um rastro de luz liga o problema escolhido à resposta.
+    const drawLink = (animate: boolean) => {
+      if (!svg || !wide.matches) return;
+      const tab = root.querySelector<HTMLElement>('[aria-selected="true"]');
+      const panel = root.querySelector<HTMLElement>(".svc-panel:not([hidden])");
+      if (!tab || !panel) return;
+      const box = root.getBoundingClientRect();
+      const t = tab.getBoundingClientRect();
+      const p = panel.getBoundingClientRect();
+      const x1 = t.right - box.left - 6;
+      const y1 = t.top + t.height / 2 - box.top;
+      const x2 = p.left - box.left + 2;
+      const y2 = Math.min(Math.max(y1, p.top - box.top + 48), p.bottom - box.top - 48);
+      const mid = (x1 + x2) / 2;
+      const d = `M ${x1} ${y1} C ${mid} ${y1}, ${mid} ${y2}, ${x2} ${y2}`;
+      svg.setAttribute("viewBox", `0 0 ${box.width} ${box.height}`);
+      for (const path of paths) {
+        path.setAttribute("d", d);
+        if (animate && !reduce.matches) {
+          const length = path.getTotalLength();
+          path.animate([{ strokeDasharray: `${length}`, strokeDashoffset: `${length}` }, { strokeDasharray: `${length}`, strokeDashoffset: "0" }], {
+            duration: 650,
+            easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+          });
+        }
+      }
+    };
+
+    enhanceTabs(root, {
+      orientation: "vertical",
+      onChange: (_id, _index, source) => {
+        requestAnimationFrame(() => drawLink(source !== "init"));
+        if (source === "user" && !wide.matches) {
+          const panel = root.querySelector<HTMLElement>(".svc-panel:not([hidden])");
+          const top = panel?.getBoundingClientRect().top ?? 0;
+          if (panel && top > window.innerHeight * 0.75) {
+            panel.scrollIntoView({ behavior: reduce.matches ? "auto" : "smooth", block: "start" });
+          }
+        }
+      },
+    });
+
+    if ("ResizeObserver" in window) new ResizeObserver(() => drawLink(false)).observe(root);
+    document.fonts?.ready.then(() => drawLink(false));
+
+    // Na primeira passagem, os problemas acendem em sequência.
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            root.dataset.lit = "true";
+            io.disconnect();
+          }
+        },
+        { threshold: 0.3 },
+      );
+      io.observe(root);
+    } else {
+      root.dataset.lit = "true";
+    }
+  }
+</script>
+
 <style>
-  .svc-list {
-    grid-column: 1 / -1;
+  .svc-head {
+    margin-bottom: clamp(2.5rem, 2rem + 3vw, 4.5rem);
   }
 
   .svc {
+    position: relative;
     display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: var(--col-gap);
-    row-gap: var(--s-5);
-    padding-block: var(--s-7);
-    border-top: 1px solid var(--rule);
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
   }
 
-  .svc:last-child {
-    border-bottom: 1px solid var(--rule);
+  .svc-list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: var(--s-2);
+    position: sticky;
+    top: calc(var(--header-h) + 1.5rem);
   }
 
-  .svc-id {
-    grid-column: 1 / span 4;
+  .svc-tab {
+    position: relative;
     display: grid;
-    align-content: start;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
     gap: var(--s-4);
-  }
-
-  .svc-id h3 {
-    font-size: var(--t-xl);
-    max-width: 14ch;
-  }
-
-  .svc-body {
-    grid-column: 5 / -1;
-    display: grid;
-    grid-template-columns: repeat(8, minmax(0, 1fr));
-    column-gap: var(--col-gap);
-    row-gap: var(--s-5);
-  }
-
-  .svc-body dt {
-    font-size: var(--t-sm);
-    font-weight: 600;
-    margin-bottom: var(--s-2);
-  }
-
-  .svc-body dd {
+    min-height: 3.75rem;
+    padding: 0.9rem 1.1rem 0.9rem 1.25rem;
+    border: 1px solid transparent;
+    border-radius: var(--r-md);
+    font-family: var(--font-display);
+    font-size: var(--t-md);
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
     color: var(--fg-2);
+    text-decoration: none;
+    transition:
+      color 220ms var(--ease-out),
+      background-color 220ms var(--ease-out),
+      border-color 220ms var(--ease-out),
+      box-shadow 300ms var(--ease-out);
+  }
+
+  .svc-dot {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    border: 1.5px solid var(--line-2);
+    transition:
+      background-color 300ms var(--ease-out),
+      border-color 300ms var(--ease-out),
+      box-shadow 300ms var(--ease-out),
+      transform 500ms var(--ease-spring);
+  }
+
+  .svc :global(.svc-arrow) {
+    width: 1.2rem;
+    height: 1.2rem;
+    color: var(--sodio);
+    opacity: 0;
+    transform: translateX(-6px);
+    transition:
+      opacity 220ms var(--ease-out),
+      transform 400ms var(--ease-spring);
+  }
+
+  @media (hover: hover) {
+    .svc-tab:hover {
+      color: var(--fg);
+      background: color-mix(in srgb, var(--fg) 5%, transparent);
+    }
+    .svc-tab:hover :global(.svc-arrow) {
+      opacity: 0.6;
+      transform: translateX(0);
+    }
+  }
+
+  .svc-tab[aria-selected="true"] {
+    color: var(--fg);
+    background: var(--bg-2);
+    border-color: var(--line);
+    box-shadow: var(--shadow-1);
+  }
+
+  .svc-tab[aria-selected="true"] .svc-dot {
+    background: var(--sodio);
+    border-color: var(--sodio);
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--sodio) 20%, transparent), 0 0 14px var(--sodio);
+    transform: scale(1.15);
+  }
+
+  .svc-tab[aria-selected="true"] :global(.svc-arrow) {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* Primeira passagem: cada problema acende um depois do outro. */
+  @media (prefers-reduced-motion: no-preference) {
+    .svc[data-lit="true"] .svc-list li .svc-dot {
+      animation: dot-wake 900ms var(--ease-out) both;
+      animation-delay: calc(var(--i) * 110ms);
+    }
+  }
+
+  @keyframes dot-wake {
+    40% {
+      background: var(--sodio);
+      border-color: var(--sodio);
+      box-shadow: 0 0 12px var(--sodio);
+    }
+  }
+
+  .svc-link {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    display: none;
+  }
+
+  .svc[data-enhanced="true"] .svc-link {
+    display: block;
+  }
+
+  .svc-link path {
+    fill: none;
+    stroke: var(--sodio);
+    stroke-linecap: round;
+  }
+
+  .svc-link-glow {
+    stroke-width: 7;
+    opacity: var(--trail-glow);
+  }
+
+  .svc-link-core {
+    stroke-width: 1.75;
+  }
+
+  .svc-panels {
+    display: grid;
+    gap: var(--s-6);
+  }
+
+  .svc-panel {
+    position: relative;
+    padding: clamp(1.5rem, 1rem + 2.5vw, 3rem);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    background:
+      radial-gradient(90% 60% at 100% 0%, color-mix(in srgb, var(--sodio) 9%, transparent), transparent 70%),
+      var(--bg-2);
+    box-shadow: var(--shadow-2);
+  }
+
+  .svc-panel:focus-visible {
+    outline-offset: 4px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .svc[data-enhanced="true"] .svc-panel:not([hidden]) {
+      animation: panel-in 500ms var(--ease-out);
+    }
+  }
+
+  @keyframes panel-in {
+    from {
+      opacity: 0.4;
+      translate: 0 10px;
+    }
+  }
+
+  .svc-panel h3 {
+    font-size: var(--t-xl);
+    max-width: 18ch;
   }
 
   .svc-when {
-    grid-column: 1 / span 4;
+    margin-top: var(--s-4);
+    font-size: var(--t-md);
+    line-height: 1.5;
+    color: var(--fg-2);
+    max-width: 50ch;
   }
 
-  .svc-deliver {
-    grid-column: 5 / -1;
-    grid-row: span 2;
+  .svc-cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: var(--s-6);
+    margin-top: var(--s-7);
+    padding-top: var(--s-6);
+    border-top: 1px solid var(--line);
+  }
+
+  .svc-cols h4 {
+    margin-bottom: var(--s-3);
+    font-family: var(--font-text);
+    font-size: var(--t-sm);
+    font-weight: 700;
+    letter-spacing: 0;
+    color: var(--fg);
   }
 
   .svc-outcome {
-    grid-column: 1 / span 4;
+    font-family: var(--font-display);
+    font-size: var(--t-lg);
+    line-height: 1.25;
+    letter-spacing: -0.015em;
   }
 
-  .svc-outcome dd {
-    color: var(--fg);
-    font-weight: 500;
+  .svc-foot {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: var(--s-5);
+    margin-top: var(--s-7);
   }
 
-  .svc-deliver li {
-    position: relative;
-    padding-left: 1.25rem;
+  .svc-proof {
+    font-size: var(--t-sm);
     color: var(--fg-2);
+    max-width: 46ch;
   }
 
-  .svc-deliver li + li {
-    margin-top: var(--s-2);
+  .svc-proof .text-link {
+    display: inline;
+    min-height: 0;
   }
 
-  .svc-deliver li::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0.62em;
-    width: 0.45rem;
-    height: 0.45rem;
-    background: var(--anil);
+  .svc-proof .text-link :global(svg) {
+    display: inline-block;
+    vertical-align: -0.15em;
   }
 
   @media (max-width: 63.99rem) {
-    .svc-id,
-    .svc-body {
-      grid-column: 1 / -1;
+    .svc {
+      grid-template-columns: 1fr;
     }
-    .svc-id {
-      grid-template-columns: auto 1fr;
-      column-gap: var(--s-5);
-      align-items: center;
+
+    .svc-list {
+      position: static;
     }
-    .svc-id :global(.glyph) {
-      grid-row: span 2;
+
+    .svc-cols,
+    .svc-foot {
+      grid-template-columns: 1fr;
     }
-    .svc-id h3 {
-      max-width: none;
+
+    .svc-foot .btn {
+      justify-self: start;
     }
   }
 
-  @media (max-width: 40rem) {
-    .svc {
-      padding-block: var(--s-6);
+  @media (max-width: 30rem) {
+    .svc-tab {
+      font-size: 1.125rem;
+      padding-inline: 1rem;
     }
-    .svc-id {
-      grid-template-columns: 1fr;
-    }
-    .svc-id :global(.glyph) {
-      grid-row: auto;
-    }
-    .svc-body {
-      grid-template-columns: 1fr;
-    }
-    .svc-when,
-    .svc-deliver,
-    .svc-outcome {
-      grid-column: 1 / -1;
-      grid-row: auto;
+    .svc-foot .btn {
+      width: 100%;
     }
   }
 </style>

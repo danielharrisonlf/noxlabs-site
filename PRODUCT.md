@@ -12,9 +12,10 @@ web
 
 ## Stack
 
-Delegado: Astro 5 com saída estática, CSS próprio com tokens, sem framework de UI e sem JS além do
-toggle de tema e do menu mobile. Escolhido porque o site é conteúdo estático, precisa de Lighthouse
-95+ e de páginas de case geradas a partir dos mesmos dados. Servido por nginx em contêiner.
+Delegado: Astro com saída estática, CSS próprio com tokens, sem framework de UI. JavaScript pequeno e sem
+biblioteca para tema, menu, seção atual, seletor de problemas, o caminho de um pedido no Kairos e cópia de
+e-mail; todo o conteúdo aparece sem script. Escolhido porque o site é conteúdo estático, precisa de
+Lighthouse 95+ e de páginas de case geradas a partir dos mesmos dados. Servido por nginx em contêiner.
 
 ## Users
 
@@ -111,7 +112,16 @@ gerada por IA.
 - `public/img/whatsapp-control-center.webp`: `public/uploads/projects/whatsapp-control-center.jpg` do portfólio,
   convertida para WebP (ffmpeg, qualidade 82). Captura do frontend real do repositório público
   `danielharrisonlf/whatsapp-control-center`, com organização e conta de demonstração.
-- `public/og.png` e ícones: gerados por `scripts/og-image.mjs` a partir de HTML/SVG deste projeto.
+- `public/og.png`, `favicon.svg`, `favicon.ico` e ícones PNG: desenhados neste projeto (SVG) e rasterizados por
+  `scripts/og-image.mjs`; sem IA nem banco de imagens.
+
+### Fontes do caminho de um pedido no Kairos
+
+`src/data/cases.ts` (`kairosFlow`): `axial/docs/architecture.md` (gateway só roteia; MCP verifica o JWT RS256 e repassa
+o token do chamador; serviços validam localmente), `axial/apps/mcp-server/README.md` (ferramenta `create-task`, escopo
+`projects:write`) e o próprio caso (outbox, relay com `FOR UPDATE SKIP LOCKED`, ID do evento como ID do job, auditoria
+append-only). O pedido "crie a tarefa Revisar contrato no projeto Onboarding" é exemplo ilustrativo e está rotulado
+assim no site.
 
 ## Product Principles
 

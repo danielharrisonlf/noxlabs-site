@@ -5,6 +5,8 @@
 // - contraste WCAG de todo texto visível contra o fundo efetivo
 // - imagens sem alt, ordem de títulos, alvos de toque
 // - tema (alternância e persistência), menu mobile (Esc) e cópia de e-mail
+// - seletor de problemas (abas, teclado, assunto do e-mail) e o caminho do Kairos
+//   (próximo, teclado, reproduzir/pausar)
 import { chromium } from "@playwright/test";
 import { serveDist } from "./serve-dist.mjs";
 
@@ -133,6 +135,43 @@ for (const theme of ["light", "dark"]) {
   const focused = await page.evaluate(() => document.activeElement?.hasAttribute("data-menu-toggle"));
   if (!focused) fail("menu: foco não voltou ao botão");
 
+  // Seletor de problemas: abas com teclado e o problema escolhido no assunto do e-mail.
+  const svc = page.locator("[data-svc]");
+  await svc.scrollIntoViewIfNeeded();
+  const svcTabs = svc.locator('[role="tab"]');
+  if ((await svcTabs.count()) !== 6) fail(`serviços: ${await svcTabs.count()} abas, esperado 6`);
+  await svcTabs.nth(2).click();
+  if ((await svcTabs.nth(2).getAttribute("aria-selected")) !== "true") fail("serviços: clique não selecionou a aba");
+  const visiblePanels = await svc.locator('[role="tabpanel"]:visible').count();
+  if (visiblePanels !== 1) fail(`serviços: ${visiblePanels} painéis visíveis, esperado 1`);
+  await page.keyboard.press("ArrowDown");
+  if ((await svcTabs.nth(3).getAttribute("aria-selected")) !== "true") fail("serviços: seta para baixo não avançou");
+  const focusedTab = await page.evaluate(() => document.activeElement?.getAttribute("role"));
+  if (focusedTab !== "tab") fail("serviços: foco não acompanhou a aba");
+  const svcMail = await svc.locator('[role="tabpanel"]:visible a[href^="mailto:"]').getAttribute("href");
+  const problem = await svcTabs.nth(3).textContent();
+  if (!svcMail || !decodeURIComponent(svcMail).includes((problem ?? "").trim())) fail(`serviços: assunto sem o problema (${svcMail})`);
+
+  // Caminho do Kairos: próximo, teclado e reproduzir/pausar.
+  const flow = page.locator("[data-flow]").first();
+  await flow.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(300);
+  const playBtn = flow.locator("[data-play]");
+  if ((await playBtn.getAttribute("data-state")) === "playing") await playBtn.click();
+  const stepBefore = Number(await flow.getAttribute("data-step"));
+  await flow.locator("[data-next]").click();
+  const stepAfter = Number(await flow.getAttribute("data-step"));
+  if (stepAfter !== Math.min(stepBefore + 1, 6)) fail(`kairos: próximo foi de ${stepBefore} para ${stepAfter}`);
+  await flow.locator('[role="tab"][aria-selected="true"]').focus();
+  await page.keyboard.press("End");
+  if ((await flow.getAttribute("data-step")) !== "6") fail("kairos: End não levou ao último passo");
+  if ((await flow.locator('[role="tabpanel"]:visible').count()) !== 1) fail("kairos: mais de um passo visível");
+  await page.keyboard.press("Home");
+  await playBtn.click();
+  if ((await playBtn.getAttribute("data-state")) !== "playing") fail("kairos: reproduzir não iniciou");
+  await playBtn.click();
+  if ((await playBtn.getAttribute("data-state")) === "playing") fail("kairos: pausar não parou");
+
   await page.locator("[data-copy]").scrollIntoViewIfNeeded();
   await page.click("[data-copy]");
   await page.waitForTimeout(300);
@@ -151,5 +190,5 @@ if (failures.length) {
   console.error(`${failures.length} problema(s):\n` + [...new Set(failures)].join("\n"));
   process.exitCode = 1;
 } else {
-  console.log(`OK: ${routes.length} rotas, ${widths.length} larguras, 2 temas, contraste, títulos, alvos e interações.`);
+  console.log(`OK: ${routes.length} rotas, ${widths.length} larguras, 2 temas, contraste, títulos, alvos, abas, caminho do Kairos e interações.`);
 }
