@@ -49,7 +49,7 @@ const audited = new Set(["320x640", "390x844", "768x1024", "1440x900", "2560x144
 const heroCta = { "/": ".hero .btn-primary", "/contabilidade/": ".acc-hero .btn-primary" };
 // Termos técnicos que não podem aparecer no caminho principal (o rodapé técnico das páginas de caso é a exceção).
 const jargon =
-  /\b(arquitetura|banco de dados|API|MCP|microsservi\w*|deploy|PostgreSQL|Redis|NestJS|React|OAuth|stack|gateway|outbox|backend|frontend|servidor|webhooks?|JWT|Docker|Prisma|produção|VPS|monorepo|S3|Vercel|GitHub|código-fonte)\b/i;
+  /\b(arquitetura|banco de dados|API|MCP|microsservi\w*|deploy|PostgreSQL|Redis|NestJS|React|OAuth|stack|gateway|outbox|backend|frontend|servidor|webhooks?|JWT|Docker|Prisma|produção|VPS|monorepo|S3|Vercel|GitHub|código-fonte|CRM)\b/i;
 
 const failures = [];
 const fail = (msg) => failures.push(msg);

@@ -168,7 +168,7 @@ export const moreCases: CaseEntry[] = [
     href: `/casos/${kairos.slug}/`,
   },
   {
-    name: "Omni CRM AI",
+    name: "Omni, atendimento e vendas com IA",
     icon: "chat",
     summary: "Atendimento e vendas de vários canais num lugar só, com IA ajudando a responder e a organizar os contatos.",
     status: "Projeto privado",

@@ -86,7 +86,7 @@ export const stats: Stat[] = [
     id: "tr-5h",
     value: 5,
     suffix: " h",
-    text: "por semana: em 2025, profissionais de contabilidade, tributos e direito previam que quem usa IA economizaria isso em até um ano.",
+    text: "por semana. Em 2025, profissionais de contabilidade, tributos e direito previam que quem usa IA economizaria isso em até um ano.",
     source: {
       org: "Thomson Reuters",
       title: "Future of Professionals Report",

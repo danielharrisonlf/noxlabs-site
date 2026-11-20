@@ -69,7 +69,7 @@ Processo: conversa de 30 min → diagnóstico da rotina → proposta por escrito
 ## Evidence on Hand
 
 - Kairos (produto próprio no ar, repositório público `axial`), ClinicFlow (público, com landing), WhatsApp Control Center
-  (público). FinFlow, Omni CRM AI, controle de pátio e monitoramento de câmeras são privados: descritos, nunca linkados.
+  (público). FinFlow, Omni CRM AI (no site, "Omni, atendimento e vendas com IA"), controle de pátio e monitoramento de câmeras são privados: descritos, nunca linkados.
 - Experiência anterior do Daniel (portfólio, `danielharrisonlf/portfolio`, `src/data/portfolioData.ts`): setores
   engenharia, controle de acesso e locação de equipamentos (campo `context`); portal de suporte com fila e prazos,
   notificações WhatsApp/Telegram, câmeras de obra (`experiences[0].bullets`); catracas e leitores biométricos
