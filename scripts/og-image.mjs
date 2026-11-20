@@ -69,7 +69,7 @@ const og = `<!doctype html><html><head><meta charset="utf-8"><style>
     ${rows
       .map(
         ([t, s]) => `<div class="row"><span class="dot ${s === "Revisar" ? "r" : ""}">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${s === "Revisar" ? "#5c4a00" : "#fff"}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${s === "Revisar" ? "#5c4a00" : "#fff"}" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">${s === "Revisar" ? '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/>' : '<path d="m5 12.5 4.5 4.5L19 7"/>'}</svg>
         </span><span class="t">${t}</span><span class="tag ${s === "Revisar" ? "r" : ""}">${s}</span></div>`,
       )
       .join("")}

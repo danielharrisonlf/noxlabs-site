@@ -1,6 +1,6 @@
 ---
 /** O que já construí: histórias em linguagem de negócio, com link para a página de cada caso. */
-import { detailCases, moreCases, srcset } from "../data/cases";
+import { featuredCases, moreCases, srcset } from "../data/cases";
 import Icon from "./Icon.astro";
 ---
 
@@ -15,9 +15,9 @@ import Icon from "./Icon.astro";
 
     <ul role="list" class="cases">
       {
-        detailCases.map((c, i) => (
+        featuredCases.map((c, i) => (
           <li class:list={["case", { "has-shot": c.image }]} data-reveal style={`--i:${i % 2}`}>
-            <a class="case-link" href={`/casos/${c.slug}/`}>
+            <a class="case-link" href={`/casos/${c.slug}/`} aria-label={`${c.name}: ${c.summary} Ver o caso.`}>
               {c.image ? (
                 <span class="case-shot">
                   <img
@@ -64,7 +64,14 @@ import Icon from "./Icon.astro";
             <span class="more-icon">
               <Icon name={c.icon} />
             </span>
-            <span class="more-name">{c.name}</span>
+            {c.href ? (
+              <a class="more-name more-link" href={c.href}>
+                {c.name}
+                <Icon name="arrow-right" />
+              </a>
+            ) : (
+              <span class="more-name">{c.name}</span>
+            )}
             <span class="more-summary">{c.summary}</span>
             <span class="tag tag-neutral">{c.status}</span>
           </li>
@@ -81,7 +88,7 @@ import Icon from "./Icon.astro";
 <style>
   .cases {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--s-5);
   }
 
@@ -256,6 +263,24 @@ import Icon from "./Icon.astro";
     font-weight: 700;
   }
 
+  .more-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    min-height: 2.75rem;
+    margin-block: -0.6rem;
+    color: var(--caneta);
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+    text-underline-offset: 0.25em;
+  }
+
+  .more-link :global(svg) {
+    width: 1rem;
+    height: 1rem;
+  }
+
   .more-summary {
     grid-area: text;
     color: var(--ink-2);
@@ -273,38 +298,10 @@ import Icon from "./Icon.astro";
     max-width: 70ch;
   }
 
-  @media (max-width: 63.99rem) {
-    .cases {
-      grid-template-columns: 1fr;
-    }
-
-    .case-link {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      grid-template-rows: none;
-    }
-
-    .case-shot {
-      aspect-ratio: auto;
-      min-height: 100%;
-      border-bottom: 0;
-      border-right: 1px solid var(--line);
-    }
-
+  @media (max-width: 52rem) {
+    .cases,
     .more {
       grid-template-columns: 1fr;
-    }
-  }
-
-  @media (max-width: 44rem) {
-    .case-link {
-      grid-template-columns: 1fr;
-    }
-
-    .case-shot {
-      aspect-ratio: 16 / 10;
-      min-height: 0;
-      border-right: 0;
-      border-bottom: 1px solid var(--line);
     }
   }
 

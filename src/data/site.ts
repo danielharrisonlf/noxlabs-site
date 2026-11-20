@@ -15,7 +15,7 @@ export const mailScript = [
 ] as const;
 
 function mailBody(context?: string, extra: string[] = []) {
-  return ["Olá, Daniel.", "", ...(context ? [`Assunto: ${context}`, ""] : []), ...extra, ...(extra.length ? [""] : []), ...mailScript].join(
+  return ["Olá, Daniel.", "", ...(context ? [`Sobre: ${context}`, ""] : []), ...extra, ...(extra.length ? [""] : []), ...mailScript].join(
     "\n",
   );
 }

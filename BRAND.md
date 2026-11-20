@@ -50,7 +50,8 @@ Clara, próxima, confiante, sem tecnês.
 - Ganhos dos casos são qualitativos e descritos pelo que o sistema faz. Nada de "reduziu 40%" sem medição.
 - Cenários e telas de exemplo são rotulados como exemplo ou ilustração.
 - Não prometa o que não está confirmado: "gratuito", preço, prazo fixo, integração com um sistema específico.
-- Botões dizem o que acontece: "Marcar conversa de 30 min", "Escrever o e-mail", "Estimar horas liberadas".
+- Botões dizem o que acontece: "Pedir uma conversa de 30 min" (abre um e-mail), "Escrever o e-mail", "Estimar horas
+  liberadas". "Marcar" só quando houver agenda de verdade.
 - Português do Brasil, frase em caixa normal. Sem caixa-alta em rótulos, sem emoji.
 - IA é ferramenta, não tema. Diga o que o assistente faz ("responde o status da guia"), não o que ele é.
 
@@ -64,7 +65,7 @@ Clara, próxima, confiante, sem tecnês.
 | "Eventos com outbox, filas, observabilidade e testes de carga." | "O que não bate é separado para conferência; a pessoa revisa só as exceções." |
 | "Migração para VPS com Docker e Dokploy." | (fora do site: não é dor de dono de escritório) |
 | "Cinco serviços NestJS com banco próprio cada." | "Organiza projetos, tarefas e equipes de várias empresas, cada uma vendo só o que é dela." |
-| "Pedir diagnóstico de 30 min" | "Marcar conversa de 30 min" |
+| "Pedir diagnóstico de 30 min" | "Pedir uma conversa de 30 min" |
 
 ## Identidade visual (resumo)
 
@@ -90,3 +91,4 @@ Clara, próxima, confiante, sem tecnês.
 | Rotular exemplos e ilustrações. | Mostrar tela de exemplo como se fosse de cliente. |
 | Citar fonte, ano e escopo de cada número. | Arredondar para impressionar ou tirar a ressalva. |
 | Dizer quando automação não compensa. | Prometer resultado, gratuidade ou prazo sem confirmação. |
+| "Pensado para a LGPD." | "Conforme a LGPD" ou "dados protegidos" como garantia: conformidade é do controlador. |

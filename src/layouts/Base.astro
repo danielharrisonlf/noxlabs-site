@@ -103,7 +103,7 @@ const graph = [org, person, website, ...schema];
     <meta property="og:image:height" content="630" />
     <meta
       property="og:image:alt"
-      content="Noxlabs: sua equipe não foi contratada para copiar e colar. Uma lista de rotinas do escritório marcadas como feitas."
+      content="Noxlabs: sua equipe não foi contratada para copiar e colar. Ao lado, uma lista de exemplo com rotinas de escritório marcadas como feitas."
     />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
@@ -120,6 +120,7 @@ const graph = [org, person, website, ...schema];
     <link rel="preload" href="/fonts/figtree-latin-var.woff2" as="font" type="font/woff2" crossorigin />
 
     <script is:inline>
+      document.documentElement.classList.add("js");
       // Entradas por rolagem só quando há script e movimento permitido (ver global.css).
       if ("IntersectionObserver" in window && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
         document.documentElement.classList.add("reveal-on");

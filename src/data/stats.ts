@@ -22,6 +22,7 @@ export const stats: Stat[] = [
     id: "cfc-escritorios",
     value: 101880,
     text: "escritórios e empresas de contabilidade com registro ativo no Brasil no fim de 2025.",
+    note: "Registro no CFC; o número não indica quantos estão em atividade.",
     source: {
       org: "CFC",
       title: "Relato Integrado 2025",
@@ -45,7 +46,7 @@ export const stats: Stat[] = [
     id: "contabil-retrabalho",
     value: 34,
     suffix: "%",
-    text: "dos profissionais de contabilidade citam o excesso de retrabalho manual como desafio da rotina, o mais citado da pesquisa.",
+    text: "dos profissionais de contabilidade citam o excesso de retrabalho manual como desafio da rotina, o mais citado entre os desafios divulgados.",
     source: {
       org: "IOB, CFC e Fenacon",
       title: "pesquisa sobre IA na rotina contábil",
@@ -67,19 +68,7 @@ export const stats: Stat[] = [
     },
     note: "393 profissionais ouvidos.",
   },
-  {
-    id: "bm-horas-impostos",
-    value: 1501,
-    suffix: " h",
-    text: "por ano era o tempo que uma empresa de porte médio levava no Brasil só para cumprir as obrigações de impostos.",
-    source: {
-      org: "Banco Mundial",
-      title: "Doing Business 2020, perfil do Brasil",
-      year: "2019",
-      url: "https://subnational.doingbusiness.org/content/dam/doingBusiness/country/b/brazil/BRA-LITE.pdf",
-    },
-    note: "Empresa-modelo; dados de 2019, último ano da série.",
-  },
+
   {
     id: "ibpt-normas",
     value: 569469,
@@ -97,7 +86,7 @@ export const stats: Stat[] = [
     id: "tr-5h",
     value: 5,
     suffix: " h",
-    text: "por semana é quanto profissionais contábeis, tributários e jurídicos esperam economizar com IA já no próximo ano.",
+    text: "por semana: em 2025, profissionais de contabilidade, tributos e direito previam que quem usa IA economizaria isso em até um ano.",
     source: {
       org: "Thomson Reuters",
       title: "Future of Professionals Report",
@@ -135,19 +124,7 @@ export const stats: Stat[] = [
     },
     note: "Potencial técnico, não previsão de corte de vagas.",
   },
-  {
-    id: "salesforce-imediato",
-    value: 77,
-    suffix: "%",
-    text: "dos clientes esperam falar com alguém imediatamente quando entram em contato com uma empresa.",
-    source: {
-      org: "Salesforce",
-      title: "State of the Connected Customer",
-      year: "2023",
-      url: "https://www.salesforce.com/au/news/stories/customer-engagement-research-2023/",
-    },
-    note: "11 mil consumidores e 3.300 compradores de empresas em 25 países.",
-  },
+
 
   /* ---- Empresas brasileiras ---- */
   {
@@ -162,32 +139,8 @@ export const stats: Stat[] = [
       url: "https://agenciasebrae.com.br/dados/whatsapp-se-consolida-nas-vendas-on-line-enquanto-facebook-e-lojas-proprias-perdem-folego/",
     },
   },
-  {
-    id: "cetic-ia",
-    value: 17,
-    suffix: "%",
-    text: "das empresas brasileiras usam inteligência artificial. Entre as pequenas, 15%.",
-    source: {
-      org: "Cetic.br",
-      title: "TIC Empresas 2025",
-      year: "2026",
-      url: "https://cetic.br/media/docs/publicacoes/2/pt-br/20260831091252/TIC_EMPRESAS_2025_PT_RE.pdf",
-    },
-    note: "Empresas com 10 ou mais pessoas.",
-  },
-  {
-    id: "cetic-erp",
-    value: 58,
-    suffix: "%",
-    text: "das empresas brasileiras não usam um sistema de gestão que integre os dados dos departamentos.",
-    source: {
-      org: "Cetic.br",
-      title: "TIC Empresas 2025, tabela G2",
-      year: "2026",
-      url: "https://cetic.br/pt/tics/pesquisa/2025/empresas/G2/",
-    },
-    note: "Empresas com 10 ou mais pessoas.",
-  },
+
+
 ];
 
 export function statById(id: string) {

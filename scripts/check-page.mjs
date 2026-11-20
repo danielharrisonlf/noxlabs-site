@@ -49,7 +49,7 @@ const audited = new Set(["320x640", "390x844", "768x1024", "1440x900", "2560x144
 const heroCta = { "/": ".hero .btn-primary", "/contabilidade/": ".acc-hero .btn-primary" };
 // Termos técnicos que não podem aparecer no caminho principal (o rodapé técnico das páginas de caso é a exceção).
 const jargon =
-  /\b(arquitetura|banco de dados|API|MCP|microsservi\w*|deploy|PostgreSQL|Redis|NestJS|React|OAuth|stack|gateway|outbox|backend|frontend|servidor|webhooks?|JWT|Docker|Prisma)\b/i;
+  /\b(arquitetura|banco de dados|API|MCP|microsservi\w*|deploy|PostgreSQL|Redis|NestJS|React|OAuth|stack|gateway|outbox|backend|frontend|servidor|webhooks?|JWT|Docker|Prisma|produção|VPS|monorepo|S3|Vercel|GitHub|código-fonte)\b/i;
 
 const failures = [];
 const fail = (msg) => failures.push(msg);
@@ -77,7 +77,7 @@ const browser = await chromium.launch();
       const sw = await page.evaluate(() => document.documentElement.scrollWidth);
       if (sw > width) fail(`${tag} transbordo: scrollWidth ${sw}`);
 
-      if (heroCta[route] && ((width === 390 && height === 844) || (width === 360 && height === 740))) {
+      if (heroCta[route] && width <= 390 && height >= 640) {
         const box = await page.locator(heroCta[route]).first().boundingBox();
         if (!box || box.y + box.height > height) fail(`${tag} CTA do topo fora da primeira tela (${box?.y}+${box?.height})`);
       }
@@ -146,7 +146,8 @@ const browser = await chromium.launch();
           last = lvl;
         }
         if (document.querySelectorAll("h1").length !== 1) out.headings.push("número de H1 diferente de 1");
-        for (const el of document.querySelectorAll('a.btn, button, summary, input, [role="tab"], .nav-list a, .text-link')) {
+        const targets = 'a.btn, button, summary, input, [role="tab"], .nav-list a, .text-link, .contact-email a, .crumbs a, .footer-group a, .more-link, a.seg-proof, .menu-mail';
+        for (const el of document.querySelectorAll(targets)) {
           if (el.closest("[inert]")) continue;
           const r = el.getBoundingClientRect();
           if (r.width === 0 || getComputedStyle(el).visibility === "hidden") continue;
@@ -167,10 +168,23 @@ const browser = await chromium.launch();
           const m = t.textContent.match(re);
           if (m) out.jargon.push(`"${m[0]}" em "${t.textContent.trim().slice(0, 50)}"`);
         }
-        for (const attr of document.querySelectorAll("[alt], [aria-label], meta[name='description'], title")) {
+        const meta = "[alt], [aria-label], meta[name='description'], meta[property^='og:'], meta[name^='twitter:'], title";
+        for (const attr of document.querySelectorAll(meta)) {
+          if (attr.matches("meta[property='og:url'], meta[property='og:image'], meta[name='twitter:image']")) continue;
           const text = attr.getAttribute("alt") ?? attr.getAttribute("aria-label") ?? attr.getAttribute("content") ?? attr.textContent;
           const m = text?.match(re);
           if (m) out.jargon.push(`"${m[0]}" em atributo "${text.slice(0, 50)}"`);
+        }
+        // Dados estruturados: só os textos (URLs de perfis ficam de fora).
+        for (const node of document.querySelectorAll('script[type="application/ld+json"]')) {
+          const walk = (v) => {
+            if (typeof v === "string") {
+              if (/^https?:/.test(v)) return;
+              const m = v.match(re);
+              if (m) out.jargon.push(`"${m[0]}" em JSON-LD "${v.slice(0, 50)}"`);
+            } else if (v && typeof v === "object") for (const x of Object.values(v)) walk(x);
+          };
+          walk(JSON.parse(node.textContent));
         }
         return out;
       }, jargon.source);
@@ -225,11 +239,22 @@ const browser = await chromium.launch();
   // 5 pessoas × 10 h × 4 semanas × 30% = 60
   if (after !== "60") fail(`calculadora: horas liberadas "${before}" → "${after}", esperado "60"`);
   if ((await page.locator('[data-out="hours"]').textContent()) !== "10 h") fail("calculadora: valor das horas não atualizou");
-  await page.locator("#est-cost").fill("6600");
+  // Custo como o brasileiro digita: "6.600" vale 6600.
+  await page.locator("#est-cost").fill("6.600");
   await page.waitForTimeout(600);
   const month = (await page.locator('[data-res="month"]').textContent())?.replace(/\s/g, " ");
   // 60 h × (6600 ÷ 220) = 1.800
   if (month !== "R$ 1.800") fail(`calculadora: valor mensal "${month}", esperado "R$ 1.800"`);
+  // Valor inválido: avisa e mantém a última conta válida.
+  await page.locator("#est-cost").fill("abc");
+  await page.waitForTimeout(500);
+  if (!(await page.locator("[data-cost-error]").isVisible())) fail("calculadora: custo inválido sem aviso");
+  const kept = (await page.locator('[data-res="month"]').textContent())?.replace(/\s/g, " ");
+  if (kept !== "R$ 1.800") fail(`calculadora: custo inválido mudou a conta para "${kept}"`);
+  await page.locator("#est-cost").fill("6600");
+  await page.locator("#est-cost").blur();
+  await page.waitForTimeout(300);
+  if ((await page.locator("#est-cost").inputValue()) !== "6.600") fail("calculadora: custo não foi formatado ao sair do campo");
   const mail = decodeURIComponent((await page.locator("[data-est-mail]").getAttribute("href")) ?? "");
   if (!mail.includes("10 h por semana") || !mail.includes("60 horas por mês")) fail(`calculadora: e-mail sem os números (${mail.slice(0, 120)})`);
 

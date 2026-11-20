@@ -73,7 +73,7 @@ export const clinicflow: CaseStudy = {
     alt: "Painel do dia do ClinicFlow: lista de consultas com horário, paciente, estado e botão do próximo passo; à direita, contadores, próxima chegada, sala de espera e retornos que vencem hoje.",
     caption: "Painel do dia, com dados de demonstração.",
   },
-  links: [{ label: "Ver a página do produto", href: "https://clinicflow-landing-orcin.vercel.app" }],
+  links: [],
   tech: [
     "Aplicação web com API em NestJS 11 e interface em React 19, num monorepo pnpm e Turborepo.",
     "Banco PostgreSQL 16 com Prisma; Redis para filas; armazenamento de arquivos compatível com S3.",
@@ -85,17 +85,17 @@ export const clinicflow: CaseStudy = {
 export const whatsapp: CaseStudy = {
   slug: "whatsapp-control-center",
   name: "WhatsApp Control Center",
-  summary: "Um painel para a empresa cuidar do WhatsApp oficial: números, mensagens prontas, envios e problemas.",
+  summary: "Um painel para a empresa cuidar do WhatsApp Business oficial, o usado para avisos e atendimento em volume.",
   status: "Produto próprio",
   icon: "chat",
   fits: ["Empresas que atendem e vendem pelo WhatsApp", "Escritórios que enviam avisos e guias em volume"],
   problem:
-    "Quem usa o WhatsApp oficial da Meta para atender ou avisar clientes trabalha espalhado: números, perfil da empresa, modelos de mensagem e configurações ficam em telas diferentes, e quando algo falha a mensagem de erro raramente diz o que fazer.",
-  hook: "Números, mensagens prontas e configurações do WhatsApp oficial espalhados, e erros que não dizem o que fazer.",
+    "Quem atende ou avisa clientes pelo WhatsApp Business oficial, o que permite mandar mensagens em volume, trabalha espalhado: números, perfil da empresa, mensagens prontas e configurações ficam em telas diferentes, e quando um envio falha a mensagem de erro raramente diz o que fazer.",
+  hook: "Números, mensagens prontas e configurações do WhatsApp da empresa espalhados, e envios que falham sem dizer por quê.",
   does: [
-    "Reúne num painel só os números da empresa, o perfil comercial, os modelos de mensagem e o histórico de envios.",
-    "Tem um editor de modelos de mensagem com a prévia de como ela chega no celular do cliente.",
-    "Aponta o que está errado quando um envio falha, em vez de um código de erro.",
+    "Reúne num painel só os números da empresa, o perfil que o cliente vê, as mensagens prontas e o histórico de envios.",
+    "Tem um editor de mensagens prontas com a prévia de como ela chega no celular do cliente.",
+    "Explica em palavras o que deu errado quando um envio falha.",
     "Controla quem pode fazer o quê, por empresa e por função.",
   ],
   gains: [
@@ -107,8 +107,8 @@ export const whatsapp: CaseStudy = {
     src: "/img/whatsapp-control-center.webp",
     width: 1440,
     height: 960,
-    alt: "Editor de modelo de mensagem do WhatsApp Control Center: formulário com conta, idioma, nome e categoria à esquerda, e prévia da mensagem num celular à direita.",
-    caption: "Editor de modelos de mensagem com prévia, em conta de demonstração.",
+    alt: "Editor de mensagem pronta do WhatsApp Control Center: formulário com conta, idioma, nome e categoria à esquerda, e prévia da mensagem num celular à direita.",
+    caption: "Editor de mensagens prontas com prévia, em conta de demonstração.",
   },
   links: [],
   tech: [
@@ -133,12 +133,12 @@ export const kairos: CaseStudy = {
     "Organiza projetos, tarefas e equipes de várias empresas, cada uma vendo só o que é dela.",
     "Cadastro de empresas, convite por link e permissões por empresa, equipe e projeto.",
     "Deixa a pessoa pedir ao assistente de IA (Claude, ChatGPT e outros) para criar tarefas ou consultar o andamento, e o assistente só faz o que aquela pessoa poderia fazer.",
-    "Guarda um histórico de cada alteração que ninguém consegue apagar.",
+    "Guarda um histórico de cada alteração que o próprio sistema impede de editar ou apagar.",
   ],
   gains: [
     "IA útil no dia a dia sem abrir mão do controle de quem vê o quê.",
     "Histórico confiável para saber quem mudou o quê, inclusive o assistente.",
-    "Funciona em produção, com cadastro aberto de empresas.",
+    "Está no ar em kairos.noxlabs.tech.",
   ],
   links: [{ label: "Abrir o Kairos", href: "https://kairos.noxlabs.tech" }],
   tech: [
@@ -155,9 +155,18 @@ export type CaseEntry = {
   icon: IconName;
   summary: string;
   status: string;
+  /** Página de caso, quando existe. */
+  href?: string;
 };
 
 export const moreCases: CaseEntry[] = [
+  {
+    name: kairos.name,
+    icon: kairos.icon,
+    summary: "Gestão de projetos e equipes com assistentes de IA que só fazem o que a pessoa que pediu poderia fazer.",
+    status: "No ar",
+    href: `/casos/${kairos.slug}/`,
+  },
   {
     name: "Omni CRM AI",
     icon: "chat",
@@ -184,4 +193,8 @@ export const moreCases: CaseEntry[] = [
   },
 ];
 
-export const detailCases = [clinicflow, whatsapp, kairos];
+/** Todas as páginas de caso. */
+export const detailCases = [whatsapp, clinicflow, kairos];
+
+/** Os que abrem a seção de casos na página inicial: os mais próximos da rotina de um escritório. */
+export const featuredCases = [whatsapp, clinicflow];

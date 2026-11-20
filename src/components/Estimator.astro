@@ -7,9 +7,13 @@
 import {
   brl,
   estimate,
+  estimateMail,
   estimatorDefaults as d,
   estimatorLimits as lim,
+  FULL_TIME_HOURS,
+  fteText,
   HOURS_PER_MONTH,
+  moneyInput,
   num,
   WEEKS_PER_MONTH,
 } from "../data/estimator";
@@ -20,15 +24,7 @@ const r = estimate(d);
 /** Quanto do trilho fica preenchido, em %. */
 const fill = (v: number, l: { min: number; max: number }) => Math.round(((v - l.min) / (l.max - l.min)) * 100);
 const freedPct = Math.round((r.freed / r.repetitive) * 100);
-
-const mailLines = (x: typeof d, res: ReturnType<typeof estimate>) => [
-  "Fiz a estimativa no site:",
-  `- ${x.people} pessoas, ${x.hours} h por semana cada em tarefas repetitivas`,
-  `- Custo mensal por pessoa: ${brl(x.cost)}`,
-  `- Parcela automatizável considerada: ${x.share}%`,
-  `- Resultado: ${num(res.freed)} horas por mês, cerca de ${brl(res.month)} por mês em horas de trabalho`,
-];
-const initialMail = talkMailto("Estimativa de horas liberadas", mailLines(d, r));
+const initialMail = talkMailto("Estimativa de horas liberadas", estimateMail(d));
 ---
 
 <section class="section est" id="estimativa" aria-labelledby="est-title">
@@ -36,7 +32,7 @@ const initialMail = talkMailto("Estimativa de horas liberadas", mailLines(d, r))
     <header class="section-head" data-reveal>
       <h2 id="est-title" class="section-title">Quanto tempo a sua equipe pode recuperar?</h2>
       <p class="section-lede">
-        Ajuste os números para a sua empresa. A conta é simples, as premissas estão abaixo e nada sai do seu navegador.
+        Ajuste os números para a sua empresa. A conta é simples, as premissas estão logo abaixo e o cálculo é feito aqui na página: nada é enviado.
       </p>
     </header>
 
@@ -87,16 +83,17 @@ const initialMail = talkMailto("Estimativa de horas liberadas", mailLines(d, r))
             <input
               id="est-cost"
               name="cost"
-              type="number"
-              inputmode="numeric"
-              min={lim.cost.min}
-              max={lim.cost.max}
-              step={lim.cost.step}
-              value={d.cost}
-              aria-describedby="est-cost-hint"
+              type="text"
+              inputmode="decimal"
+              autocomplete="off"
+              value={moneyInput(d.cost)}
+              data-min={lim.cost.min}
+              data-max={lim.cost.max}
+              aria-describedby="est-cost-hint est-cost-error"
             />
           </div>
-          <p class="hint" id="est-cost-hint">Salário mais encargos e benefícios. Uma média serve.</p>
+          <p class="hint" id="est-cost-hint">Salário mais encargos e benefícios. Uma média serve, por exemplo 4.000.</p>
+          <p class="field-error" id="est-cost-error" data-cost-error hidden></p>
         </div>
 
         <div class="field">
@@ -117,9 +114,16 @@ const initialMail = talkMailto("Estimativa de horas liberadas", mailLines(d, r))
           </div>
           <p class="hint" id="est-share-hint">Uma hipótese sua. Começamos em 30% para não exagerar.</p>
         </div>
+
+        <!-- Celular: o resultado fica longe dos campos, então um resumo acompanha a rolagem. -->
+        <p class="est-mini tabular" aria-hidden="true">
+          <span><strong data-mini="freed">{num(r.freed)}</strong> h por mês</span>
+          <span><strong data-mini="month">{brl(r.month)}</strong> por mês</span>
+        </p>
       </form>
 
-      <div class="est-result" aria-live="polite" aria-atomic="true" data-est-result>
+      <div class="est-result" data-est-result>
+        <p class="res-tag">Estimativa ilustrativa</p>
         <p class="res-label">Horas que podem voltar para a equipe</p>
         <p class="res-big tabular"><span data-res="freed">{num(r.freed)}</span> <span class="res-unit">horas por mês</span></p>
 
@@ -133,7 +137,7 @@ const initialMail = talkMailto("Estimativa de horas liberadas", mailLines(d, r))
         <dl class="res-list">
           <div>
             <dt>Equivale a</dt>
-            <dd class="tabular"><span data-res="fte">{num(r.fte, 1)}</span> pessoa(s) em tempo integral</dd>
+            <dd class="tabular" data-res-fte>{fteText(r.fte)}</dd>
           </div>
           <div>
             <dt>Em horas de trabalho</dt>
@@ -146,21 +150,19 @@ const initialMail = talkMailto("Estimativa de horas liberadas", mailLines(d, r))
         </dl>
 
         <a class="btn btn-primary btn-block" href={initialMail} data-est-mail>
-          Enviar esta estimativa e marcar conversa
-          <Icon name="arrow-right" />
+          <Icon name="mail" class="no-nudge" />
+          Enviar esta estimativa por e-mail
         </a>
         <p class="res-disclaimer">
-          Estimativa ilustrativa, não promessa de resultado. Horas liberadas viram capacidade para atender mais clientes ou
-          fazer trabalho de mais valor; não são economia automática de salário.
+          Não é promessa de resultado. Horas liberadas viram capacidade para atender mais clientes ou fazer trabalho de mais
+          valor; não são economia automática de salário.
         </p>
+        <p class="visually-hidden" aria-live="polite" data-est-live></p>
       </div>
     </div>
 
-    <details class="assumptions">
-      <summary>
-        <span>Como a conta é feita</span>
-        <Icon name="plus" />
-      </summary>
+    <div class="assumptions">
+      <h3>Como a conta é feita</h3>
       <ul role="list" class="checks">
         <li>
           Horas repetitivas por mês = pessoas × horas por semana × {WEEKS_PER_MONTH} semanas. O mês tem cerca de 4,3 semanas;
@@ -171,41 +173,60 @@ const initialMail = talkMailto("Estimativa de horas liberadas", mailLines(d, r))
           Custo da hora = custo mensal ÷ {HOURS_PER_MONTH} horas, o divisor usado na CLT para a jornada de 44 horas semanais.
           Um divisor maior deixa a hora mais barata e o resultado mais baixo.
         </li>
-        <li>Tempo integral = horas liberadas ÷ {HOURS_PER_MONTH} horas por mês.</li>
+        <li>
+          Tempo integral = horas liberadas ÷ {FULL_TIME_HOURS} horas (44 horas por semana nas mesmas {WEEKS_PER_MONTH}
+          semanas).
+        </li>
         <li>Não entram na conta: erros evitados, multas por atraso, clientes a mais atendidos nem o custo da automação.</li>
       </ul>
-    </details>
+    </div>
   </div>
 </section>
 
 <script>
-  import { brl, estimate, num } from "../data/estimator";
+  import { brl, estimate, estimateMail, estimateSummary, fteText, num, parseMoney } from "../data/estimator";
   import { talkMailto } from "../data/site";
 
   const form = document.querySelector<HTMLFormElement>("[data-est-form]");
   const result = document.querySelector<HTMLElement>("[data-est-result]");
   const mail = document.querySelector<HTMLAnchorElement>("[data-est-mail]");
   const bar = document.querySelector<HTMLElement>("[data-res-bar]");
+  const live = document.querySelector<HTMLElement>("[data-est-live]");
+  const costError = document.querySelector<HTMLElement>("[data-cost-error]");
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   if (form && result) {
     const field = (name: string) => form.elements.namedItem(name) as HTMLInputElement;
     const out = (name: string) => form.querySelector<HTMLOutputElement>(`[data-out="${name}"]`);
     const res = (name: string) => result.querySelector<HTMLElement>(`[data-res="${name}"]`);
+    const mini = (name: string) => form.querySelector<HTMLElement>(`[data-mini="${name}"]`);
     const shown = new Map<string, number>();
     const frames = new Map<string, number>();
+    const cost = field("cost");
+    const costMin = Number(cost.dataset.min);
+    const costMax = Number(cost.dataset.max);
+    let lastCost = parseMoney(cost.value) ?? costMin;
+    let liveTimer: number | undefined;
 
-    const clamp = (input: HTMLInputElement) => {
-      const v = Number(input.value);
-      const min = Number(input.min);
-      const max = Number(input.max);
-      if (!Number.isFinite(v)) return min;
-      return Math.min(Math.max(v, min), max);
+    const range = (input: HTMLInputElement) => Math.min(Math.max(Number(input.value), Number(input.min)), Number(input.max));
+
+    // Custo digitado: aceita "4000", "4.000" e "4.000,50"; fora do formato ou do intervalo, avisa e mantém o último válido.
+    const readCost = () => {
+      const value = parseMoney(cost.value);
+      let message = "";
+      if (value === null) message = "Digite só números, por exemplo 4.000 ou 4.000,50.";
+      else if (value < costMin || value > costMax) message = `Use um valor entre ${brl(costMin)} e ${brl(costMax)}.`;
+      if (costError) {
+        costError.textContent = message;
+        costError.hidden = message === "";
+      }
+      cost.setAttribute("aria-invalid", String(message !== ""));
+      if (!message && value !== null) lastCost = value;
+      return lastCost;
     };
 
     // O número desliza até o novo valor; com movimento reduzido, troca direto.
-    const tween = (key: string, to: number, fmt: (n: number) => string) => {
-      const el = res(key);
+    const tween = (el: HTMLElement | null, key: string, to: number, fmt: (n: number) => string) => {
       if (!el) return;
       const from = shown.get(key) ?? to;
       shown.set(key, to);
@@ -224,57 +245,47 @@ const initialMail = talkMailto("Estimativa de horas liberadas", mailLines(d, r))
       frames.set(key, requestAnimationFrame(step));
     };
 
-    const update = () => {
-      const x = {
-        people: clamp(field("people")),
-        hours: clamp(field("hours")),
-        cost: clamp(field("cost")),
-        share: clamp(field("share")),
-      };
+    const update = (announce = true) => {
+      const x = { people: range(field("people")), hours: range(field("hours")), cost: readCost(), share: range(field("share")) };
       const r = estimate(x);
-      const p = out("people");
-      const h = out("hours");
-      const s = out("share");
       for (const name of ["people", "hours", "share"]) {
         const input = field(name);
         const pct = ((Number(input.value) - Number(input.min)) / (Number(input.max) - Number(input.min))) * 100;
         input.style.setProperty("--fill", `${pct}%`);
       }
+      const p = out("people");
+      const h = out("hours");
+      const s = out("share");
       if (p) p.textContent = String(x.people);
       if (h) h.textContent = `${x.hours} h`;
       if (s) s.textContent = `${x.share}%`;
+      field("people").setAttribute("aria-valuetext", `${x.people} pessoas`);
       field("hours").setAttribute("aria-valuetext", `${x.hours} horas por semana`);
       field("share").setAttribute("aria-valuetext", `${x.share} por cento`);
-      field("people").setAttribute("aria-valuetext", `${x.people} pessoas`);
 
-      tween("freed", r.freed, (n) => num(n));
-      tween("repetitive", r.repetitive, (n) => num(n));
-      tween("fte", r.fte, (n) => num(n, 1));
-      tween("month", r.month, brl);
-      tween("year", r.year, brl);
+      tween(res("freed"), "freed", r.freed, (n) => num(n));
+      tween(res("repetitive"), "repetitive", r.repetitive, (n) => num(n));
+      tween(res("month"), "month", r.month, brl);
+      tween(res("year"), "year", r.year, brl);
+      tween(mini("freed"), "mini-freed", r.freed, (n) => num(n));
+      tween(mini("month"), "mini-month", r.month, brl);
+      const fte = result.querySelector<HTMLElement>("[data-res-fte]");
+      if (fte) fte.textContent = fteText(r.fte);
       bar?.style.setProperty("--p", `${Math.round((r.freed / r.repetitive) * 100)}%`);
+      if (mail) mail.href = talkMailto("Estimativa de horas liberadas", estimateMail(x));
 
-      if (mail) {
-        mail.href = talkMailto("Estimativa de horas liberadas", [
-          "Fiz a estimativa no site:",
-          `- ${x.people} pessoas, ${x.hours} h por semana cada em tarefas repetitivas`,
-          `- Custo mensal por pessoa: ${brl(x.cost)}`,
-          `- Parcela automatizável considerada: ${x.share}%`,
-          `- Resultado: ${num(r.freed)} horas por mês, cerca de ${brl(r.month)} por mês em horas de trabalho`,
-        ]);
-      }
+      // O leitor de tela ouve só o resultado final, quando a pessoa para de ajustar.
+      window.clearTimeout(liveTimer);
+      if (announce && live) liveTimer = window.setTimeout(() => (live.textContent = estimateSummary(x)), 700);
     };
 
-    form.addEventListener("input", update);
+    form.addEventListener("input", () => update());
     form.addEventListener("submit", (event) => event.preventDefault());
-    // Campo de custo: corrige o valor fora do intervalo quando a pessoa sai dele.
-    field("cost").addEventListener("change", () => {
-      field("cost").value = String(clamp(field("cost")));
-      update();
+    // Ao sair do campo de custo, o valor válido volta formatado ("4000" vira "4.000").
+    cost.addEventListener("change", () => {
+      if (cost.getAttribute("aria-invalid") !== "true") cost.value = num(lastCost, Number.isInteger(lastCost) ? 0 : 2);
     });
-    // Primeiro cálculo sem animação.
-    shown.clear();
-    update();
+    update(false);
   }
 </script>
 
@@ -293,6 +304,7 @@ const initialMail = talkMailto("Estimativa de horas liberadas", mailLines(d, r))
 
   .est-form {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--s-5);
     padding: clamp(1.25rem, 1rem + 1.5vw, 2.25rem);
     border: 1px solid var(--line);
@@ -423,6 +435,7 @@ const initialMail = talkMailto("Estimativa de horas liberadas", mailLines(d, r))
 
   .money input {
     flex: 1;
+    width: 100%;
     min-width: 0;
     min-height: 2.75rem;
     border: 0;
@@ -436,6 +449,45 @@ const initialMail = talkMailto("Estimativa de horas liberadas", mailLines(d, r))
     outline: none;
   }
 
+  .money:has(input[aria-invalid="true"]) {
+    border-color: var(--prazo);
+  }
+
+  .field-error {
+    font-size: var(--t-sm);
+    font-weight: 650;
+    color: var(--prazo);
+  }
+
+  /* Resumo que acompanha os campos no celular. */
+  .est-mini {
+    display: none;
+  }
+
+  @media (max-width: 56rem) {
+    .est-mini {
+      position: sticky;
+      bottom: calc(0.75rem + env(safe-area-inset-bottom));
+      z-index: 2;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: var(--s-1) var(--s-4);
+      padding: var(--s-3) var(--s-4);
+      border-radius: var(--r-md);
+      background: var(--pine-deep);
+      color: #f2f7f3;
+      font-size: var(--t-sm);
+      box-shadow: 0 12px 28px -12px rgb(11 58 47 / 0.6);
+    }
+
+    .est-mini strong {
+      color: var(--marca);
+      font-family: var(--font-display);
+      font-size: var(--t-md);
+    }
+  }
+
   /* ---- Resultado ---- */
   .est-result {
     display: grid;
@@ -446,6 +498,16 @@ const initialMail = talkMailto("Estimativa de horas liberadas", mailLines(d, r))
     background: var(--pine-deep);
     color: #f2f7f3;
     box-shadow: var(--shadow-2);
+  }
+
+  .res-tag {
+    justify-self: start;
+    padding: 0.15rem 0.6rem;
+    border-radius: var(--r-xs);
+    background: var(--marca);
+    color: #1d2a12;
+    font-size: var(--t-sm);
+    font-weight: 700;
   }
 
   .res-label {
@@ -541,41 +603,32 @@ const initialMail = talkMailto("Estimativa de horas liberadas", mailLines(d, r))
 
   .assumptions {
     margin-top: var(--s-5);
+    padding: var(--s-5) clamp(1.25rem, 1rem + 1.5vw, 2.25rem);
     border: 1px solid var(--line);
     border-radius: var(--r-lg);
     background: var(--bg);
   }
 
-  .assumptions summary {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--s-4);
-    min-height: 3.5rem;
-    padding: var(--s-3) var(--s-5);
-    font-weight: 700;
-    cursor: pointer;
-    list-style: none;
-  }
-
-  .assumptions summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .assumptions summary :global(svg) {
-    flex: none;
-    width: 1.25rem;
-    height: 1.25rem;
-    transition: transform var(--d-base) var(--ease-spring);
-  }
-
-  .assumptions[open] summary :global(svg) {
-    transform: rotate(45deg);
+  .assumptions h3 {
+    margin-bottom: var(--s-4);
+    font-size: var(--t-md);
   }
 
   .assumptions ul {
-    padding: 0 var(--s-5) var(--s-5);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s-3) var(--s-6);
     font-size: var(--t-sm);
+  }
+
+  .assumptions li + li {
+    margin-top: 0;
+  }
+
+  @media (max-width: 48rem) {
+    .assumptions ul {
+      grid-template-columns: 1fr;
+    }
   }
 
   @media (max-width: 56rem) {

@@ -12,6 +12,7 @@ interface Props {
 
 const { ids, title, lede, id = "numeros" } = Astro.props;
 const items = ids.map(statById).filter((s) => s !== undefined);
+// A grade tem três colunas no desktop: use 3 ou 6 dados para ela fechar sem buraco.
 ---
 
 {
@@ -24,7 +25,7 @@ const items = ids.map(statById).filter((s) => s !== undefined);
           </h2>
           <p class="section-lede">{lede}</p>
         </header>
-        <div class:list={["market-grid", { "is-odd": items.length % 3 === 1, "is-uneven": items.length % 2 === 1 }]}>
+        <div class:list={["market-grid", { "is-uneven": items.length % 2 === 1 }]}>
           {items.map((s, i) => (
             <Stat stat={s} index={i % 3} size={i === 0 ? "lg" : "md"} />
           ))}
@@ -41,20 +42,12 @@ const items = ids.map(statById).filter((s) => s !== undefined);
     gap: var(--s-5);
   }
 
-  /* Com 4, 7 ou 10 dados, o primeiro ocupa duas colunas e a grade fecha sem buraco. */
-  .market-grid.is-odd > :global(:first-child) {
-    grid-column: span 2;
-  }
-
   @media (max-width: 63.99rem) {
     .market-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .market-grid.is-odd > :global(:first-child) {
-      grid-column: auto;
-    }
-
+    /* Em duas colunas, com número ímpar de dados, o primeiro ocupa a linha toda. */
     .market-grid.is-uneven > :global(:first-child) {
       grid-column: 1 / -1;
     }

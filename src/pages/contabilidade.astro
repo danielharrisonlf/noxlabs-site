@@ -70,8 +70,8 @@ const breadcrumb = {
         </p>
         <div class="acc-actions" data-cta-anchor>
           <a class="btn btn-primary" href={mailto}>
-            Marcar conversa de 30 min
-            <Icon name="arrow-right" />
+            Pedir uma conversa de 30 min
+            <Icon name="mail" class="no-nudge" />
           </a>
           <a class="btn btn-secondary" href="#cenarios">Ver os cenários</a>
         </div>
@@ -95,7 +95,7 @@ const breadcrumb = {
 
   <MarketData
     id="setor"
-    ids={["cfc-escritorios", "cfc-profissionais", "contabil-retrabalho", "contabil-ia-semanal", "bm-horas-impostos", "ibpt-normas", "tr-5h"]}
+    ids={["cfc-escritorios", "cfc-profissionais", "contabil-retrabalho", "contabil-ia-semanal", "ibpt-normas", "tr-5h"]}
     title="Um setor grande, com regra que muda toda hora."
     lede="Números públicos sobre o tamanho da contabilidade no Brasil, a complexidade dos impostos e o que os próprios profissionais dizem da rotina."
   />
@@ -212,6 +212,7 @@ const breadcrumb = {
   .crumbs a {
     display: inline-flex;
     align-items: center;
+    min-width: 2.75rem;
     min-height: 2.75rem;
     color: var(--caneta);
     font-weight: 700;
@@ -394,6 +395,21 @@ const breadcrumb = {
   @media (max-width: 39.99rem) {
     .acc-actions .btn {
       flex: 1 1 100%;
+    }
+  }
+
+  /* Telas de 320 px: o botão principal continua na primeira tela. */
+  @media (max-width: 24rem) {
+    .acc-hero-copy {
+      gap: var(--s-4);
+    }
+
+    .acc-hero h1 {
+      font-size: 2rem;
+    }
+
+    .acc-lede {
+      font-size: var(--t-base);
     }
   }
 </style>

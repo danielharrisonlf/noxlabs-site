@@ -36,15 +36,15 @@ const here = Astro.url.pathname;
 
       <div class="menu-foot">
         <a class="btn btn-primary btn-block" href={mailto}>
-          Marcar conversa de 30 min
-          <Icon name="arrow-right" />
+          Pedir uma conversa de 30 min
+          <Icon name="mail" class="no-nudge" />
         </a>
         <a class="menu-mail" href={site.mailto}>{site.email}</a>
       </div>
     </nav>
 
     <div class="header-actions">
-      <a class="btn btn-primary btn-sm header-cta" href={mailto}>Marcar conversa</a>
+      <a class="btn btn-primary btn-sm header-cta" href={mailto}>Pedir conversa</a>
       <button
         class="menu-toggle"
         type="button"
@@ -285,8 +285,13 @@ const here = Astro.url.pathname;
 
   /* ---- Abaixo de 64rem: menu em tela cheia ---- */
   @media (max-width: 63.99rem) {
-    .menu-toggle {
+    :global(html.js) .menu-toggle {
       display: inline-grid;
+    }
+
+    /* Sem JavaScript o menu não abre: a navegação fica no rodapé. */
+    :global(html:not(.js)) .header-nav {
+      display: none;
     }
 
     .header-nav {

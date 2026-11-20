@@ -62,10 +62,11 @@ AA (verificado por `scripts/check-page.mjs`, que compõe os fundos semitranspare
 ## Componentes
 
 - **Botões:** primário pinho com texto branco (na faixa verde, amarelo com texto escuro); secundário branco com borda.
+  O contato é por e-mail, então o CTA diz "Pedir uma conversa de 30 min" com ícone de envelope, não "marcar".
   Altura mínima de 52 px (44 px no `btn-sm`). Seta que avança 3 px no hover.
 - **Link de texto:** caneta azul, sublinhado de 1,5 px que escurece no hover, alvo de 44 px.
 - **Etiquetas:** `tag-done` (feito), `tag-review` (para revisar, marca-texto), `tag-late` (prazo), `tag-neutral`.
-- **Chips de exemplo:** borda fina e fundo branco, não clicáveis.
+- **Etiquetas de exemplo** (`.chips`): fundo sálvia, sem borda, para não parecerem botões.
 - **Lista com visto** (`.checks`): círculo pinho-claro com visto; na faixa verde, visto amarelo.
 - **Dado de mercado** (`Stat.astro`): número grande com marca-texto (amarelo puro na faixa verde), frase curta e a linha
   "Fonte: organização, título, ano." com link e ressalva. O número conta até o valor ao entrar na tela; o leitor de tela
@@ -76,8 +77,10 @@ AA (verificado por `scripts/check-page.mjs`, que compõe os fundos semitranspare
   marca-texto.
 - **Perguntas:** `details` em cartão, com o sinal de mais que gira e vira marca-texto quando aberto.
 - **Calculadora** (`Estimator.astro`): campos em cartões sobre papel quadriculado; controles deslizantes com alça de
-  28 px em trilho de 44 px e preenchimento pinho; resultado em painel pinho profundo com o número em amarelo, barra de
-  proporção, lista de equivalências e premissas abertas num `details`.
+  28 px em trilho de 44 px e preenchimento pinho; custo em campo de texto com formato brasileiro e aviso de erro;
+  resultado em painel pinho profundo com a etiqueta "Estimativa ilustrativa" acima do número em amarelo, barra de
+  proporção e equivalências; premissas sempre visíveis logo abaixo. No celular, um resumo fixo acompanha os campos. O
+  leitor de tela ouve um resumo só quando a pessoa para de ajustar.
 - **Formulários:** o campo de custo segue o mesmo cartão; foco com anel pinho-claro; 16 px no mínimo para o iOS não dar
   zoom.
 
@@ -96,7 +99,7 @@ Pouco e com propósito. Tudo usa só `transform` e `opacity` (e `width` na barra
   CSS puro; o último vira "para você revisar".
 - **Entradas por rolagem:** subida curta (24 px, 600–700 ms) uma vez por bloco, via IntersectionObserver; sem JS ou com
   movimento reduzido, tudo nasce visível; trava de 3 s se o script não rodar.
-- **Contadores** nos dados de mercado (1,1 s, desaceleração cúbica).
+- **Contadores** nos dados de mercado (1,1 s, desaceleração cúbica). Faixas como "60 a 70%" não animam.
 - **Retorno da calculadora:** números deslizam até o novo valor em 320 ms; a barra acompanha.
 - **Microinterações:** botões sobem 1 px, setas avançam, o visto se desenha ao copiar o e-mail, perguntas abrem com
   altura animada, cabeçalho ganha fundo ao rolar.
@@ -104,9 +107,10 @@ Pouco e com propósito. Tudo usa só `transform` e `opacity` (e `width` na barra
 
 ## Layout e páginas
 
-Home: topo (dor e promessa, rotina de exemplo) → números do mercado → soluções por rotina → como funciona (4 passos) →
-contabilidade (faixa verde) → outros segmentos → o que já construí → estimativa → quem faz → segurança e LGPD →
-perguntas → contato (faixa verde) → rodapé.
+Home: topo (dor e promessa, rotina de exemplo) → três números do mercado → contabilidade (faixa verde) → soluções por
+rotina → como funciona (4 passos) → outros segmentos → o que já construí (WhatsApp Control Center e ClinicFlow em
+destaque; Kairos e os demais na lista) → estimativa → quem faz → segurança e LGPD → perguntas → contato (faixa verde) →
+rodapé.
 
 `/contabilidade/`: topo com dores → dados do setor → seis cenários (faixa verde) → o que não muda → como funciona →
 estimativa → perguntas de escritório → contato com assunto próprio.

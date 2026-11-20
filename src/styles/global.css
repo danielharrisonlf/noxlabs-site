@@ -567,10 +567,9 @@ textarea {
 }
 
 .chips li {
-  padding: 0.3rem 0.75rem;
-  border: 1px solid var(--line);
-  border-radius: var(--r-sm);
-  background: var(--surface);
+  padding: 0.15rem 0.6rem;
+  border-radius: var(--r-xs);
+  background: var(--sunken);
   font-size: var(--t-sm);
   color: var(--ink-2);
 }

@@ -19,8 +19,10 @@ export const estimatorLimits = {
 
 /** Semanas por mês: 4, abaixo das 4,33 do calendário, para não inflar. */
 export const WEEKS_PER_MONTH = 4;
-/** Horas por mês de uma jornada de 44 h semanais: o divisor 220 da CLT. */
+/** Divisor do custo da hora: 220, o usado na CLT para a jornada de 44 h semanais (deixa a hora mais barata). */
 export const HOURS_PER_MONTH = 220;
+/** Uma pessoa em tempo integral no mesmo mês de 4 semanas usado nas horas: 44 h × 4 = 176 h. */
+export const FULL_TIME_HOURS = 44 * WEEKS_PER_MONTH;
 
 export type EstimatorInput = { people: number; hours: number; cost: number; share: number };
 
@@ -32,7 +34,7 @@ export function estimate({ people, hours, cost, share }: EstimatorInput) {
   return {
     repetitive,
     freed,
-    fte: freed / HOURS_PER_MONTH,
+    fte: freed / FULL_TIME_HOURS,
     hourCost,
     month: value,
     year: value * 12,
@@ -44,3 +46,40 @@ export const brl = (n: number) =>
 
 export const num = (n: number, decimals = 0) =>
   new Intl.NumberFormat("pt-BR", { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(n);
+
+/** "0,3 de uma pessoa", "1,2 pessoa", "2,5 pessoas" em tempo integral. */
+export function fteText(fte: number) {
+  const n = num(fte, 1);
+  if (fte < 0.95) return `${n} de uma pessoa em tempo integral`;
+  if (fte < 1.95) return `${n} pessoa em tempo integral`;
+  return `${n} pessoas em tempo integral`;
+}
+
+/**
+ * Lê um valor em reais como o brasileiro digita: "4000", "4.000", "4.000,50",
+ * "R$ 4.000". Devolve null se não for um número.
+ */
+export function parseMoney(raw: string) {
+  const clean = raw.replace(/R\$|\s/g, "");
+  if (!/^\d{1,3}(\.\d{3})*(,\d{1,2})?$|^\d+(,\d{1,2})?$/.test(clean)) return null;
+  return Number(clean.replace(/\./g, "").replace(",", "."));
+}
+
+export const moneyInput = (n: number) => num(n);
+
+export function estimateMail(x: EstimatorInput) {
+  const r = estimate(x);
+  return [
+    "Fiz a estimativa no site:",
+    `- ${x.people} pessoas, ${x.hours} h por semana cada em tarefas repetitivas`,
+    `- Custo mensal por pessoa: ${brl(x.cost)}`,
+    `- Parte automatizável considerada: ${x.share}%`,
+    `- Resultado: ${num(r.freed)} horas por mês, cerca de ${brl(r.month)} por mês em horas de trabalho`,
+  ];
+}
+
+/** Resumo curto para leitor de tela, anunciado só depois que a pessoa para de ajustar. */
+export function estimateSummary(x: EstimatorInput) {
+  const r = estimate(x);
+  return `Estimativa: ${num(r.freed)} horas por mês, ${fteText(r.fte)}, cerca de ${brl(r.month)} por mês em horas de trabalho.`;
+}

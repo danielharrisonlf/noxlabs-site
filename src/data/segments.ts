@@ -113,7 +113,7 @@ export const accountingScenarios: Scenario[] = [
       "Pergunta fora do padrão vai para a pessoa certa, com o histórico junto",
       "Tudo o que o assistente respondeu fica registrado",
     ],
-    gain: "Resposta na hora para o cliente e menos interrupção para quem está fechando o mês.",
+    gain: "Resposta rápida para o cliente nas perguntas de sempre e menos interrupção para quem está fechando o mês.",
   },
   {
     id: "digitacao",

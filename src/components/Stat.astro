@@ -1,7 +1,8 @@
 ---
 /**
  * Bloco de dado de mercado: número grande, frase curta e a fonte com o ano.
- * O número conta até o valor quando entra na tela (motion.ts); o HTML já traz
+ * O número conta até o valor quando entra na tela (motion.ts), exceto faixas
+ * como "60 a 70%", que ficam paradas para não mostrar valores falsos; o HTML já traz
  * o valor final, e o leitor de tela lê a frase completa, que não se mexe.
  */
 import { type Stat, formatStat } from "../data/stats";
@@ -17,18 +18,14 @@ const shown = formatStat(stat);
 ---
 
 <figure class:list={["stat", `stat-${size}`]} data-reveal style={`--i:${index}`}>
-  <p class="stat-value tabular" aria-hidden="true">
-    {stat.prefix}<span
-      data-count={stat.value}
-      data-decimals={stat.decimals ?? 0}>{shown}</span
-    >{stat.suffix && <span class="stat-suffix">{stat.suffix}</span>}
-  </p>
+  <!-- Tudo numa linha: espaço entre os elementos apareceria entre o número e o "%". -->
+  <p class="stat-value tabular" aria-hidden="true">{stat.prefix}{stat.prefix ? <span>{shown}</span> : <span data-count={stat.value} data-decimals={stat.decimals ?? 0}>{shown}</span>}{stat.suffix && <span class="stat-suffix">{stat.suffix}</span>}</p>
   <p class="stat-text">
     <span class="visually-hidden">{stat.prefix}{shown}{stat.suffix}: </span>
     {stat.text}
   </p>
   <figcaption class="fonte">
-    Fonte: <a href={stat.source.url}>{stat.source.org}, {stat.source.title}</a>, {stat.source.year}.{
+    Fonte: <a href={stat.source.url}>{stat.source.org}, {stat.source.title}</a> (publicação de {stat.source.year}).{
       stat.note && ` ${stat.note}`
     }
   </figcaption>

@@ -24,7 +24,7 @@ export const security: { icon: IconName; title: string; text: string }[] = [
   {
     icon: "lock",
     title: "Cada pessoa vê só o que deve",
-    text: "Acesso por pessoa e por função. Quem sai da empresa perde o acesso no mesmo dia.",
+    text: "Acesso por pessoa e por função, que você retira quando alguém sai da equipe.",
   },
   {
     icon: "eye",
@@ -39,12 +39,12 @@ export const security: { icon: IconName; title: string; text: string }[] = [
   {
     icon: "shield",
     title: "Dado do cliente sai só o necessário",
-    text: "A IA recebe apenas o que precisa para a tarefa, com fornecedores que assinam contrato de tratamento de dados.",
+    text: "A IA recebe apenas o que precisa para a tarefa, de preferência por fornecedores com contrato de tratamento de dados.",
   },
   {
     icon: "doc",
     title: "Os dados e o sistema são seus",
-    text: "Contas, acessos e documentação ficam no nome da sua empresa. Se a parceria acabar, nada para.",
+    text: "Contas, acessos e documentação ficam no nome da sua empresa, para que nada dependa da Noxlabs.",
   },
 ];
 
@@ -73,14 +73,14 @@ export const faq = [
     q: "Minha equipe vai conseguir usar?",
     a: [
       "A ideia é que a equipe faça menos coisas, não aprenda mais telas. Boa parte das automações roda sem ninguém abrir nada: a pessoa só recebe o que precisa conferir.",
-      "Quando há tela nova, ela é desenhada com quem vai usar e vem com um guia curto e acompanhamento nas primeiras semanas.",
+      "Quando há tela nova, ela é desenhada com quem vai usar e vem com um guia curto e acompanhamento no começo, no formato combinado na proposta.",
     ],
   },
   {
     q: "E os dados dos meus clientes?",
     a: [
-      "Ficam com acesso controlado por pessoa, registro do que foi feito e só o necessário sai para serviços de IA, com fornecedores que assinam contrato de tratamento de dados.",
-      "O desenho segue a LGPD desde o começo. Não substitui o seu jurídico, mas facilita o trabalho dele.",
+      "O desenho prevê acesso controlado por pessoa, registro do que foi feito e só o necessário saindo para serviços de IA, de preferência por fornecedores com contrato de tratamento de dados.",
+      "Tudo é pensado para a LGPD desde o começo. Não substitui o seu jurídico, mas facilita o trabalho dele.",
     ],
   },
   {

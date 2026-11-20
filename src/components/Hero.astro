@@ -26,8 +26,8 @@ const routine = [
       </p>
       <div class="hero-actions" data-cta-anchor>
         <a class="btn btn-primary" href={site.talkMailto}>
-          Marcar conversa de 30 min
-          <Icon name="arrow-right" />
+          Pedir uma conversa de 30 min
+          <Icon name="mail" class="no-nudge" />
         </a>
         <a class="btn btn-secondary" href="#estimativa">
           <Icon name="calculator" class="no-nudge" />
@@ -37,7 +37,7 @@ const routine = [
       <ul class="hero-assure" role="list">
         <li><Icon name="check" />Você fala com quem constrói</li>
         <li><Icon name="check" />Começa pelos sistemas que você já usa</li>
-        <li><Icon name="check" />Dados de clientes tratados conforme a LGPD</li>
+        <li><Icon name="check" />Pensado para a LGPD desde o começo</li>
       </ul>
     </div>
 
@@ -368,6 +368,17 @@ const routine = [
 
     .routine-time {
       display: none;
+    }
+  }
+
+  /* Telas de 320 px: o botão principal continua na primeira tela. */
+  @media (max-width: 24rem) {
+    .hero-copy {
+      gap: var(--s-4);
+    }
+
+    .hero-lede {
+      font-size: var(--t-base);
     }
   }
 
