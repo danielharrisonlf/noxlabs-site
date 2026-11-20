@@ -62,14 +62,15 @@ const poem = [
     display: grid;
     grid-template-columns:
       [full-start] minmax(var(--gutter), 1fr)
-      [content-start] repeat(12, minmax(0, calc((var(--max) - 11 * var(--col-gap)) / 12)))
+      [content-start] calc(min(var(--max), 100% - 2 * var(--gutter)) * 0.67)
+      [split] calc(min(var(--max), 100% - 2 * var(--gutter)) * 0.33)
       [content-end] minmax(var(--gutter), 1fr) [full-end];
-    column-gap: var(--col-gap);
     min-height: min(calc(100svh - 4.5rem - 6.5rem), 52rem);
   }
 
   .hero-copy {
-    grid-column: content-start / span 7;
+    grid-column: content-start / split;
+    padding-right: var(--col-gap);
     align-self: center;
     padding-block: clamp(3rem, 2rem + 5vw, 6.5rem);
   }
@@ -114,7 +115,7 @@ const poem = [
 
   /* O campo anil sangra até a borda direita da janela. */
   .hero-field {
-    grid-column: 10 / full-end;
+    grid-column: split / full-end;
     background: var(--anil);
     color: var(--anil-sobre);
     display: grid;
@@ -216,6 +217,7 @@ const poem = [
 
     .hero-copy {
       grid-column: content-start / content-end;
+      padding-right: 0;
       padding-bottom: var(--s-7);
     }
 

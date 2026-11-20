@@ -40,7 +40,7 @@ export function serveDist(port = 4329) {
   return new Promise((ok) => server.listen(port, "127.0.0.1", () => ok(server)));
 }
 
-if (import.meta.url === `file:///${process.argv[1].replace(/\\/g, "/")}`) {
+if (process.argv[1] && import.meta.url === `file:///${process.argv[1].replace(/\\/g, "/")}`) {
   const port = Number(process.env.PORT ?? 4329);
   await serveDist(port);
   console.log(`dist/ em http://127.0.0.1:${port}`);
