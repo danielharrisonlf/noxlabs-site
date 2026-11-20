@@ -79,23 +79,6 @@ const subject = topic ? `${site.talkSubject}: ${topic}` : site.talkSubject;
     padding-block: clamp(4.5rem, 3rem + 6vw, 8rem);
   }
 
-  /* Quatro azulejos da marca no canto, grandes e quase apagados. */
-  .contact::before {
-    content: "";
-    position: absolute;
-    right: -6rem;
-    top: -6rem;
-    width: 26rem;
-    height: 26rem;
-    background:
-      radial-gradient(circle at 50% 100%, rgb(238 90 111 / 0.16) 0 70%, transparent 71%) right top / 48% 48% no-repeat,
-      linear-gradient(rgb(255 255 255 / 0.05), rgb(255 255 255 / 0.05)) left top / 48% 48% no-repeat,
-      linear-gradient(rgb(255 178 62 / 0.12), rgb(255 178 62 / 0.12)) left bottom / 48% 48% no-repeat,
-      linear-gradient(rgb(255 255 255 / 0.05), rgb(255 255 255 / 0.05)) right bottom / 48% 48% no-repeat;
-    border-radius: 3rem;
-    pointer-events: none;
-  }
-
   .contact-grid {
     position: relative;
     display: grid;
