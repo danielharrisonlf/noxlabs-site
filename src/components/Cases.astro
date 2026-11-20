@@ -1,0 +1,389 @@
+---
+import { clinicflow, kairos, moreCases, whatsapp } from "../data/cases";
+import Icon from "./Icon.astro";
+import KairosDiagram from "./KairosDiagram.astro";
+
+const pair = [clinicflow, whatsapp];
+---
+
+<section class="section seam" id="casos" aria-labelledby="casos-title">
+  <div class="wrap grid">
+    <header class="section-head">
+      <h2 id="casos-title">Trabalho que você pode abrir e conferir.</h2>
+      <p>
+        Sem logo de cliente nem depoimento inventado. São sistemas que construí, com código aberto sempre que possível e
+        resultado descrito como ele é: medido ou qualitativo.
+      </p>
+    </header>
+
+    <article class="flagship" id="kairos" aria-labelledby="kairos-title">
+      <div class="flag-head">
+        <h3 id="kairos-title">{kairos.name}</h3>
+        <p class="flag-summary">{kairos.summary}</p>
+        <p class="flag-status live">{kairos.status.label}</p>
+        <div class="flag-links">
+          <a class="btn btn-primary" href={kairos.links[0].href}>
+            {kairos.links[0].label}
+            <Icon name="arrow-up-right" />
+          </a>
+          <a class="btn btn-ghost" href={kairos.links[1].href}>{kairos.links[1].label}</a>
+        </div>
+      </div>
+
+      <div class="flag-diagram">
+        <KairosDiagram id="kd-home" />
+      </div>
+
+      <div class="flag-cols">
+        <section aria-labelledby="k-problema">
+          <h4 id="k-problema">O problema</h4>
+          <p>{kairos.problem}</p>
+        </section>
+        <section aria-labelledby="k-construido">
+          <h4 id="k-construido">O que construí</h4>
+          <ul role="list" class="squares">
+            {kairos.built.slice(0, 5).map((b) => <li>{b}</li>)}
+          </ul>
+        </section>
+        <section aria-labelledby="k-resultado">
+          <h4 id="k-resultado">Resultado</h4>
+          <ul role="list" class="outcomes">
+            {kairos.outcome.map((o) => <li>{o}</li>)}
+          </ul>
+          <a class="text-link flag-more" href="/casos/kairos/">
+            Ler o caso completo
+            <Icon name="arrow-right" class="link-icon" />
+          </a>
+        </section>
+      </div>
+    </article>
+
+    <div class="pair">
+      {
+        pair.map((c) => (
+          <article class="case-card" aria-labelledby={`${c.slug}-title`}>
+            {c.image && (
+              <a class="case-shot" href={`/casos/${c.slug}/`} tabindex="-1" aria-hidden="true">
+                <img
+                  src={c.image.src}
+                  width={c.image.width}
+                  height={c.image.height}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                />
+              </a>
+            )}
+            <p class="case-proves">{c.proves}</p>
+            <h3 id={`${c.slug}-title`}>
+              <a href={`/casos/${c.slug}/`}>{c.name}</a>
+            </h3>
+            <p class="case-summary">{c.summary}</p>
+            <a class="text-link" href={`/casos/${c.slug}/`} aria-label={`Ler o caso ${c.name}`}>
+              Ler o caso
+              <Icon name="arrow-right" class="link-icon" />
+            </a>
+          </article>
+        ))
+      }
+    </div>
+
+    <div class="more">
+      <h3 class="more-title">Outros sistemas que construí</h3>
+      <ul class="more-list" role="list">
+        {
+          moreCases.map((c) => (
+            <li class="more-row">
+              <p class="more-name">{c.name}</p>
+              <p class="more-summary">{c.summary}</p>
+              <p class="more-stack">{c.stack}</p>
+              <p class="more-link">
+                {c.link ? (
+                  <a class="text-link" href={c.link.href} aria-label={`${c.link.label} de ${c.name}`}>
+                    {c.link.label}
+                    <Icon name="arrow-up-right" class="link-icon" />
+                  </a>
+                ) : (
+                  <span class="more-private">Código privado</span>
+                )}
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .flagship {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    row-gap: var(--s-7);
+  }
+
+  .flag-head {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    row-gap: var(--s-4);
+    align-items: end;
+  }
+
+  .flag-head h3 {
+    grid-column: 1 / span 5;
+    grid-row: span 2;
+    font-size: clamp(3.5rem, 2rem + 7vw, 8.5rem);
+    line-height: 0.85;
+    letter-spacing: -0.045em;
+  }
+
+  .flag-summary {
+    grid-column: 6 / -1;
+    font-family: var(--font-display);
+    font-size: var(--t-lg);
+    line-height: 1.3;
+    max-width: 30ch;
+  }
+
+  .flag-status {
+    grid-column: 6 / span 3;
+    font-size: var(--t-sm);
+    font-weight: 600;
+  }
+
+  .flag-links {
+    grid-column: 9 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    justify-content: flex-end;
+  }
+
+  .flag-diagram {
+    grid-column: 1 / -1;
+  }
+
+  .flag-cols {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    row-gap: var(--s-6);
+  }
+
+  .flag-cols h4 {
+    font-family: var(--font-text);
+    font-size: var(--t-sm);
+    font-weight: 600;
+    letter-spacing: 0;
+    padding-bottom: var(--s-3);
+    margin-bottom: var(--s-4);
+    border-bottom: 1px solid var(--rule-strong);
+  }
+
+  .flag-cols p,
+  .flag-cols li {
+    color: var(--fg-2);
+  }
+
+  .squares li,
+  .outcomes li {
+    position: relative;
+    padding-left: 1.25rem;
+  }
+
+  .squares li + li,
+  .outcomes li + li {
+    margin-top: var(--s-3);
+  }
+
+  .squares li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 0.45rem;
+    height: 0.45rem;
+    background: var(--anil);
+  }
+
+  .outcomes li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.5em;
+    width: 0.6rem;
+    height: 0.6rem;
+    border: 1.5px solid var(--fg);
+    border-radius: 50%;
+  }
+
+  .outcomes li:first-child {
+    color: var(--fg);
+    font-weight: 500;
+  }
+
+  .flag-more {
+    margin-top: var(--s-5);
+  }
+
+  :global(.link-icon) {
+    width: 1.1em;
+    height: 1.1em;
+  }
+
+  .pair {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    row-gap: var(--s-8);
+    margin-top: var(--s-9);
+  }
+
+  .case-card {
+    display: grid;
+    align-content: start;
+    gap: var(--s-3);
+  }
+
+  .case-shot {
+    display: block;
+    border: 1px solid var(--rule-strong);
+    background: var(--bg-2);
+    overflow: hidden;
+    margin-bottom: var(--s-3);
+    aspect-ratio: 16 / 10;
+  }
+
+  .case-shot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top left;
+    transition: transform 400ms var(--ease-out);
+  }
+
+  @media (hover: hover) {
+    .case-card:hover .case-shot img {
+      transform: scale(1.015);
+    }
+  }
+
+  .case-proves {
+    font-size: var(--t-sm);
+    color: var(--fg-2);
+  }
+
+  .case-card h3 {
+    font-size: var(--t-xl);
+  }
+
+  .case-card h3 a {
+    text-decoration: none;
+  }
+
+  @media (hover: hover) {
+    .case-card h3 a:hover {
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+    }
+  }
+
+  .case-summary {
+    color: var(--fg-2);
+    max-width: 48ch;
+  }
+
+  .more {
+    grid-column: 1 / -1;
+    margin-top: var(--s-9);
+  }
+
+  .more-title {
+    font-size: var(--t-lg);
+    padding-bottom: var(--s-4);
+    border-bottom: 1px solid var(--rule-strong);
+  }
+
+  .more-row {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    row-gap: var(--s-1);
+    padding-block: var(--s-4);
+    border-bottom: 1px solid var(--rule);
+    font-size: var(--t-sm);
+    line-height: 1.5;
+  }
+
+  .more-name {
+    grid-column: 1 / span 3;
+    font-family: var(--font-display);
+    font-size: var(--t-md);
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .more-summary {
+    grid-column: 4 / span 5;
+    color: var(--fg-2);
+  }
+
+  .more-stack {
+    grid-column: 9 / span 2;
+    color: var(--fg-2);
+  }
+
+  .more-link {
+    grid-column: 11 / -1;
+    justify-self: end;
+  }
+
+  .more-private {
+    color: var(--fg-2);
+  }
+
+  @media (max-width: 63.99rem) {
+    .flag-head h3,
+    .flag-summary,
+    .flag-status,
+    .flag-links {
+      grid-column: 1 / -1;
+      grid-row: auto;
+    }
+    .flag-links {
+      justify-content: flex-start;
+    }
+    .flag-cols {
+      grid-template-columns: 1fr;
+    }
+    .pair {
+      grid-template-columns: 1fr;
+    }
+    .more-name {
+      grid-column: 1 / -1;
+    }
+    .more-summary {
+      grid-column: 1 / -1;
+    }
+    .more-stack {
+      grid-column: 1 / span 8;
+    }
+    .more-link {
+      grid-column: 9 / -1;
+    }
+  }
+
+  @media (max-width: 30rem) {
+    .more-stack,
+    .more-link {
+      grid-column: 1 / -1;
+      justify-self: start;
+    }
+  }
+</style>

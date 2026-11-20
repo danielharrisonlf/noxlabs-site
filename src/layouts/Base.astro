@@ -1,0 +1,128 @@
+---
+import "../styles/global.css";
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import { site } from "../data/site";
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Caminho canônico, com barra final: "/" ou "/casos/kairos/". */
+  path: string;
+  type?: "website" | "article";
+  /** JSON-LD adicional desta página. */
+  schema?: Record<string, unknown>[];
+}
+
+const { title = site.title, description = site.description, path, type = "website", schema = [] } = Astro.props;
+
+const canonical = new URL(path, site.url).href;
+const ogImage = new URL("/og.png", site.url).href;
+
+const org = {
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "@id": `${site.url}/#org`,
+  name: site.name,
+  url: site.url,
+  logo: `${site.url}/icon-512.png`,
+  image: ogImage,
+  email: site.email,
+  description: site.description,
+  areaServed: { "@type": "Country", name: "Brasil" },
+  founder: { "@id": `${site.url}/#daniel` },
+  sameAs: [site.links.github, site.links.linkedin],
+  knowsAbout: [
+    "Desenvolvimento de software",
+    "Inteligência artificial aplicada",
+    "Model Context Protocol",
+    "Arquitetura de microsserviços",
+    "Integrações com WhatsApp Cloud API",
+    "Self-hosting com Docker e Dokploy",
+  ],
+};
+
+const person = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "@id": `${site.url}/#daniel`,
+  name: site.founder.name,
+  jobTitle: site.founder.role,
+  url: site.links.portfolio,
+  image: `${site.url}/img/daniel-harrison.webp`,
+  email: site.email,
+  worksFor: { "@id": `${site.url}/#org` },
+  sameAs: [site.links.github, site.links.linkedin, site.links.portfolio],
+};
+
+const website = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": `${site.url}/#site`,
+  url: site.url,
+  name: site.name,
+  inLanguage: "pt-BR",
+  publisher: { "@id": `${site.url}/#org` },
+};
+
+const graph = [org, person, website, ...schema];
+---
+
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="author" content={site.founder.name} />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0e0f12" media="(prefers-color-scheme: dark)" />
+
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content={site.locale} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Noxlabs: software e IA que entram em produção." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <link rel="preload" href="/fonts/jost-latin-var.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/archivo-latin-var.woff2" as="font" type="font/woff2" crossorigin />
+
+    <script is:inline>
+      // Tema resolvido antes da primeira pintura: escolha salva ou preferência do sistema.
+      try {
+        const saved = localStorage.getItem("noxlabs-theme");
+        if (saved === "light" || saved === "dark") document.documentElement.dataset.theme = saved;
+      } catch {
+        // Armazenamento bloqueado: segue a preferência do sistema.
+      }
+    </script>
+
+    <script type="application/ld+json" set:html={JSON.stringify(graph)} />
+  </head>
+  <body>
+    <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+    <Header />
+    <main id="conteudo" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

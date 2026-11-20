@@ -1,0 +1,272 @@
+---
+import { nav, site } from "../data/site";
+import Icon from "./Icon.astro";
+import Logo from "./Logo.astro";
+---
+
+<header class="header">
+  <div class="wrap header-bar">
+    <a class="header-home" href="/" aria-label="Noxlabs, página inicial">
+      <Logo />
+    </a>
+
+    <nav class="header-nav" id="site-nav" aria-label="Principal" data-open="false">
+      <ul role="list">
+        {
+          nav.map((item) => (
+            <li>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+      <a class="btn btn-primary header-cta-mobile" href={site.diagnosisMailto}>Pedir diagnóstico</a>
+    </nav>
+
+    <div class="header-actions">
+      <button class="icon-btn theme-toggle" type="button" data-theme-toggle aria-label="Alternar tema claro e escuro">
+        <Icon name="moon" class="i-moon" />
+        <Icon name="sun" class="i-sun" />
+      </button>
+      <a class="btn btn-primary header-cta" href={site.diagnosisMailto}>Pedir diagnóstico</a>
+      <button
+        class="icon-btn menu-toggle"
+        type="button"
+        aria-controls="site-nav"
+        aria-expanded="false"
+        aria-label="Abrir menu"
+        data-menu-toggle
+      >
+        <Icon name="menu" class="i-menu" />
+        <Icon name="close" class="i-close" />
+      </button>
+    </div>
+  </div>
+</header>
+
+<script>
+  const root = document.documentElement;
+  const themeBtn = document.querySelector<HTMLButtonElement>("[data-theme-toggle]");
+
+  const currentTheme = (): "light" | "dark" => {
+    const set = root.dataset.theme;
+    if (set === "light" || set === "dark") return set;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  };
+
+  const labelTheme = () => {
+    if (!themeBtn) return;
+    const next = currentTheme() === "dark" ? "claro" : "escuro";
+    themeBtn.setAttribute("aria-label", `Usar tema ${next}`);
+  };
+
+  themeBtn?.addEventListener("click", () => {
+    const next = currentTheme() === "dark" ? "light" : "dark";
+    root.dataset.theme = next;
+    try {
+      localStorage.setItem("noxlabs-theme", next);
+    } catch {
+      // Armazenamento bloqueado: o tema vale só para esta visita.
+    }
+    labelTheme();
+  });
+  labelTheme();
+
+  const menuBtn = document.querySelector<HTMLButtonElement>("[data-menu-toggle]");
+  const menu = document.getElementById("site-nav");
+
+  const setMenu = (open: boolean) => {
+    if (!menuBtn || !menu) return;
+    menuBtn.setAttribute("aria-expanded", String(open));
+    menuBtn.setAttribute("aria-label", open ? "Fechar menu" : "Abrir menu");
+    menu.dataset.open = String(open);
+    document.body.classList.toggle("menu-open", open);
+  };
+
+  menuBtn?.addEventListener("click", () => setMenu(menuBtn.getAttribute("aria-expanded") !== "true"));
+  menu?.addEventListener("click", (event) => {
+    if ((event.target as HTMLElement).closest("a")) setMenu(false);
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && menuBtn?.getAttribute("aria-expanded") === "true") {
+      setMenu(false);
+      menuBtn.focus();
+    }
+  });
+  window.matchMedia("(min-width: 64rem)").addEventListener("change", (event) => {
+    if (event.matches) setMenu(false);
+  });
+</script>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .header-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--s-5);
+    min-height: 4.5rem;
+  }
+
+  .header-home {
+    text-decoration: none;
+    margin-right: auto;
+    padding-block: var(--s-2);
+  }
+
+  .header-nav ul {
+    display: flex;
+    gap: var(--s-1);
+  }
+
+  .header-nav a:not(.btn) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: var(--s-3);
+    font-size: var(--t-sm);
+    font-weight: 500;
+    text-decoration: none;
+    color: var(--fg);
+  }
+
+  @media (hover: hover) {
+    .header-nav a:not(.btn):hover {
+      text-decoration: underline;
+      text-decoration-thickness: 1.5px;
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  .header-cta {
+    min-height: 2.75rem;
+    padding-block: 0.6rem;
+  }
+
+  .header-cta-mobile {
+    display: none;
+  }
+
+  .icon-btn {
+    display: inline-grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    color: var(--fg);
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .icon-btn :global(svg) {
+    width: 1.25rem;
+    height: 1.25rem;
+    grid-area: 1 / 1;
+  }
+
+  @media (hover: hover) {
+    .icon-btn:hover {
+      border-color: var(--rule-strong);
+    }
+  }
+
+  .theme-toggle :global(.i-sun) {
+    display: none;
+  }
+
+  :global(:root[data-theme="dark"]) .theme-toggle :global(.i-sun) {
+    display: block;
+  }
+
+  :global(:root[data-theme="dark"]) .theme-toggle :global(.i-moon) {
+    display: none;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme="light"])) .theme-toggle :global(.i-sun) {
+      display: block;
+    }
+    :global(:root:not([data-theme="light"])) .theme-toggle :global(.i-moon) {
+      display: none;
+    }
+  }
+
+  .menu-toggle {
+    display: none;
+  }
+
+  .menu-toggle :global(.i-close) {
+    display: none;
+  }
+
+  .menu-toggle[aria-expanded="true"] :global(.i-close) {
+    display: block;
+  }
+
+  .menu-toggle[aria-expanded="true"] :global(.i-menu) {
+    display: none;
+  }
+
+  @media (max-width: 63.99rem) {
+    .menu-toggle {
+      display: inline-grid;
+    }
+
+    .header-cta {
+      display: none;
+    }
+
+    .header-nav {
+      position: fixed;
+      inset: 4.5rem 0 auto 0;
+      display: none;
+      padding: var(--s-4) var(--gutter) var(--s-6);
+      background: var(--bg);
+      border-bottom: 1px solid var(--rule-strong);
+    }
+
+    .header-nav[data-open="true"] {
+      display: block;
+    }
+
+    .header-nav ul {
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: var(--s-5);
+    }
+
+    .header-nav li + li {
+      border-top: 1px solid var(--rule);
+    }
+
+    .header-nav a:not(.btn) {
+      display: flex;
+      min-height: 3.25rem;
+      padding-inline: 0;
+      font-family: var(--font-display);
+      font-size: var(--t-lg);
+    }
+
+    .header-cta-mobile {
+      display: flex;
+      width: 100%;
+    }
+
+    :global(body.menu-open) {
+      overflow: hidden;
+    }
+  }
+</style>

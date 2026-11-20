@@ -1,0 +1,116 @@
+---
+/**
+ * Composições concretas de cada serviço, no mesmo vocabulário do diagrama:
+ * círculo = serviço/agente, quadrado = dado, barra = entrega ou fila.
+ * Onde as formas se cruzam, a tinta sobreimprime (multiply).
+ */
+import type { Service } from "../data/services";
+
+interface Props {
+  glyph: Service["glyph"];
+}
+
+const { glyph } = Astro.props;
+---
+
+<svg class="glyph" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true" focusable="false">
+  {
+    glyph === "ia" && (
+      <>
+        <circle class="g-anil" cx="26" cy="26" r="22" />
+        <rect class="g-ink" x="30" y="30" width="28" height="28" />
+        <circle class="g-paper" cx="26" cy="26" r="4" />
+      </>
+    )
+  }
+  {
+    glyph === "mvp" && (
+      <>
+        <rect class="g-ink" x="4" y="8" width="24" height="24" />
+        <rect class="g-anil" x="4" y="40" width="56" height="10" />
+        <rect class="g-anil" x="4" y="54" width="36" height="6" />
+      </>
+    )
+  }
+  {
+    glyph === "arquitetura" && (
+      <>
+        <line class="g-line" x1="10" y1="18" x2="54" y2="18" />
+        <line class="g-line" x1="32" y1="18" x2="32" y2="44" />
+        <circle class="g-anil" cx="10" cy="18" r="8" />
+        <circle class="g-anil" cx="32" cy="18" r="8" />
+        <circle class="g-anil" cx="54" cy="18" r="8" />
+        <rect class="g-ink" x="22" y="40" width="20" height="20" />
+      </>
+    )
+  }
+  {
+    glyph === "integracoes" && (
+      <>
+        <circle class="g-ring" cx="22" cy="32" r="17" />
+        <circle class="g-anil" cx="42" cy="32" r="18" />
+      </>
+    )
+  }
+  {
+    glyph === "cto" && (
+      <>
+        <rect class="g-ink" x="6" y="26" width="52" height="32" />
+        <circle class="g-anil" cx="32" cy="26" r="16" />
+      </>
+    )
+  }
+  {
+    glyph === "infra" && (
+      <>
+        <rect class="g-ink" x="4" y="10" width="56" height="10" />
+        <rect class="g-ink" x="4" y="26" width="40" height="10" />
+        <rect class="g-ink" x="4" y="42" width="24" height="10" />
+        <rect class="g-anil" x="36" y="38" width="20" height="20" />
+      </>
+    )
+  }
+</svg>
+
+<style>
+  .glyph {
+    width: 3.5rem;
+    height: 3.5rem;
+    flex: none;
+  }
+
+  .g-anil {
+    fill: var(--anil);
+    mix-blend-mode: multiply;
+  }
+
+  .g-ink {
+    fill: var(--fg);
+    mix-blend-mode: multiply;
+  }
+
+  .g-paper {
+    fill: var(--bg);
+  }
+
+  .g-ring {
+    fill: none;
+    stroke: var(--fg);
+    stroke-width: 2.5;
+  }
+
+  .g-line {
+    stroke: var(--fg);
+    stroke-width: 2;
+  }
+
+  :global(:root[data-theme="dark"]) .glyph :is(.g-anil, .g-ink) {
+    mix-blend-mode: screen;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme="light"])) .glyph :is(.g-anil, .g-ink) {
+      mix-blend-mode: screen;
+    }
+  }
+</style>

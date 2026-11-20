@@ -1,0 +1,176 @@
+---
+import { principles, steps } from "../data/content";
+
+/* As mesmas formas do poema do topo: o processo é a sequência real. */
+const shapes = ["ring", "square", "bars", "live"] as const;
+---
+
+<section class="section seam process" id="processo" aria-labelledby="processo-title">
+  <div class="wrap grid">
+    <header class="section-head">
+      <h2 id="processo-title">Como um projeto anda.</h2>
+      <p>Quatro etapas, nesta ordem. Ao fim de cada uma, você decide se segue.</p>
+    </header>
+
+    <ol class="steps" role="list">
+      {
+        steps.map((step, i) => (
+          <li class="step">
+            <div class="step-mark" aria-hidden="true">
+              <span class="step-num tabular">{i + 1}</span>
+              <span class={`step-shape s-${shapes[i]}`} />
+            </div>
+            <h3>{step.title}</h3>
+            <p class="step-meta">{step.meta}</p>
+            <p class="step-text">{step.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="principles">
+      <h3 class="principles-title">O que vale em qualquer projeto</h3>
+      <ul role="list" class="principles-list">
+        {
+          principles.map((p) => (
+            <li>
+              <h4>{p.title}</h4>
+              <p>{p.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .process {
+    background: var(--bg-2);
+  }
+
+  .steps {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    row-gap: var(--s-7);
+  }
+
+  .step {
+    display: grid;
+    align-content: start;
+    gap: var(--s-2);
+  }
+
+  .step-mark {
+    display: flex;
+    align-items: center;
+    gap: var(--s-4);
+    padding-bottom: var(--s-4);
+    margin-bottom: var(--s-3);
+    border-bottom: 1px solid var(--rule-strong);
+  }
+
+  .step-num {
+    font-family: var(--font-display);
+    font-size: var(--t-2xl);
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  .step-shape {
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-left: auto;
+  }
+
+  .s-ring {
+    border: 2px solid var(--fg);
+    border-radius: 50%;
+  }
+
+  .s-square {
+    background: var(--fg);
+  }
+
+  .s-bars {
+    width: 3rem;
+    background:
+      linear-gradient(var(--anil), var(--anil)) 0 0 / 33% 0.4rem no-repeat,
+      linear-gradient(var(--anil), var(--anil)) 0 50% / 66% 0.4rem no-repeat,
+      linear-gradient(var(--anil), var(--anil)) 0 100% / 100% 0.4rem no-repeat;
+  }
+
+  .s-live {
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--vermelhao) 0 32%, transparent 34%);
+    border: 2px solid var(--fg);
+  }
+
+  .step h3 {
+    font-size: var(--t-lg);
+  }
+
+  .step-meta {
+    font-size: var(--t-sm);
+    font-weight: 600;
+    color: var(--link);
+  }
+
+  .step-text {
+    color: var(--fg-2);
+    margin-top: var(--s-2);
+  }
+
+  .principles {
+    grid-column: 1 / -1;
+    margin-top: var(--s-9);
+  }
+
+  .principles-title {
+    font-size: var(--t-xl);
+    margin-bottom: var(--s-6);
+  }
+
+  .principles-list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+  }
+
+  .principles-list li {
+    padding-block: var(--s-5);
+    border-top: 1px solid var(--rule);
+  }
+
+  .principles-list h4 {
+    font-family: var(--font-text);
+    font-size: var(--t-base);
+    font-weight: 600;
+    letter-spacing: 0;
+    line-height: 1.4;
+    margin-bottom: var(--s-2);
+  }
+
+  .principles-list p {
+    color: var(--fg-2);
+    max-width: 36ch;
+  }
+
+  @media (max-width: 63.99rem) {
+    .steps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .principles-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .steps,
+    .principles-list {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

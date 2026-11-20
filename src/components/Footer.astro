@@ -1,0 +1,140 @@
+---
+import { site } from "../data/site";
+import Logo from "./Logo.astro";
+
+const year = new Date().getFullYear();
+
+const groups = [
+  {
+    title: "Noxlabs",
+    links: [
+      { label: "Serviços", href: "/#servicos" },
+      { label: "Casos", href: "/#casos" },
+      { label: "Como trabalho", href: "/#processo" },
+      { label: "Perguntas", href: "/#perguntas" },
+    ],
+  },
+  {
+    title: "Produtos e escrita",
+    links: [
+      { label: "Kairos", href: site.links.kairos },
+      { label: "Blog", href: site.links.blog },
+      { label: "Portfólio do Daniel", href: site.links.portfolio },
+    ],
+  },
+  {
+    title: "Contato",
+    links: [
+      { label: site.email, href: site.mailto },
+      { label: "GitHub", href: site.links.github },
+      { label: "LinkedIn", href: site.links.linkedin },
+    ],
+  },
+];
+---
+
+<footer class="footer seam">
+  <div class="wrap grid footer-grid">
+    <div class="footer-brand">
+      <Logo />
+      <p>Software e IA aplicada, do diagnóstico à operação.</p>
+    </div>
+    {
+      groups.map((group) => (
+        <nav class="footer-group" aria-label={group.title}>
+          <h2>{group.title}</h2>
+          <ul role="list">
+            {group.links.map((link) => (
+              <li>
+                <a href={link.href}>{link.label}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ))
+    }
+    <p class="footer-legal">© {year} Noxlabs. Site estático, sem rastreadores nem cookies.</p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding-block: var(--s-8) var(--s-6);
+  }
+
+  .footer-grid {
+    row-gap: var(--s-6);
+  }
+
+  .footer-brand {
+    grid-column: 1 / span 4;
+    display: grid;
+    gap: var(--s-4);
+    align-content: start;
+  }
+
+  .footer-brand p {
+    color: var(--fg-2);
+    max-width: 28ch;
+  }
+
+  .footer-group:nth-of-type(1) {
+    grid-column: 6 / span 2;
+  }
+
+  .footer-group:nth-of-type(2) {
+    grid-column: 8 / span 2;
+  }
+
+  .footer-group:nth-of-type(3) {
+    grid-column: 10 / span 3;
+  }
+
+  .footer-group h2 {
+    font-family: var(--font-text);
+    font-size: var(--t-sm);
+    font-weight: 600;
+    letter-spacing: 0;
+    margin-bottom: var(--s-3);
+  }
+
+  .footer-group li a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.25rem;
+    color: var(--fg-2);
+    font-size: var(--t-sm);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+
+  @media (hover: hover) {
+    .footer-group li a:hover {
+      color: var(--fg);
+      text-decoration: underline;
+    }
+  }
+
+  .footer-legal {
+    grid-column: 1 / -1;
+    padding-top: var(--s-5);
+    border-top: 1px solid var(--rule);
+    color: var(--fg-2);
+    font-size: var(--t-xs);
+  }
+
+  @media (max-width: 60rem) {
+    .footer-brand {
+      grid-column: 1 / -1;
+    }
+    .footer-group:nth-of-type(1) {
+      grid-column: 1 / span 6;
+    }
+    .footer-group:nth-of-type(2) {
+      grid-column: 7 / span 6;
+    }
+    .footer-group:nth-of-type(3) {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

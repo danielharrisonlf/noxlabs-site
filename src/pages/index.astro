@@ -1,0 +1,33 @@
+---
+import About from "../components/About.astro";
+import Cases from "../components/Cases.astro";
+import Contact from "../components/Contact.astro";
+import Faq from "../components/Faq.astro";
+import Hero from "../components/Hero.astro";
+import Process from "../components/Process.astro";
+import ProofStrip from "../components/ProofStrip.astro";
+import Services from "../components/Services.astro";
+import { faq } from "../data/content";
+import Base from "../layouts/Base.astro";
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: faq.map((item) => ({
+    "@type": "Question",
+    name: item.q,
+    acceptedAnswer: { "@type": "Answer", text: item.a.join(" ") },
+  })),
+};
+---
+
+<Base path="/" schema={[faqSchema]}>
+  <Hero />
+  <ProofStrip />
+  <Services />
+  <Cases />
+  <Process />
+  <About />
+  <Faq />
+  <Contact />
+</Base>

@@ -1,0 +1,178 @@
+---
+import { services } from "../data/services";
+import ServiceGlyph from "./ServiceGlyph.astro";
+---
+
+<section class="section seam" id="servicos" aria-labelledby="servicos-title">
+  <div class="wrap grid">
+    <header class="section-head">
+      <h2 id="servicos-title">Seis problemas que eu resolvo.</h2>
+      <p>Cada trabalho começa pelo problema do seu negócio. A tecnologia é escolhida depois, e explicada em português.</p>
+    </header>
+
+    <ol class="svc-list" role="list">
+      {
+        services.map((s) => (
+          <li class="svc" id={`servico-${s.id}`}>
+            <div class="svc-id">
+              <ServiceGlyph glyph={s.glyph} />
+              <h3>{s.title}</h3>
+              <p class="svc-format">{s.format}</p>
+            </div>
+            <dl class="svc-body">
+              <div class="svc-when">
+                <dt>Quando faz sentido</dt>
+                <dd>{s.when}</dd>
+              </div>
+              <div class="svc-deliver">
+                <dt>O que entrego</dt>
+                <dd>
+                  <ul role="list">
+                    {s.deliver.map((d) => (
+                      <li>{d}</li>
+                    ))}
+                  </ul>
+                </dd>
+              </div>
+              <div class="svc-outcome">
+                <dt>Resultado</dt>
+                <dd>{s.outcome}</dd>
+              </div>
+            </dl>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .svc-list {
+    grid-column: 1 / -1;
+  }
+
+  .svc {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    row-gap: var(--s-5);
+    padding-block: var(--s-7);
+    border-top: 1px solid var(--rule);
+  }
+
+  .svc:last-child {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .svc-id {
+    grid-column: 1 / span 4;
+    display: grid;
+    align-content: start;
+    gap: var(--s-4);
+  }
+
+  .svc-id h3 {
+    font-size: var(--t-xl);
+    max-width: 14ch;
+  }
+
+  .svc-format {
+    font-size: var(--t-sm);
+    color: var(--fg-2);
+  }
+
+  .svc-body {
+    grid-column: 5 / -1;
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    row-gap: var(--s-5);
+  }
+
+  .svc-body dt {
+    font-size: var(--t-sm);
+    font-weight: 600;
+    margin-bottom: var(--s-2);
+  }
+
+  .svc-body dd {
+    color: var(--fg-2);
+  }
+
+  .svc-when {
+    grid-column: 1 / span 4;
+  }
+
+  .svc-deliver {
+    grid-column: 5 / -1;
+    grid-row: span 2;
+  }
+
+  .svc-outcome {
+    grid-column: 1 / span 4;
+  }
+
+  .svc-outcome dd {
+    color: var(--fg);
+    font-weight: 500;
+  }
+
+  .svc-deliver li {
+    position: relative;
+    padding-left: 1.25rem;
+    color: var(--fg-2);
+  }
+
+  .svc-deliver li + li {
+    margin-top: var(--s-2);
+  }
+
+  .svc-deliver li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 0.45rem;
+    height: 0.45rem;
+    background: var(--anil);
+  }
+
+  @media (max-width: 63.99rem) {
+    .svc-id,
+    .svc-body {
+      grid-column: 1 / -1;
+    }
+    .svc-id {
+      grid-template-columns: auto 1fr;
+      column-gap: var(--s-5);
+      align-items: center;
+    }
+    .svc-id :global(.glyph) {
+      grid-row: span 2;
+    }
+    .svc-id h3 {
+      max-width: none;
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .svc {
+      padding-block: var(--s-6);
+    }
+    .svc-id {
+      grid-template-columns: 1fr;
+    }
+    .svc-id :global(.glyph) {
+      grid-row: auto;
+    }
+    .svc-body {
+      grid-template-columns: 1fr;
+    }
+    .svc-when,
+    .svc-deliver,
+    .svc-outcome {
+      grid-column: 1 / -1;
+      grid-row: auto;
+    }
+  }
+</style>

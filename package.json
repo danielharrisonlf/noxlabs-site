@@ -1,0 +1,28 @@
+{
+  "name": "noxlabs-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Site institucional da Noxlabs (noxlabs.tech).",
+  "packageManager": "pnpm@10.11.1",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview --port 4321",
+    "og": "node scripts/og-image.mjs",
+    "shots": "node scripts/screenshots.mjs",
+    "check:a11y": "node scripts/check-page.mjs"
+  },
+  "dependencies": {
+    "astro": "^7.4.13"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@astrojs/sitemap": "^3.7.6",
+    "@playwright/test": "^1.65.1",
+    "typescript": "^6.0.3"
+  }
+}

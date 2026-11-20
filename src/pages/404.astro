@@ -1,0 +1,65 @@
+---
+import Icon from "../components/Icon.astro";
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="Página não encontrada | Noxlabs" description="Este endereço não existe no site da Noxlabs." path="/404/">
+  <section class="wrap nf" aria-labelledby="nf-title">
+    <div class="nf-art" aria-hidden="true">
+      <span class="nf-ring"></span>
+      <span class="nf-square"></span>
+    </div>
+    <h1 id="nf-title">Este endereço não existe.</h1>
+    <p>O link pode estar errado ou a página mudou de lugar. Os serviços, os casos e o contato estão na página inicial.</p>
+    <a class="btn btn-primary" href="/">
+      Ir para a página inicial
+      <Icon name="arrow-right" />
+    </a>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    display: grid;
+    justify-items: start;
+    gap: var(--s-5);
+    padding-block: clamp(4rem, 3rem + 6vw, 9rem);
+    min-height: 60vh;
+  }
+
+  .nf-art {
+    position: relative;
+    width: 6rem;
+    height: 4rem;
+    margin-bottom: var(--s-4);
+  }
+
+  .nf-ring {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4rem;
+    height: 4rem;
+    border: 3px solid var(--fg);
+    border-radius: 50%;
+  }
+
+  .nf-square {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: var(--anil);
+  }
+
+  .nf h1 {
+    font-size: var(--t-2xl);
+    max-width: 16ch;
+  }
+
+  .nf p {
+    color: var(--fg-2);
+    max-width: 48ch;
+  }
+</style>

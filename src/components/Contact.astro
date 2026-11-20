@@ -1,0 +1,177 @@
+---
+import { site } from "../data/site";
+import Icon from "./Icon.astro";
+---
+
+<section class="contact on-anil" id="contato" aria-labelledby="contato-title">
+  <div class="wrap grid contact-grid">
+    <div class="contact-copy">
+      <h2 id="contato-title">Traga o problema. Saia com um próximo passo.</h2>
+      <p>
+        Escreva em poucas linhas o que está travando: um processo manual, um sistema lento, uma ideia de produto, uma conta
+        de nuvem alta. Eu leio e respondo pessoalmente para marcarmos os 30 minutos.
+      </p>
+      <div class="contact-actions">
+        <a class="btn btn-paper" href={site.diagnosisMailto}>
+          <Icon name="mail" />
+          Escrever e pedir diagnóstico
+        </a>
+        {
+          site.scheduleUrl && (
+            <a class="btn btn-outline-light" href={site.scheduleUrl}>
+              Escolher horário na agenda
+            </a>
+          )
+        }
+        <button class="btn btn-outline-light" type="button" data-copy={site.email}>
+          <span class="copy-icon"><Icon name="copy" /></span>
+          <span class="check-icon"><Icon name="check" /></span>
+          <span data-copy-label>Copiar e-mail</span>
+        </button>
+      </div>
+      <p class="contact-email">
+        <a href={site.mailto}>{site.email}</a>
+      </p>
+      <p class="contact-status" role="status" aria-live="polite" data-copy-status></p>
+    </div>
+
+    <!-- O último verso do poema do topo: operação, no ar. -->
+    <div class="contact-art" aria-hidden="true">
+      <span class="art-ring"></span>
+      <span class="art-dot"></span>
+    </div>
+  </div>
+</section>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>("[data-copy]");
+  const label = button?.querySelector<HTMLElement>("[data-copy-label]");
+  const status = document.querySelector<HTMLElement>("[data-copy-status]");
+  let timer: number | undefined;
+
+  button?.addEventListener("click", async () => {
+    const value = button.dataset.copy ?? "";
+    window.clearTimeout(timer);
+    try {
+      await navigator.clipboard.writeText(value);
+      button.dataset.copied = "true";
+      if (label) label.textContent = "E-mail copiado";
+      if (status) status.textContent = "";
+    } catch {
+      button.dataset.copied = "false";
+      if (status) status.textContent = "O navegador não permitiu copiar. Selecione o endereço acima e copie manualmente.";
+    }
+    timer = window.setTimeout(() => {
+      delete button.dataset.copied;
+      if (label) label.textContent = "Copiar e-mail";
+    }, 2400);
+  });
+</script>
+
+<style>
+  .contact {
+    background: var(--anil);
+    color: var(--anil-sobre);
+    padding-block: var(--section-y);
+    overflow: hidden;
+  }
+
+  .contact-grid {
+    align-items: center;
+    row-gap: var(--s-7);
+  }
+
+  .contact-copy {
+    grid-column: 1 / span 8;
+    display: grid;
+    gap: var(--s-5);
+    position: relative;
+    z-index: 1;
+  }
+
+  .contact h2 {
+    font-size: var(--t-display);
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+    max-width: 13ch;
+  }
+
+  .contact-copy > p:not(.contact-email):not(.contact-status) {
+    font-size: var(--t-md);
+    line-height: 1.5;
+    color: var(--anil-sobre-2);
+    max-width: 46ch;
+  }
+
+  .contact-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-3);
+  }
+
+  .copy-icon {
+    display: inline-flex;
+  }
+
+  .check-icon,
+  [data-copied="true"] .copy-icon {
+    display: none;
+  }
+
+  [data-copied="true"] .check-icon {
+    display: inline-flex;
+  }
+
+  .contact-email a {
+    font-size: var(--t-md);
+    font-weight: 600;
+    color: var(--anil-sobre);
+    text-decoration-color: color-mix(in srgb, var(--anil-sobre) 50%, transparent);
+    overflow-wrap: anywhere;
+  }
+
+  .contact-status {
+    min-height: 1.5em;
+    font-size: var(--t-sm);
+    color: var(--anil-sobre);
+  }
+
+  .contact-art {
+    grid-column: 9 / -1;
+    position: relative;
+    justify-self: end;
+    width: min(100%, 26rem);
+    aspect-ratio: 1;
+    margin-right: calc(-1 * var(--gutter) - 6rem);
+  }
+
+  .art-ring {
+    position: absolute;
+    inset: 0;
+    border: clamp(1.25rem, 2vw, 2rem) solid var(--anil-sobre);
+    border-radius: 50%;
+  }
+
+  .art-dot {
+    position: absolute;
+    inset: 34%;
+    border-radius: 50%;
+    background: var(--vermelhao);
+  }
+
+  @media (max-width: 63.99rem) {
+    .contact-copy {
+      grid-column: 1 / -1;
+    }
+    .contact-art {
+      display: none;
+    }
+  }
+
+  @media (max-width: 30rem) {
+    .contact-actions .btn {
+      width: 100%;
+    }
+  }
+</style>
