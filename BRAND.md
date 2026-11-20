@@ -14,7 +14,7 @@ você é quem constrói, começa pelo que a empresa já usa e entrega uma rotina
 
 **Promessa em uma linha:** menos trabalho repetitivo, mais tempo para o que faz a empresa crescer.
 
-**Frase de abertura:** "Tire o trabalho repetitivo da rotina da sua empresa."
+**Frase de abertura:** "Cada negócio é de um jeito. O trabalho repetitivo é igual em todos."
 
 ## Conceito
 
@@ -60,8 +60,10 @@ Clara, próxima, confiante, sem tecnês.
   daquele setor. Nunca apresente dado de mercado como resultado da Noxlabs.
 - Telas, conversas e números de exemplo são rotulados como exemplo, com nomes fictícios.
 - Não prometa o que não está confirmado: "gratuito", preço, prazo fixo, integração com um sistema específico.
-- Botões dizem o que acontece: "Pedir uma conversa de 30 min" (abre um e-mail), "Ver como seria no seu ramo",
-  "Enviar esta estimativa por e-mail".
+- Botões dizem o que acontece: "Contar como é a minha rotina" (abre um e-mail com roteiro), "Ver exemplos no meu ramo",
+  "Mandar esta conta por e-mail".
+- Compromisso que o Daniel ainda não confirmou (contas no nome do cliente, fornecedores de IA com contrato de dados,
+  cuidado depois da entrega) é escrito como intenção: "a intenção é", "combinado na proposta".
 - Português do Brasil, frase em caixa normal. Sem caixa-alta em rótulos, sem emoji, sem ponto médio entre itens.
 - IA é ferramenta, não tema. Diga o que o assistente faz ("responde preço, estoque e prazo"), não o que ele é.
 
@@ -69,10 +71,11 @@ Clara, próxima, confiante, sem tecnês.
 
 | Antes (v3) | Depois (v4) |
 | --- | --- |
-| "Sua equipe não foi contratada para copiar e colar." com rotina de escritório contábil ao lado | "Tire o trabalho repetitivo da rotina da sua empresa." com doze ramos no mosaico |
+| "Sua equipe não foi contratada para copiar e colar." com rotina de escritório contábil ao lado | "Cada negócio é de um jeito. O trabalho repetitivo é igual em todos." no meio de nove ramos |
 | "Para contabilidade e pequenas e médias empresas" | "Para empresas de todo ramo" |
-| Bloco escuro "O escritório cresce. A digitação, não." e página `/contabilidade/` | Seletor "Como funcionaria na sua empresa" com seis ramos de mesmo peso; contabilidade é a aba "Escritório" |
-| Dados do CFC e da IOB na página inicial | Microsoft, McKinsey e Sebrae (dois dados): valem para qualquer empresa |
+| Bloco escuro "O escritório cresce. A digitação, não." e página `/contabilidade/` | Seletor "Como funcionaria na sua empresa" com seis ramos de mesmo peso, a começar por loja e indústria; escritório é o último |
+| Dados do CFC e da IOB na página inicial | Três números do Sebrae de 2026 com donos de pequenos negócios do Brasil |
+| "Pedir uma conversa de 30 min" | "Contar como é a minha rotina" |
 
 ## Identidade visual (resumo)
 
@@ -84,7 +87,7 @@ Clara, próxima, confiante, sem tecnês.
 - **Tipografia:** Parkinsans (títulos, números) e Onest (texto e interface), ambas OFL, hospedadas no site.
 - **Ilustração:** pictogramas de ramo planos, construídos numa grade de 64 com a mesma regra (uma forma em tinta, um
   acento, detalhes em papel), dentro de azulejos de cor. `src/data/illustrations.ts`.
-- **Imagem:** telas de exemplo desenhadas em HTML (conversa, painel, ordens de serviço), capturas reais dos sistemas com
+- **Imagem:** a conversa de exemplo no celular (HTML do site), recortes legíveis das telas reais dos sistemas com
   dados de demonstração e a foto do Daniel. Sem banco de imagens, sem imagem gerada por IA.
 
 ## Faça e não faça

@@ -62,8 +62,8 @@ segurança, além do redirecionamento 301 de `/contabilidade/`. A CSP lista o ha
 src/
   data/          conteúdo: contato, soluções, ramos e cenários, casos, dados de mercado, calculadora, FAQ, ícones,
                  pictogramas de ramo
-  components/    seções (Hero, SectorStrip, MarketData/Stat, Solutions, Scenarios, HowItWorks, Work, Estimator,
-                 About, Security, Faq, Contact), cabeçalho com o menu do celular, rodapé, marca, ícones e pictogramas
+  components/    seções (Hero, Scenarios, Solutions, Work, MarketData/Stat, Estimator, About, Security, Faq, Contact
+                 com os passos de como começa), cabeçalho com o menu do celular, rodapé, marca, ícones e pictogramas
   scripts/       motion.ts (entradas por rolagem e contadores) e copy.ts (copiar e-mail)
   layouts/       Base.astro: head, SEO, JSON-LD, cabeçalho e rodapé
   pages/         index, casos/[slug] e 404
@@ -84,4 +84,3 @@ de mercado novo entra em `src/data/stats.ts` com fonte, ano e link, e na tabela 
 - E-mail no domínio (hoje o Gmail do Daniel).
 - Confirmar se a conversa inicial de 30 min é gratuita. O site hoje não promete.
 - Captura atual do Kairos: o caso usa o ícone do sistema no lugar da tela.
-- Reabrir a página da McKinsey e conferir a citação do dado "60 a 70%" (na v4 a página não abriu daqui; ver `PRODUCT.md`).

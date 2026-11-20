@@ -6,8 +6,8 @@ Sistema visual do site da Noxlabs na v4 (novembro de 2026). Marca e voz em `BRAN
 ## Ideia
 
 Cada empresa é uma peça. O azulejo, um ladrilho de cantos arredondados, é a unidade de tudo: a ilustração de um ramo,
-uma tela de exemplo do que roda sozinho, um dado com fonte, a capa de um projeto. O topo é um mosaico em que ramos
-diferentes e telas de exemplo se encaixam; o resto da página repete a mesma peça em escalas diferentes. Calor vem das
+a capa de um projeto, a resposta da conta. No topo, a mensagem é a peça do meio de um mosaico de nove ramos, com uma
+peça vazia para o ramo de quem lê; o resto da página repete a mesma peça em escalas diferentes. Calor vem das
 cores de fruta brasileira (jabuticaba, goiaba, caju) sobre papel rosado; confiança vem da disciplina: uma cor de ação,
 tinta escura, muito respiro.
 
@@ -62,33 +62,34 @@ são cor de texto sobre fundo claro.
 
 - **Pictogramas de ramo** (`src/data/illustrations.ts`, componente `Ill.astro`): grade de 64, área útil de 10 a 54, formas
   planas com cantos arredondados, uma forma principal em jabuticaba, um acento em goiaba ou caju, detalhes em papel. As
-  cores vêm de classes, então a mesma peça serve em qualquer fundo. Doze ramos: clínica, loja, escritório, advocacia,
-  indústria, distribuidora, imobiliária, escola, transportadora, agro, e-commerce, agência.
+  cores vêm de classes, então a mesma peça serve em qualquer fundo. Doze ramos: clínica (prancheta com cruz e pulso),
+  loja, escritório, advocacia, indústria, distribuidora, imobiliária, escola, transportadora, agro, e-commerce, agência.
 - **Ícones de interface** (`src/data/icons.ts`): traço único de 1,75 px, pontas arredondadas, 24 px.
-- **Telas de exemplo**: conversa (bolhas brancas do cliente, goiaba-claro do assistente, lilás da pessoa da equipe e um
-  aviso de passagem), registro do dia, painel de números, ordens de serviço, fluxo de integração, mapa de tempo. Sempre
-  com a nota "de exemplo".
+- **Telas de exemplo**: a conversa no celular do seletor de ramos (bolhas brancas do cliente, goiaba-claro do
+  assistente, lilás da pessoa da equipe e um aviso de passagem), com nomes fictícios e a nota "de exemplo".
 
 ## Componentes
 
 - **Botões:** primário goiaba-escuro com texto branco (na faixa escura e no menu, goiaba com texto jabuticaba);
-  secundário branco com borda. Altura de 54 px (44 px no `btn-sm`), raio de 14 px, texto equilibrado em duas linhas.
-- **Mosaico do topo** (`Hero.astro`): 4 colunas por 3 linhas no desktop; no celular, duas linhas que rolam de lado, com o
-  painel e a conversa ocupando 2×2.
-- **Faixa de ramos** (`SectorStrip.astro`): doze ramos com pictograma; 6 colunas, 4 no tablet, duas linhas roláveis no
-  celular.
-- **Dado de mercado** (`Stat.astro`): azulejo claro, número em tinta, frase, linha de fonte com link, ano e ressalva. O
-  número conta até o valor ao entrar na tela; faixas ("60 a 70%") não animam.
-- **Ofertas** (`Solutions.astro`): grade de azulejos 3 colunas (2 no tablet, 1 no celular), cada um com uma tela de
-  exemplo; abaixo, "O que muda na empresa" em seis linhas.
-- **Seletor de ramos** (`Scenarios.astro`): abas com pictograma (chips roláveis no celular, setas do teclado, Home e End);
-  celular de exemplo, "Hoje", "Com a Noxlabs" e "O que você ganha". Sem JS, os seis cenários aparecem em sequência.
-- **Projetos** (`Work.astro`): capturas reais assentadas em azulejos de cor; "Também construí" vira faixa rolável com
-  contador no celular.
-- **Calculadora** (`Estimator.astro`): botões de menos e mais de 44 px ao lado de cada controle deslizante (alça de 28 px
-  em trilho de 44 px); custo com teclado decimal; resumo fixo no celular; resultado num azulejo branco; premissas sempre
-  visíveis.
-- **Contato** (`Contact.astro`): a faixa escura, com o roteiro do e-mail num cartão branco e cópia do endereço.
+  secundário branco com borda. Altura de 54 px (44 px no `btn-sm`), raio de 14 px.
+- **Topo** (`Hero.astro`): grade de 6 colunas; a primeira linha tem seis ramos quadrados; a mensagem ocupa 4×2 no meio,
+  com dois ramos de cada lado, e a última peça da direita é a vazia ("E o seu ramo?", leva aos exemplos). Até 64rem:
+  quatro ramos, a mensagem e os outros seis em três colunas. No celular, os quatro primeiros ramos vêm antes do título.
+- **Seletor de ramos** (`Scenarios.astro`): abas com pictograma, na ordem loja, indústria e distribuidora, clínica,
+  imobiliária, escola, escritório e serviços (chips roláveis no celular, setas do teclado, Home e End); celular de
+  exemplo, "Hoje", "Com a Noxlabs" e "O que você ganha". Sem JS, os seis cenários aparecem em sequência.
+- **Ofertas** (`Solutions.astro`): seis linhas em duas colunas, cada uma com uma peça de cor e o ícone, título, promessa e
+  exemplos em texto corrido.
+- **Projetos** (`Work.astro`): recortes legíveis das telas reais (a conversa no celular; as consultas de hoje) numa
+  moldura branca sobre azulejo de cor; "Também construí" em quatro colunas, duas no tablet, faixa rolável com contador
+  no celular.
+- **Dado de mercado** (`MarketData.astro`, `Stat.astro`): título fixo à esquerda e uma lista à direita; cada linha tem o
+  número em goiaba-escuro, a frase e a fonte com link, ano e ressalva.
+- **A conta** (`Estimator.astro`): uma frase para completar ("Na minha empresa, 6 pessoas passam 6 horas por semana…"),
+  com botões de menos e mais de 48 px e campos com teclado numérico; a resposta num azulejo goiaba-claro; premissas num
+  bloco que abre; resumo fixo no celular.
+- **Como começa e contato** (`Contact.astro`): a única faixa escura; os quatro passos à esquerda e, à direita, o cartão
+  com o e-mail, a cópia do endereço e o roteiro que o e-mail já traz.
 
 ## Celular
 
@@ -96,34 +97,35 @@ O celular é a experiência principal, não uma adaptação.
 
 - **Cabeçalho:** 64 px, só a marca e "Menu". Some ao rolar para baixo e volta ao rolar para cima; fica visível durante a
   rolagem disparada pelo menu.
-- **Menu:** folha que sobe da base (zona do polegar), com fundo escurecido. Ordem de cima para baixo: outros contatos
-  (e-mail com "Copiar"; WhatsApp quando houver) e links externos com seta; as seis seções em letras grandes com "Você
-  está aqui" na atual; a ação principal fixa na base. Abre e fecha em 360 ms, sem salto; trava a rolagem do fundo; prende
+- **Menu:** folha que sobe da base (zona do polegar), com fundo escurecido. De cima para baixo: as seis seções em letras
+  grandes com "Você está aqui" na atual; a ação principal; e, por último, os contatos e links externos em chips
+  ("Copiar e-mail", WhatsApp quando houver, Blog e Portfólio com seta). Com o menu fechado, o botão mostra o nome da
+  seção atual. Abre e fecha em 360 ms, sem salto; trava a rolagem do fundo; prende
   o foco; fecha ao tocar num link (e rola até a seção sem escondê-la sob o cabeçalho), ao tocar fora, com Esc, no
-  "Fechar" e com o gesto de voltar. Alvos de 48 px; telas baixas (até 704 px de altura) reduzem os links; respeita a
-  área segura do aparelho.
+  "Fechar" e com o gesto de voltar. Alvos de 48 px; cabe sem rolagem interna em 360×640 e 320×568; respeita a área
+  segura do aparelho.
 - **CTA da base:** aparece depois do topo e some sobre o seletor de ramos, a calculadora, o contato, o rodapé e com o
   menu aberto.
-- **Faixas roláveis** com encaixe e o próximo item cortado na borda: mosaico, ramos, chips do seletor, "Também construí".
+- **Faixas roláveis** com encaixe e o próximo item cortado na borda: chips do seletor e "Também construí". O topo não
+  rola de lado: os ramos aparecem inteiros na primeira tela.
 - Sem rolagem horizontal da página de 320 a 2560 px; campos com 16 px ou mais (sem zoom no iOS); nada de hover preso.
 
 ## Movimento
 
 Pouco e com propósito; só `transform` e `opacity` (e `width` na barra da calculadora).
 
-- **Um momento orquestrado:** os azulejos do topo se assentam um a um; a conversa mostra "digitando" e recebe a resposta;
-  o painel marca as rotinas do dia e as barras sobem. CSS puro, uma vez.
+- **Um momento orquestrado:** as peças do topo se assentam em volta da mensagem, uma a uma. CSS puro, uma vez.
 - **Entradas por rolagem:** subida curta (20 px, 640 ms) uma vez por bloco; sem JS ou com movimento reduzido, tudo nasce
   visível; trava de 3 s se o script não rodar.
 - **Respostas à ação:** troca de ramo com a conversa chegando mensagem a mensagem; menu com links que sobem em sequência;
-  números da calculadora deslizam até o novo valor; visto que se desenha ao copiar o e-mail.
+  números da conta deslizam até o novo valor; visto que se desenha ao copiar o e-mail.
 - `prefers-reduced-motion: reduce` zera durações: a página aparece no estado final.
 
 ## Páginas
 
-Home: topo com mosaico → ramos → quatro dados de mercado → o que eu faço (ofertas e o que muda) → como funcionaria na
-sua empresa (seis ramos) → como funciona (4 passos) → o que já construí → estimativa → quem faz → segurança e LGPD →
-perguntas → contato → rodapé.
+Home: topo (mensagem no mosaico de ramos) → como funcionaria na sua empresa (seis ramos) → o que eu faço → feito por mim
+(projetos) → números do Sebrae → a conta da sua equipe → quem cuida da sua rotina → seus dados → antes de começar
+(perguntas) → como começa e contato → rodapé.
 
 `/casos/<slug>/` (ClinicFlow, WhatsApp Control Center, Kairos): cabeçalho com status e "serve para", captura, problema,
 o que o sistema faz, o que muda na rotina, rodapé técnico recolhido, outros casos, contato.

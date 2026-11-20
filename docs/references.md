@@ -72,6 +72,28 @@ Direção B, com o que o revisor indicou das outras:
 6. Celular como experiência principal: menu em folha que sobe da base, mosaico em duas linhas que rolam de lado, chips de
    ramo roláveis, cabeçalho que some ao descer.
 
+## Revisão crítica e reconstrução do esqueleto
+
+A primeira montagem completa foi reprovada por um revisor independente: a direção B estava certa, mas o esqueleto era o
+da v3 recolorido (título à esquerda com cartão de "rotina do dia" à direita, a mesma ordem de seções, a mesma calculadora
+e as mesmas frases). Também apontou o ícone de clínica com cara de lápide, a captura do WhatsApp Control Center com o
+menu de desenvolvedor visível, telas de exemplo miúdas em grade de cartões e números globais sem dizer que eram globais.
+
+O que mudou de verdade:
+
+| v3 | v4 |
+| --- | --- |
+| Título à esquerda, cartão de rotina à direita | A mensagem é uma peça no meio do mosaico de nove ramos, com uma peça vazia para o ramo de quem lê |
+| "Sua equipe não foi contratada para copiar e colar." | "Cada negócio é de um jeito. O trabalho repetitivo é igual em todos." |
+| Números → soluções → como funciona → contabilidade → segmentos → casos → estimativa → sobre → segurança → perguntas → contato | Ramos na prática → o que eu faço → projetos → números do Sebrae → a conta → quem cuida → dados → perguntas → como começa e contato |
+| Microsoft, McKinsey, Sebrae, CFC, IOB | Só Sebrae 2026, com donos de pequenos negócios do Brasil |
+| Calculadora com controles deslizantes e painel escuro | Uma frase para completar, com botões de menos e mais, e a resposta num azulejo claro |
+| Contato com carta inclinada | Os quatro passos de como começa ao lado do contato, na única faixa escura |
+| Menu em tela cheia, e-mail embaixo | Folha que sobe da base: seções, ação, contatos; o botão fechado mostra a seção atual |
+
+Comparação lado a lado em `docs/screenshots/local/comparacao/` (`topo-1440-v3-x-v4.png`, `topo-390-v3-x-v4.png`,
+`menu-390-v3-x-v4.png`).
+
 ## Desvios conscientes
 
 - O revisor sugeriu trocar o e-mail do menu por WhatsApp e um e-mail no domínio. Não há número nem domínio confirmados:
